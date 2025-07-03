@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Amtsilati Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body { font-family: sans-serif; margin: 2em; background-color: #f4f4f9; }
+        h1, h2 { color: #333; }
+        .container { background: white; padding: 2em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2em; }
+        form { display: flex; flex-direction: column; gap: 1em; }
+        label { font-weight: bold; }
+        input, select, button { padding: 0.8em; border-radius: 4px; border: 1px solid #ccc; font-size: 1em; }
+        button { background-color: #007bff; color: white; cursor: pointer; border: none; }
+        button:hover { background-color: #0056b3; }
+        a.button { background-color: #28a745; color: white; padding: 0.8em; text-decoration: none; border-radius: 4px; }
+        #message { margin-top: 1em; padding: 1em; border-radius: 4px; display: none; }
+        #message.success { background-color: #d4edda; color: #155724; }
+        #message.error { background-color: #f8d7da; color: #721c24; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+        th, td { border: 1px solid #ccc; padding: 0.8em; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { 
+    background: white; 
+    padding: 2em; 
+    border-radius: 8px; 
+    width: 90%; 
+    max-width: 500px; 
+    max-height: 85vh; /* Batasi tinggi modal maksimal 85% dari tinggi layar */
+    overflow-y: auto; /* Tambahkan scrollbar vertikal jika konten meluap */
+}
+        .close-button { float: right; font-size: 1.5em; cursor: pointer; }
+        #edit-book-form { display: flex; flex-direction: column; gap: 1em; margin-top: 1em;}
+        .select2-container { width: 100% !important; }
+        .select2-container .select2-selection--single { height: auto; padding: 0.8em; border-radius: 4px; border: 1px solid #ccc; }
+        .select2-container--default .select2-selection--single .select2-selection__arrow { top: 50%; transform: translateY(-50%); }
+    </style>
+</head>
+<body>
+    <h1>Dashboard Admin Amtsilati Store</h1>
+    <div id="message"></div>
+<div class="container">
+    <h2>Manajemen Kitab</h2>
+    <form id="add-book-form">
+    <label for="book-name">Nama Kitab:</label>
+    <input type="text" id="book-name" name="name" required>
+
+    <label for="book-price">Harga Kitab (angka saja, misal: 25000):</label>
+    <input type="number" id="book-price" name="price" required>
+
+    <label for="book-availability">Ketersediaan:</label>
+    <select id="book-availability" name="availability" required>
+        <option value="Tersedia">Tersedia</option>
+        <option value="Tidak Tersedia">Tidak Tersedia</option>
+    </select>
+
+    <label for="book-link-ig">Link Instagram:</label>
+    <input type="url" id="book-link-ig" name="link_ig" placeholder="https://instagram.com/...">
+
+    <label for="book-link-wa">Link WhatsApp:</label>
+    <input type="url" id="book-link-wa" name="link_wa" placeholder="https://wa.me/...">
+
+    <label for="book-link-shopee">Link Shopee:</label>
+    <input type="url" id="book-link-shopee" name="link_shopee" placeholder="https://shopee.co.id/...">
+
+    <label for="book-link-tiktok">Link TikTok:</label>
+    <input type="url" id="book-link-tiktok" name="link_tiktok" placeholder="https://tiktok.com/...">
+    <button type="submit">Tambah Kitab Baru</button>
+</form>
+
+    <hr style="margin: 2em 0;">
+
+    <h3>Daftar Kitab Saat Ini</h3>
+    <table id="books-table">
+        <thead>
+            <tr>
+                <th>Nama Kitab</th>
+                <th>Harga</th>
+                <th>Status</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="books-table-body">
+            </tbody>
+    </table>
+</div>
+    <div class="container">
+        <h2>1. Data Pembeli Offline</h2>
+        <form id="import-form">
+            <label for="excel-file">Import Data Pembeli dari Excel (.xlsx):</label>
+            <input type="file" id="excel-file" name="file" accept=".xlsx" required>
+            <button type="submit">Import</button>
+        </form>
+    </div>
+
+    <div class="container">
+        <h2>2. Rekap Pembelian Offline</h2>
+        <form id="offline-sale-form">
+            <label for="offline-buyer">Nama Pembeli:</label>
+            <select id="offline-buyer" name="buyer_id" required></select>
+            
+            <label for="offline-book">Kitab:</label>
+            <select id="offline-book" name="book_id" required></select>
+
+            <label for="offline-price">Harga (otomatis):</label>
+            <input type="text" id="offline-price" disabled>
+
+            <label for="offline-quantity">Jumlah:</label>
+            <input type="number" id="offline-quantity" name="quantity" min="1" value="1" required>
+
+            <button type="submit">Tambah Rekap</button>
+        </form>
+        <br>
+        <a href="/api/export-offline-sales" class="button">Export Rekap Offline ke Excel</a>
+    </div>
+
+    <div class="container">
+        <h2>3. Rekap Pembelian Online</h2>
+        <form id="online-sale-form">
+            <label for="online-buyer-name">Nama Pembeli:</label>
+            <input type="text" id="online-buyer-name" name="buyer_name" required>
+
+            <label for="online-buyer-address">Alamat Pembeli:</label>
+            <input type="text" id="online-buyer-address" name="buyer_address" required>
+
+            <label for="online-transfer-date">Tanggal Transfer:</label>
+            <input type="date" id="online-transfer-date" name="transfer_date" required>
+            
+            <label for="online-book">Kitab:</label>
+            <select id="online-book" name="book_id" required></select>
+
+            <label for="online-price">Harga Kitab (otomatis):</label>
+            <input type="text" id="online-price" disabled>
+            
+            <label for="online-ongkir">Ongkir (otomatis):</label>
+            <input type="text" id="online-ongkir" value="Rp 15,000 (contoh)" disabled>
+
+            <label for="online-total">Total Harga (otomatis):</label>
+            <input type="text" id="online-total" disabled>
+
+            <button type="submit">Tambah Rekap</button>
+        </form>
+    </div>
+
+    <div id="edit-book-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>Edit Detail Kitab</h2>
+        <form id="edit-book-form">
+            <input type="hidden" id="edit-book-id" name="id">
+
+            <label for="edit-book-name">Nama Kitab:</label>
+            <input type="text" id="edit-book-name" name="name" required>
+
+            <label for="edit-book-price">Harga Kitab:</label>
+            <input type="number" id="edit-book-price" name="price" required>
+
+            <label for="edit-book-availability">Ketersediaan:</label>
+            <select id="edit-book-availability" name="availability" required>
+                <option value="Tersedia">Tersedia</option>
+                <option value="Tidak Tersedia">Tidak Tersedia</option>
+            </select>
+
+            <label for="edit-book-link-ig">Link Instagram:</label>
+            <input type="url" id="edit-book-link-ig" name="link_ig">
+
+            <label for="edit-book-link-wa">Link WhatsApp:</label>
+            <input type="url" id="edit-book-link-wa" name="link_wa">
+
+            <label for="edit-book-link-shopee">Link Shopee:</label>
+            <input type="url" id="edit-book-link-shopee" name="link_shopee">
+
+            <label for="edit-book-link-tiktok">Link TikTok:</label>
+            <input type="url" id="edit-book-link-tiktok" name="link_tiktok">
+
+            <button type="submit">Simpan Perubahan</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Library Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        const messageDiv = document.getElementById('message');
+const books = []; // Variabel global untuk menyimpan data kitab
+
+// --- FUNGSI-FUNGSI UTAMA ---
+
+function showMessage(text, type) {
+    messageDiv.textContent = text;
+    messageDiv.className = type;
+    messageDiv.style.display = 'block';
+    setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
+}
+
+function updatePriceDisplay() {
+    // Update harga di form offline
+    const offlineBookSelect = document.getElementById('offline-book');
+    const selectedOfflineBook = books.find(b => b.id == offlineBookSelect.value);
+    if (selectedOfflineBook) {
+        document.getElementById('offline-price').value = `Rp ${selectedOfflineBook.price}`;
+    }
+
+    // Update harga di form online
+    const onlineBookSelect = document.getElementById('online-book');
+    const selectedOnlineBook = books.find(b => b.id == onlineBookSelect.value);
+    if (selectedOnlineBook) {
+        document.getElementById('online-price').value = `Rp ${selectedOnlineBook.price}`;
+        const ongkir = 15000; // Contoh ongkir statis
+        const total = selectedOnlineBook.price + ongkir;
+        document.getElementById('online-total').value = `Rp ${total}`;
+    }
+}
+
+async function loadBooksTable() {
+    const response = await fetch('/api/books/all');
+    const allBooks = await response.json();
+    const tableBody = document.getElementById('books-table-body');
+    tableBody.innerHTML = ''; // Kosongkan tabel sebelum diisi
+    allBooks.forEach(book => {
+        const row = `
+            <tr>
+                <td>${book.name}</td>
+                <td>Rp ${book.price}</td>
+                <td>${book.availability}</td>
+                <td><a href="#" class="button" onclick="event.preventDefault(); editBook(${book.id})">Edit</a></td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    });
+}
+
+async function loadRecentSales() {
+    // Memuat rekap offline
+    const offResponse = await fetch('/api/recent-offline-sales');
+    const offSales = await offResponse.json();
+    const offTbody = document.querySelector('#all-offline-sales tbody');
+    offTbody.innerHTML = ''; // Kosongkan
+    offSales.forEach(s => {
+        const row = `
+            <tr>
+                <td>${s.sale_date_formatted}</td>
+                <td>${s.buyer_name}</td>
+                <td>${s.dormitory || '-'}</td>
+                <td>${s.address || '-'}</td>
+                <td>${s.book_name}</td>
+                <td>${s.quantity}</td>
+                <td>Rp ${s.total_price}</td>
+            </tr>
+        `;
+        offTbody.innerHTML += row;
+    });
+
+    // Memuat rekap online
+    const onResponse = await fetch('/api/recent-online-sales');
+const onSales = await onResponse.json();
+const onTbody = document.querySelector('#all-online-sales tbody');
+onTbody.innerHTML = ''; // Kosongkan
+onSales.forEach(s => {
+    // Ganti 'row' di bawah ini dengan versi yang baru
+    const row = `
+        <tr>
+            <td>${s.sale_date_formatted}</td>
+            <td>${s.transfer_date_formatted || '-'}</td> <!-- TAMBAHKAN INI -->
+            <td>${s.buyer_name}</td>
+            <td>${s.buyer_address}</td>
+            <td>${s.book_name}</td>
+            <td>Rp ${s.shipping_cost}</td>
+            <td>Rp ${s.total_price}</td>
+        </tr>
+    `;
+    onTbody.innerHTML += row;
+});
+}
+
+async function editBook(id) {
+    const response = await fetch(`/api/book/${id}`);
+    if (!response.ok) {
+        alert('Gagal memuat data kitab. Pastikan server berjalan dan API endpoint benar.');
+        return;
+    }
+    const book = await response.json();
+
+    document.getElementById('edit-book-id').value = book.id;
+    document.getElementById('edit-book-name').value = book.name;
+    document.getElementById('edit-book-price').value = book.price;
+    document.getElementById('edit-book-availability').value = book.availability;
+    document.getElementById('edit-book-link-ig').value = book.link_ig || '';
+    document.getElementById('edit-book-link-wa').value = book.link_wa || '';
+    document.getElementById('edit-book-link-shopee').value = book.link_shopee || '';
+    document.getElementById('edit-book-link-tiktok').value = book.link_tiktok || '';
+
+    document.getElementById('edit-book-modal').style.display = 'flex';
+}
+
+// --- FUNGSI UTAMA YANG MEMUAT SEMUA DATA SAAT HALAMAN DIBUKA ---
+async function loadInitialData() {
+    // 1. Muat tabel daftar kitab
+    await loadBooksTable();
+
+    // 2. Muat data kitab untuk dropdown (hanya yang tersedia)
+    const bookResponse = await fetch('/api/books');
+    const bookData = await bookResponse.json();
+    books.length = 0;
+    books.push(...bookData);
+
+    const offlineBookSelect = document.getElementById('offline-book');
+    const onlineBookSelect = document.getElementById('online-book');
+    offlineBookSelect.innerHTML = '<option value="">-- Pilih Kitab --</option>';
+    onlineBookSelect.innerHTML = '<option value="">-- Pilih Kitab --</option>';
+    books.forEach(book => {
+        const option = new Option(`${book.name} - Rp ${book.price}`, book.id);
+        offlineBookSelect.add(option.cloneNode(true));
+        onlineBookSelect.add(option.cloneNode(true));
+    });
+
+    // 3. Muat data pembeli offline untuk dropdown
+    const buyerResponse = await fetch('/api/offline-buyers');
+    const buyerData = await buyerResponse.json();
+    const offlineBuyerSelect = document.getElementById('offline-buyer');
+    offlineBuyerSelect.innerHTML = '<option value="">-- Pilih Pembeli --</option>';
+    buyerData.forEach(buyer => {
+        offlineBuyerSelect.add(new Option(buyer.name, buyer.id));
+    });
+
+    // 4. Muat tabel rekap penjualan terbaru
+    await loadRecentSales();
+    
+    // 5. Update tampilan harga awal
+    updatePriceDisplay();
+    $('#offline-buyer, #offline-book, #online-book').select2();
+}
+
+// --- EVENT LISTENERS (PENANGAN AKSI PENGGUNA) ---
+
+// Jalankan loadInitialData saat halaman selesai dimuat
+document.addEventListener('DOMContentLoaded', loadInitialData);
+
+// Update harga otomatis saat kitab di dropdown diganti
+//document.getElementById('offline-book').addEventListener('change', updatePriceDisplay);
+//document.getElementById('online-book').addEventListener('change', updatePriceDisplay);
+
+$('#offline-book, #online-book').on('select2:select', function (e) {
+    updatePriceDisplay();
+});
+ 
+// Menutup modal edit
+document.querySelector('.close-button').addEventListener('click', () => {
+    document.getElementById('edit-book-modal').style.display = 'none';
+});
+
+// Handler untuk form TAMBAH KITAB BARU
+document.getElementById('add-book-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this).entries());
+    data.price = parseFloat(data.price);
+
+    const response = await fetch('/api/add-book', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    if (response.ok) {
+        showMessage(result.message, 'success');
+        this.reset();
+        loadInitialData(); // Muat ulang semua data
+    } else {
+        showMessage(`Error: ${result.error}`, 'error');
+    }
+});
+
+// Handler untuk form EDIT KITAB (dari modal)
+document.getElementById('edit-book-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this).entries());
+    data.price = parseFloat(data.price);
+
+    const response = await fetch('/api/update-book', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    if (response.ok) {
+        showMessage(result.message, 'success');
+        document.getElementById('edit-book-modal').style.display = 'none';
+        loadInitialData(); // Muat ulang semua data
+    } else {
+        showMessage(`Error: ${result.error}`, 'error');
+    }
+});
+
+// Handler untuk form IMPORT PEMBELI OFFLINE
+document.getElementById('import-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const response = await fetch('/api/import-buyers', {
+        method: 'POST', body: new FormData(this)
+    });
+    const result = await response.json();
+    if (response.ok) {
+        showMessage(result.message, 'success');
+        loadInitialData(); // Muat ulang data pembeli di dropdown
+    } else {
+        showMessage(`Error: ${result.error}`, 'error');
+    }
+});
+
+// Handler untuk form REKAP OFFLINE
+document.getElementById('offline-sale-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this).entries());
+    
+    const response = await fetch('/api/add-offline-sale', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    if (response.ok) {
+        showMessage(result.message, 'success');
+        this.reset();
+        loadRecentSales(); // Cukup update tabel rekap
+        updatePriceDisplay();
+    } else {
+        showMessage(`Error: ${result.error}`, 'error');
+    }
+});
+
+// Handler untuk form REKAP ONLINE
+document.getElementById('online-sale-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this).entries());
+
+    const response = await fetch('/api/add-online-sale', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+    });
+    const result = await response.json();
+    if (response.ok) {
+        showMessage(result.message, 'success');
+        this.reset();
+        loadRecentSales(); // Cukup update tabel rekap
+        updatePriceDisplay();
+    } else {
+        showMessage(`Error: ${result.error}`, 'error');
+    }
+});
+    </script>
+    <div class="container">
+    <h2>Riwayat Transaksi</h2>
+
+    <div style="display: flex; gap: 1em; margin-bottom: 1em;">
+        <a href="/api/export-offline-sales" class="button" style="background-color: #1a73e8;">Export Semua Transaksi Offline</a>
+        <a href="/api/export-online-sales" class="button" style="background-color: #28a745;">Export Semua Transaksi Online</a>
+    </div>
+
+    <h4>Transaksi Offline</h4>
+    <div style="overflow-x: auto;"> <table id="all-offline-sales">
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Nama Pembeli</th>
+                    <th>Asrama</th>
+                    <th>Alamat</th>
+                    <th>Kitab</th>
+                    <th>Jumlah</th>
+                    <th>Total Harga</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <hr style="margin: 2em 0;">
+
+    <h4>Transaksi Online</h4>
+    <div style="overflow-x: auto;"> <table id="all-online-sales">
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Tanggal Transfer</th> 
+                    <th>Nama Pembeli</th>
+                    <th>Alamat Pengiriman</th>
+                    <th>Kitab</th>
+                    <th>Ongkir</th>
+                    <th>Total Harga</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+</div>
+</body>
+</html>

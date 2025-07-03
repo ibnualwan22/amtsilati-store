@@ -1,0 +1,16 @@
+# Virtual Environment
+venv/
+
+# Folder instance (berisi database)
+instance/
+
+# Folder upload file
+uploads/
+
+# Folder cache Python
+__pycache__/
+*.pyc
+
+# File sistem operasi
+.DS_Store
+Thumbs.db
