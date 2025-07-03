@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Ongkos Kirim - Amtsilati Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f0f2f5; }
+        .header { background-color: #fff; padding: 1.5em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-bottom: 3px solid #007bff; }
+        .header h1 { margin: 0; color: #007bff; }
+        .container { max-width: 600px; margin: 2em auto; padding: 2em; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        form { display: flex; flex-direction: column; gap: 1.5em; }
+        label { font-weight: 600; }
+        input, select { padding: 0.8em; border-radius: 8px; border: 1px solid #ccc; font-size: 1em; width: 100%; box-sizing: border-box; }
+        button { padding: 1em; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        button:hover { background-color: #0056b3; }
+        #results { margin-top: 2em; }
+        .result-item { border: 1px solid #e0e0e0; padding: 1em; border-radius: 8px; margin-bottom: 1em; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .select2-container .select2-selection--single { height: auto !important; padding: 0.5em; }
+        .back-link { display: inline-block; margin-top: 2em; text-decoration: none; color: #007bff; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header class="header"><h1>Cek Ongkos Kirim</h1></header>
+    <main class="container">
+        <form id="ongkir-form">
+            <div>
+                <label>Kota Asal (Toko):</label>
+                <!-- Mengubah tampilan kota asal sesuai permintaan -->
+                <input type="text" value="Bangsri, Jepara, Jawa Tengah" disabled>
+            </div>
+            <hr>
+            <div>
+                <label for="dest-province">Provinsi Tujuan:</label>
+                <select id="dest-province" required></select>
+            </div>
+            <div>
+                <label for="dest-city">Kota/Kabupaten Tujuan:</label>
+                <select id="dest-city" required disabled></select>
+            </div>
+            <div>
+                <label for="weight">Berat (gram):</label>
+                <input type="number" id="weight" value="1000" min="1" required>
+            </div>
+            <button type="submit">Cek Ongkir <div id="loader" class="loader"></div></button>
+        </form>
+        <div id="results"></div>
+        <a href="/toko" class="back-link">&larr; Kembali ke Katalog</a>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Inisialisasi Select2
+            $('#dest-province, #dest-city').select2({
+                placeholder: "Pilih salah satu...",
+                width: '100%' // Pastikan lebar sesuai
+            });
+
+            // Mengisi dropdown provinsi tujuan
+            $.ajax({
+                url: '/api/provinsi',
+                method: 'GET',
+                success: function(provinces) {
+                    $('#dest-province').append(new Option("Pilih Provinsi...", ""));
+                    provinces.forEach(p => {
+                        $('#dest-province').append(new Option(p.province, p.province_id));
+                    });
+                }
+            });
+
+            // Mengisi dropdown kota tujuan saat provinsi dipilih
+            $('#dest-province').on('change', function() {
+                const provId = $(this).val();
+                const citySelect = $('#dest-city');
+                
+                // Kosongkan dan nonaktifkan dropdown kota
+                citySelect.empty().prop('disabled', true);
+                
+                if (!provId) {
+                    // Jika tidak ada provinsi yang dipilih, reset placeholder
+                    citySelect.append(new Option("Pilih Provinsi terlebih dahulu", "")).trigger('change');
+                    return;
+                }
+
+                // Tampilkan status loading
+                citySelect.append(new Option("Memuat kota...", "")).trigger('change');
+
+                $.ajax({
+                    url: `/api/kota/${provId}`,
+                    method: 'GET',
+                    success: function(cities) {
+                        // Kosongkan lagi sebelum diisi data baru
+                        citySelect.empty();
+                        citySelect.append(new Option("Pilih Kota/Kabupaten...", ""));
+                        cities.forEach(c => {
+                            citySelect.append(new Option(`${c.type} ${c.city_name}`, c.city_id));
+                        });
+                        // Aktifkan kembali dropdown kota
+                        citySelect.prop('disabled', false);
+                        // Perbarui tampilan Select2
+                        citySelect.trigger('change');
+                    },
+                    error: function() {
+                        citySelect.empty().append(new Option("Gagal memuat kota", "")).trigger('change');
+                    }
+                });
+            });
+
+            // Menangani submit form
+            $('#ongkir-form').on('submit', function(e) {
+                e.preventDefault();
+                $('#loader').show();
+                $('#results').html('');
+
+                const payload = {
+                    origin_city_id: '153', // ID Kabupaten Jepara
+                    destination_city_id: $('#dest-city').val(),
+                    weight: $('#weight').val()
+                };
+
+                $.ajax({
+                    url: '/api/cek-ongkir',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function(costs) {
+                        $('#loader').hide();
+                        if (costs.length === 0) {
+                            $('#results').html('<p>Layanan pengiriman tidak ditemukan untuk tujuan ini.</p>');
+                            return;
+                        }
+                        costs.forEach(cost => {
+                            const price = cost.cost[0].value.toLocaleString('id-ID');
+                            const etd = cost.cost[0].etd.replace(' HARI', '');
+                            const item = `
+                                <div class="result-item">
+                                    <strong>Layanan: ${cost.service} (${cost.description})</strong><br>
+                                    <span>Estimasi: ${etd} hari</span><br>
+                                    <span>Harga: Rp ${price}</span>
+                                </div>
+                            `;
+                            $('#results').append(item);
+                        });
+                    },
+                    error: function() {
+                        $('#loader').hide();
+                        $('#results').html('<p>Terjadi kesalahan. Pastikan API Key Anda benar dan kota tujuan sudah dipilih.</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

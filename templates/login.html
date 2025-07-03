@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Dashboard Admin</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 2.5em;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        .login-container h1 {
+            color: #007bff;
+            margin-bottom: 1.5em;
+        }
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5em;
+        }
+        .login-form input {
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        .login-form button {
+            padding: 1em;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .login-form button:hover {
+            background-color: #0056b3;
+        }
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 1em;
+            border-radius: 8px;
+            margin-top: 1.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Dashboard Admin</h1>
+        
+        <!-- Menampilkan pesan error jika login gagal -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-error">{{ messages[0] }}</div>
+            {% endif %}
+        {% endwith %}
+
+        <form class="login-form" method="post" action="{{ url_for('login') }}">
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">Login</button>
+</form>
+
+    </div>
+</body>
+</html>
