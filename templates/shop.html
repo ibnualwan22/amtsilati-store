@@ -4,95 +4,429 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amtsilati Store - Katalog Kitab</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f0f2f5; }
-        .header { background-color: #fff; padding: 1.5em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-bottom: 3px solid #007bff; }
-        .header h1 { margin: 0; color: #007bff; }
-        .header p { margin: 0.5em 0 0; color: #606770; }
-        .container { max-width: 1200px; margin: 2em auto; padding: 0 1em; }
-        .search-container { margin-bottom: 2em; }
-        #search-box { width: 100%; padding: 1em; font-size: 1em; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5em; }
-        .book-card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; }
-        .book-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); }
-        .book-card.out-of-stock { filter: grayscale(100%); opacity: 0.7; }
-        .book-card.out-of-stock:hover { transform: none; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-        .book-card-image { width: 100%; height: 250px; background-color: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d; overflow: hidden; }
-        .book-card-image img { width: 100%; height: 100%; object-fit: cover; }
-        .book-card-content { padding: 1.5em; flex-grow: 1; display: flex; flex-direction: column; }
-        .book-card-title { font-size: 1.25em; font-weight: 600; margin: 0 0 0.5em; }
-        .book-card-price { font-size: 1.5em; font-weight: 700; color: #007bff; margin: auto 0 1em; }
-        .book-card-actions { margin-top: auto; }
-        .btn { display: block; width: 100%; padding: 0.8em; text-align: center; text-decoration: none; border-radius: 8px; font-weight: 600; transition: background-color 0.3s ease; }
-        .btn-details { background-color: #007bff; color: white; }
-        .btn-details:hover { background-color: #0056b3; }
-        .btn-disabled { background-color: #6c757d; color: #fff; cursor: not-allowed; }
-        .footer { text-align: center; padding: 2em; margin-top: 2em; color: #606770; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --text-muted: #6b7280;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--white);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Search Section */
+        .search-section {
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            font-size: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Product Card */
+        .product-card {
+            background-color: var(--white);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-card.out-of-stock {
+            opacity: 0.7;
+        }
+
+        .product-card.out-of-stock:hover {
+            transform: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 300px;
+            background-color: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .out-of-stock-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: var(--danger-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .product-content {
+            padding: 1.25rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+            line-height: 1.4;
+        }
+
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .product-actions {
+            margin-top: auto;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-disabled {
+            background-color: var(--text-muted);
+            color: white;
+            cursor: not-allowed;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0 2rem;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                gap: 1rem;
+            }
+
+            .product-image {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Header -->
     <header class="header">
-        <h1>Amtsilati Store</h1>
-        <p>Menyediakan Berbagai Macam Kitab Metode Amtsilati dan Pesantren</p>
+        <div class="header-content">
+            <h1><i class="fas fa-book"></i> Amtsilati Store</h1>
+            <p>Menyediakan Berbagai Macam Kitab Metode Amtsilati dan Pesantren</p>
+        </div>
     </header>
 
-    <main class="container">
+    <!-- Search Section -->
+    <section class="search-section">
         <div class="search-container">
-            <input type="text" id="search-box" placeholder="Cari nama kitab...">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="search-box" class="search-box" placeholder="Cari nama kitab...">
         </div>
+    </section>
 
-        <div class="grid-container">
+    <!-- Main Content -->
+    <main class="container">
+        <div class="product-grid" id="product-grid">
             {% for book in books %}
-            <div class="book-card {% if book.availability != 'Tersedia' %}out-of-stock{% endif %}">
-                <div class="book-card-image">
+            <div class="book-card product-card {% if book.availability != 'Tersedia' %}out-of-stock{% endif %}" data-book-name="{{ book.name|lower }}">
+                <div class="product-image">
                     {% if book.image_filename %}
-                        <!-- PERBAIKAN: Tambahkan 'onerror' untuk menangani gambar yang rusak -->
                         <img src="{{ url_for('uploaded_file', filename=book.image_filename) }}" 
                              alt="Foto {{ book.name }}" 
-                             onerror="this.onerror=null; this.src='https://placehold.co/400x600/e2e8f0/4a5568?text=Gagal+Muat';">
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x600/e2e8f0/4a5568?text=Tidak+Ada+Gambar';">
                     {% else %}
-                        <span>[Gambar Kitab]</span>
+                        <div style="color: #9ca3af;">
+                            <i class="fas fa-book" style="font-size: 3rem;"></i>
+                            <p style="margin-top: 0.5rem;">Gambar tidak tersedia</p>
+                        </div>
+                    {% endif %}
+                    {% if book.availability != 'Tersedia' %}
+                        <span class="out-of-stock-badge">Stok Habis</span>
                     {% endif %}
                 </div>
-                <div class="book-card-content">
-                    <h3 class="book-card-title">{{ book.name }}</h3>
-                    <p class="book-card-price">Rp {{ book.price | rupiah }}</p>
-                    <div class="book-card-actions">
+                <div class="product-content">
+                    <h3 class="product-title">{{ book.name }}</h3>
+                    <p class="product-price">Rp {{ book.price | rupiah }}</p>
+                    <div class="product-actions">
                         {% if book.availability == 'Tersedia' %}
-                            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-details">Lihat Detail & Beli</a>
+                            <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-primary">
+                                <i class="fas fa-shopping-cart"></i> Lihat Detail & Beli
+                            </a>
                         {% else %}
-                            <a href="#" class="btn btn-disabled" onclick="return false;">Stok Habis</a>
+                            <button class="btn btn-disabled" disabled>
+                                <i class="fas fa-times-circle"></i> Stok Habis
+                            </button>
                         {% endif %}
                     </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+
+        <!-- Empty State (will be shown by JS if no results) -->
+        <div class="empty-state" id="empty-state" style="display: none;">
+            <i class="fas fa-search"></i>
+            <h3>Tidak ada kitab yang ditemukan</h3>
+            <p>Coba gunakan kata kunci lain</p>
+        </div>
     </main>
 
+    <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2025 Amtsilati Store. All Rights Reserved.</p>
-        <p><a href="{{ url_for('login') }}" style="color: #606770; text-decoration: none;">Admin Login</a></p>
+        <div class="footer-content">
+            <p>&copy; 2025 Amtsilati Store. All Rights Reserved.</p>
+            <p>
+                <a href="{{ url_for('login') }}">
+                    <i class="fas fa-user-shield"></i> Admin Login
+                </a>
+            </p>
+        </div>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchBox = document.getElementById('search-box');
             const bookCards = document.querySelectorAll('.book-card');
+            const emptyState = document.getElementById('empty-state');
+            const productGrid = document.getElementById('product-grid');
 
+            // Search functionality
             searchBox.addEventListener('input', function() {
                 const searchTerm = searchBox.value.toLowerCase();
+                let visibleCount = 0;
 
                 bookCards.forEach(function(card) {
-                    const titleElement = card.querySelector('.book-card-title');
-                    const title = titleElement.textContent.toLowerCase();
-
-                    if (title.includes(searchTerm)) {
+                    const bookName = card.dataset.bookName;
+                    
+                    if (bookName.includes(searchTerm)) {
                         card.style.display = 'flex';
+                        visibleCount++;
                     } else {
                         card.style.display = 'none';
                     }
+                });
+
+                // Show/hide empty state
+                if (visibleCount === 0 && searchTerm !== '') {
+                    emptyState.style.display = 'block';
+                } else {
+                    emptyState.style.display = 'none';
+                }
+            });
+
+            // Add loading animation to images
+            const images = document.querySelectorAll('.product-image img');
+            images.forEach(img => {
+                img.classList.add('loading');
+                img.addEventListener('load', function() {
+                    this.classList.remove('loading');
                 });
             });
         });

@@ -3,133 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Judul halaman akan dinamis sesuai nama kitab -->
     <title>{{ book.name }} - Amtsilati Store</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --text-muted: #6b7280;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            background-color: #f0f2f5;
-            color: #1c1e21;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
+
+        /* Header */
         .header {
-            background-color: #ffffff;
-            padding: 1.5em;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-bottom: 3px solid #007bff;
+            background-color: var(--white);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
         .header h1 {
-            margin: 0;
-            color: #007bff;
-            font-size: 2.5em;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .container {
-            max-width: 800px;
-            margin: 2em auto;
-            padding: 2em;
-            background-color: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+            font-size: 0.875rem;
         }
-        .book-image-placeholder {
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
             width: 100%;
-            height: 300px;
-            background-color: #e9ecef;
-            border-radius: 8px;
+        }
+
+        .product-container {
+            background-color: var(--white);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        /* Product Image Section */
+        .product-image-section {
+            padding: 2rem;
+            background-color: var(--light-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #6c757d;
-            margin-bottom: 2em;
         }
-        .book-title {
-            font-size: 2.5em;
-            font-weight: 700;
-            margin: 0 0 0.25em;
-        }
-        .book-price {
-            font-size: 2em;
-            font-weight: 600;
-            color: #007bff;
-            margin-bottom: 1.5em;
-        }
-        .purchase-links h3 {
-            margin-bottom: 1em;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 0.5em;
-        }
-        .purchase-links a {
-            display: block;
-            padding: 1em;
-            margin-bottom: 1em;
-            border-radius: 8px;
-            text-decoration: none;
-            color: white;
-            font-weight: 600;
-            text-align: center;
-            transition: opacity 0.3s ease;
-        }
-        .purchase-links a:hover {
-            opacity: 0.85;
-        }
-        .btn-shopee { background-color: #ee4d2d; }
-        .btn-whatsapp { background-color: #25d366; }
-        .btn-instagram { background: #d6249f; background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%); }
-        .btn-tiktok { background-color: #000000; }
 
-        .back-link {
-            display: inline-block;
-            margin-top: 2em;
-            text-decoration: none;
-            color: #007bff;
+        .product-image-wrapper {
+            width: 100%;
+            max-width: 400px;
+            height: 500px;
+            background-color: var(--white);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .product-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .no-image {
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .no-image i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Product Info Section */
+        .product-info-section {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .availability-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
             font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .available {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .unavailable {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .product-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .purchase-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--dark-color);
+        }
+
+        .purchase-links {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .purchase-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .purchase-link:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-shopee {
+            background-color: #ee4d2d;
+        }
+
+        .btn-whatsapp {
+            background-color: #25d366;
+        }
+
+        .btn-instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+        }
+
+        .btn-tiktok {
+            background-color: #000000;
+        }
+
+        .btn-ongkir {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Additional Info */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .info-card {
+            background-color: var(--light-bg);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .info-card i {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card h4 {
+            font-size: 0.875rem;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .info-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0 2rem;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.25rem;
+            }
+
+            .product-container {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .product-image-section {
+                padding: 1.5rem;
+            }
+
+            .product-image-wrapper {
+                height: 400px;
+            }
+
+            .product-title {
+                font-size: 1.5rem;
+            }
+
+            .product-price {
+                font-size: 2rem;
+            }
+
+            .info-cards {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- Header -->
     <header class="header">
-        <h1>Amtsilati Store</h1>
+        <div class="header-content">
+            <h1><i class="fas fa-book"></i> Amtsilati Store</h1>
+            <a href="/toko" class="nav-link">
+                <i class="fas fa-arrow-left"></i> Kembali ke Katalog
+            </a>
+        </div>
     </header>
 
-    <main class="container">
-        <div class="book-image-placeholder">
-            <span>[Gambar Kitab {{ book.name }}]</span>
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="product-container">
+            <!-- Product Image -->
+            <div class="product-image-section">
+                <div class="product-image-wrapper">
+                    {% if book.image_filename %}
+                        <img src="{{ url_for('uploaded_file', filename=book.image_filename) }}" 
+                             alt="Foto {{ book.name }}" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x600/e2e8f0/4a5568?text=Tidak+Ada+Gambar';">
+                    {% else %}
+                        <div class="no-image">
+                            <i class="fas fa-book"></i>
+                            <p>Gambar tidak tersedia</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Product Info -->
+            <div class="product-info-section">
+                <!-- Availability Badge -->
+                {% if book.availability == 'Tersedia' %}
+                    <span class="availability-badge available">
+                        <i class="fas fa-check-circle"></i> Stok Tersedia
+                    </span>
+                {% else %}
+                    <span class="availability-badge unavailable">
+                        <i class="fas fa-times-circle"></i> Stok Habis
+                    </span>
+                {% endif %}
+
+                <h1 class="product-title">{{ book.name }}</h1>
+                <p class="product-price">Rp {{ book.price | rupiah }}</p>
+
+                <!-- Purchase Links -->
+                <div class="purchase-section">
+                    <h3 class="section-title">Pilih Metode Pembelian:</h3>
+                    
+                    {% if book.availability == 'Tersedia' %}
+                        <div class="purchase-links">
+                            {% if book.link_shopee %}
+                                <a href="{{ book.link_shopee }}" target="_blank" class="purchase-link btn-shopee">
+                                    <i class="fas fa-shopping-bag"></i> Beli di Shopee
+                                </a>
+                            {% endif %}
+
+                            {% if book.link_wa %}
+                                <a href="{{ book.link_wa }}" target="_blank" class="purchase-link btn-whatsapp">
+                                    <i class="fab fa-whatsapp"></i> Pesan via WhatsApp
+                                </a>
+                            {% endif %}
+
+                            {% if book.link_ig %}
+                                <a href="{{ book.link_ig }}" target="_blank" class="purchase-link btn-instagram">
+                                    <i class="fab fa-instagram"></i> Lihat di Instagram
+                                </a>
+                            {% endif %}
+
+                            {% if book.link_tiktok %}
+                                <a href="{{ book.link_tiktok }}" target="_blank" class="purchase-link btn-tiktok">
+                                    <i class="fab fa-tiktok"></i> Lihat di TikTok
+                                </a>
+                            {% endif %}
+
+                            <a href="/cek-ongkir" class="purchase-link btn-ongkir">
+                                <i class="fas fa-truck"></i> Cek Estimasi Ongkos Kirim
+                            </a>
+                        </div>
+                    {% else %}
+                        <p style="color: var(--text-muted); text-align: center; padding: 2rem;">
+                            Maaf, kitab ini sedang tidak tersedia. Silakan cek kembali nanti.
+                        </p>
+                    {% endif %}
+                </div>
+
+                <!-- Additional Info -->
+                <div class="info-cards">
+                    <div class="info-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>100% Original</h4>
+                        <p>Kitab asli berkualitas</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-truck"></i>
+                        <h4>Pengiriman Cepat</h4>
+                        <p>Kirim ke seluruh Indonesia</p>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-headset"></i>
+                        <h4>Layanan 24/7</h4>
+                        <p>Siap melayani Anda</p>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <h2 class="book-title">{{ book.name }}</h2>
-        <p class="book-price">Rp {{ "%.0f"|format(book.price) }}</p>
-
-        <div class="purchase-links">
-            <h3>Link Pembelian:</h3>
-            
-            <!-- Tombol hanya akan muncul jika link-nya ada di database -->
-            {% if book.link_shopee %}
-                <a href="{{ book.link_shopee }}" target="_blank" class="btn-shopee">Beli di Shopee</a>
-            {% endif %}
-
-            {% if book.link_wa %}
-                <a href="{{ book.link_wa }}" target="_blank" class="btn-whatsapp">Pesan via WhatsApp</a>
-            {% endif %}
-
-            {% if book.link_ig %}
-                <a href="{{ book.link_ig }}" target="_blank" class="btn-instagram">Lihat di Instagram</a>
-            {% endif %}
-
-            {% if book.link_tiktok %}
-                <a href="{{ book.link_tiktok }}" target="_blank" class="btn-tiktok">Lihat di TikTok</a>
-            {% endif %}
-        </div>
-        <a href="/cek-ongkir" style="display:block; text-align:center; margin-top:1.5em; font-weight:600;">Cek Estimasi Ongkos Kirim ke Alamat Anda</a>
-
-        <a href="/toko" class="back-link">&larr; Kembali ke Katalog</a>
     </main>
-<footer class="footer">
-    <p>&copy; 2025 Amtsilati Store. All Rights Reserved.</p>
-    <!-- TAMBAHKAN BARIS INI -->
-    <p><a href="{{ url_for('login') }}" style="color: #606770; text-decoration: none;">Admin Login</a></p>
-</footer>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Amtsilati Store. All Rights Reserved.</p>
+            <p>
+                <a href="{{ url_for('login') }}">
+                    <i class="fas fa-user-shield"></i> Admin Login
+                </a>
+            </p>
+        </div>
+    </footer>
+
 </body>
 </html>

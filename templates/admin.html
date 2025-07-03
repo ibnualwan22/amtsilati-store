@@ -5,187 +5,800 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Admin - Amtsilati Store</title>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 2em; background-color: #f4f4f9; }
-        h1, h2, h3 { color: #333; }
-        .container { background: white; padding: 2em; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 2em; }
-        form { display: flex; flex-direction: column; gap: 1em; }
-        label { font-weight: bold; }
-        input, select, button { padding: 0.8em; border-radius: 4px; border: 1px solid #ccc; font-size: 1em; }
-        button { background-color: #007bff; color: white; cursor: pointer; border: none; }
-        a.button { display: inline-block; padding: 0.8em; text-decoration: none; border-radius: 4px; color: white; text-align: center; }
-        table { width: 100%; border-collapse: collapse; margin-top: 1em; }
-        th, td { border: 1px solid #ccc; padding: 0.8em; text-align: left; vertical-align: middle; }
-        .table-image { width: 60px; height: 80px; object-fit: cover; border-radius: 4px; }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: white; padding: 2em; border-radius: 8px; width: 90%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
-        .close-button { float: right; font-size: 1.5em; cursor: pointer; }
-        .btn-group { display: flex; }
-        .btn-group .button { border-radius: 0; flex-grow: 1; }
-        .btn-group .button:first-child { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
-        .btn-group .button:last-child { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
-        .btn-edit { background-color: #28a745; }
-        .btn-danger { background-color: #dc3545; }
-        #message { margin-top: 1em; padding: 1em; border-radius: 4px; display: none; }
-        #message.success { background-color: #d4edda; color: #155724; }
-        #message.error { background-color: #f8d7da; color: #721c24; }
-        .select2-container { width: 100% !important; }
-        .select2-container .select2-selection--single { height: auto !important; padding: 0.5em; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --text-muted: #6b7280;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        /* Layout Structure */
+        .admin-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-color);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-item {
+            display: block;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding-left: 2rem;
+        }
+
+        .menu-item.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .menu-item i {
+            width: 20px;
+            margin-right: 0.75rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            min-height: 100vh;
+        }
+
+        /* Top Bar */
+        .topbar {
+            background-color: white;
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar h1 {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-logout {
+            background-color: var(--danger-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #dc2626;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 2rem;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        /* Dashboard Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+
+        .date-filter {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .date-filter input {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+
+        /* Forms */
+        form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        input, select, textarea {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background-color: var(--light-bg);
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background-color: var(--light-bg);
+        }
+
+        .table-image {
+            width: 40px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 0.25rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-button {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+        }
+
+        /* Messages */
+        #message {
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.875rem;
+        }
+
+        #message.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        #message.error {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utilities */
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .mb-3 { margin-bottom: 1.5rem; }
+        .mb-4 { margin-bottom: 2rem; }
     </style>
 </head>
 <body>
-    <h1>Dashboard Admin</h1>
-    <div style="text-align: right; margin-bottom: 1em;"><a href="{{ url_for('logout') }}" class="button btn-danger">Logout</a></div>
-    <div id="message"></div>
+    <div class="admin-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-book"></i> Amtsilati Store</h2>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" data-section="dashboard">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="#" class="menu-item" data-section="books">
+                    <i class="fas fa-book"></i> Manajemen Kitab
+                </a>
+                <a href="#" class="menu-item" data-section="offline-buyers">
+                    <i class="fas fa-users"></i> Data Pembeli
+                </a>
+                <a href="#" class="menu-item" data-section="offline-sales">
+                    <i class="fas fa-store"></i> Penjualan Offline
+                </a>
+                <a href="#" class="menu-item" data-section="online-sales">
+                    <i class="fas fa-shopping-cart"></i> Penjualan Online
+                </a>
+                <a href="#" class="menu-item" data-section="transactions">
+                    <i class="fas fa-history"></i> Riwayat Transaksi
+                </a>
+            </nav>
+        </aside>
 
-    <!-- Manajemen Kitab -->
-    <div class="container">
-        <h2>Manajemen Kitab</h2>
-        <form id="add-book-form" enctype="multipart/form-data">
-            <label for="book-name">Nama Kitab:</label>
-            <input type="text" id="book-name" name="name" required>
-            <label for="book-price">Harga Kitab (angka saja):</label>
-            <input type="number" id="book-price" name="price" required>
-            <label for="book-availability">Ketersediaan:</label>
-            <select id="book-availability" name="availability" required>
-                <option value="Tersedia">Tersedia</option>
-                <option value="Tidak Tersedia">Tidak Tersedia</option>
-            </select>
-            <label for="book-link-ig">Link Instagram:</label>
-            <input type="url" id="book-link-ig" name="link_ig" placeholder="https://instagram.com/...">
-            <label for="book-link-wa">Link WhatsApp:</label>
-            <input type="url" id="book-link-wa" name="link_wa" placeholder="https://wa.me/...">
-            <label for="book-link-shopee">Link Shopee:</label>
-            <input type="url" id="book-link-shopee" name="link_shopee" placeholder="https://shopee.co.id/...">
-            <label for="book-link-tiktok">Link TikTok:</label>
-            <input type="url" id="book-link-tiktok" name="link_tiktok" placeholder="https://tiktok.com/...">
-            <label for="book-image">Foto Kitab:</label>
-            <input type="file" id="book-image" name="image" accept="image/png, image/jpeg, image/webp">
-            <button type="submit">Tambah Kitab Baru</button>
-        </form>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Bar -->
+            <div class="topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="mobile-menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1>Dashboard Admin</h1>
+                </div>
+                <div class="topbar-actions">
+                    <span class="text-muted">Admin</span>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <!-- Message Area -->
+            <div class="content">
+                <div id="message"></div>
+
+                <!-- Dashboard Section -->
+                <section id="dashboard-section" class="content-section active">
+                    <!-- Stats Cards -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Kitab</h3>
+                            <div class="stat-value" id="totalBooks">0</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: var(--success-color);">
+                            <h3>Penjualan Offline</h3>
+                            <div class="stat-value" id="totalOfflineSales">Rp 0</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: var(--warning-color);">
+                            <h3>Penjualan Online</h3>
+                            <div class="stat-value" id="totalOnlineSales">Rp 0</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: var(--danger-color);">
+                            <h3>Total Jumlah Santri</h3>
+                            <div class="stat-value" id="transactions">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Sales Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Grafik Penjualan</h2>
+                        </div>
+                        <div class="date-filter">
+                            <label>Dari:</label>
+                            <input type="date" id="startDate">
+                            <label>Sampai:</label>
+                            <input type="date" id="endDate">
+                            <button class="btn btn-primary" onclick="updateChart()">
+                                <i class="fas fa-sync"></i> Update
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Books Management Section -->
+                <section id="books-section" class="content-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Tambah Kitab Baru</h2>
+                        </div>
+                        <form id="add-book-form" enctype="multipart/form-data">
+                            <div class="form-group">
+                                <label for="book-name">Nama Kitab:</label>
+                                <input type="text" id="book-name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="book-price">Harga (angka saja):</label>
+                                <input type="number" id="book-price" name="price" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="book-availability">Ketersediaan:</label>
+                                <select id="book-availability" name="availability" required>
+                                    <option value="Tersedia">Tersedia</option>
+                                    <option value="Tidak Tersedia">Tidak Tersedia</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="book-link-ig">Link Instagram:</label>
+                                <input type="url" id="book-link-ig" name="link_ig" placeholder="https://instagram.com/...">
+                            </div>
+                            <div class="form-group">
+                                <label for="book-link-wa">Link WhatsApp:</label>
+                                <input type="url" id="book-link-wa" name="link_wa" placeholder="https://wa.me/...">
+                            </div>
+                            <div class="form-group">
+                                <label for="book-link-shopee">Link Shopee:</label>
+                                <input type="url" id="book-link-shopee" name="link_shopee" placeholder="https://shopee.co.id/...">
+                            </div>
+                            <div class="form-group">
+                                <label for="book-link-tiktok">Link TikTok:</label>
+                                <input type="url" id="book-link-tiktok" name="link_tiktok" placeholder="https://tiktok.com/...">
+                            </div>
+                            <div class="form-group">
+                                <label for="book-image">Foto Kitab:</label>
+                                <input type="file" id="book-image" name="image" accept="image/png, image/jpeg, image/webp">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Tambah Kitab
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Daftar Kitab</h2>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="books-table">
+                                <thead>
+                                    <tr>
+                                        <th>Gambar</th>
+                                        <th>Nama Kitab</th>
+                                        <th>Harga</th>
+                                        <th>Status</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="books-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Offline Buyers Section -->
+                <section id="offline-buyers-section" class="content-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Import Data Pembeli</h2>
+                        </div>
+                        <form id="import-form">
+                            <div class="form-group">
+                                <label for="excel-file">Import dari Excel (.xlsx):</label>
+                                <input type="file" id="excel-file" name="file" accept=".xlsx" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Import
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Offline Sales Section -->
+                <section id="offline-sales-section" class="content-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Rekap Penjualan Offline</h2>
+                        </div>
+                        <form id="offline-sale-form">
+                            <div class="form-group">
+                                <label for="offline-buyer">Nama Pembeli:</label>
+                                <select id="offline-buyer" name="buyer_id" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="offline-book">Kitab:</label>
+                                <select id="offline-book" name="book_id" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="offline-price">Harga (otomatis):</label>
+                                <input type="text" id="offline-price" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="offline-quantity">Jumlah:</label>
+                                <input type="number" id="offline-quantity" name="quantity" min="1" value="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Tambah Rekap
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Online Sales Section -->
+                <section id="online-sales-section" class="content-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Rekap Penjualan Online</h2>
+                        </div>
+                        <form id="online-sale-form">
+                            <div class="form-group">
+                                <label for="online-buyer-name">Nama Pembeli:</label>
+                                <input type="text" id="online-buyer-name" name="buyer_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="online-buyer-address">Alamat Pembeli:</label>
+                                <input type="text" id="online-buyer-address" name="buyer_address" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="online-transfer-date">Tanggal Transfer:</label>
+                                <input type="date" id="online-transfer-date" name="transfer_date" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="online-book">Kitab:</label>
+                                <select id="online-book" name="book_id" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label for="online-price">Harga Kitab (otomatis):</label>
+                                <input type="text" id="online-price" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="online-ongkir">Ongkir (otomatis):</label>
+                                <input type="text" id="online-ongkir" value="Rp 15.000" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="online-total">Total Harga (otomatis):</label>
+                                <input type="text" id="online-total" disabled>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Tambah Rekap
+                            </button>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Transactions Section -->
+                <section id="transactions-section" class="content-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Riwayat Transaksi</h2>
+                            <div class="btn-group">
+                                <a href="/api/export-offline-sales" class="btn btn-primary">
+                                    <i class="fas fa-download"></i> Export Offline
+                                </a>
+                                <a href="/api/export-online-sales" class="btn btn-success">
+                                    <i class="fas fa-download"></i> Export Online
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <h3 style="margin: 1rem 0;">Transaksi Offline</h3>
+                        <div class="table-responsive">
+                            <table id="all-offline-sales">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Nama Pembeli</th>
+                                        <th>Asrama</th>
+                                        <th>Alamat</th>
+                                        <th>Kitab</th>
+                                        <th>Jml</th>
+                                        <th>Total Harga</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                        <h3 style="margin: 2rem 0 1rem;">Transaksi Online</h3>
+                        <div class="table-responsive">
+                            <table id="all-online-sales">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Tgl. Transfer</th>
+                                        <th>Nama Pembeli</th>
+                                        <th>Alamat Kirim</th>
+                                        <th>Kitab</th>
+                                        <th>Ongkir</th>
+                                        <th>Total Harga</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
 
-    <!-- Daftar Kitab Saat Ini -->
-    <div class="container">
-        <h3>Daftar Kitab Saat Ini</h3>
-        <div style="overflow-x: auto;">
-            <table id="books-table">
-                <thead>
-                    <tr>
-                        <th>Gambar</th>
-                        <th>Nama Kitab</th>
-                        <th>Harga</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="books-table-body"></tbody>
-            </table>
-        </div>
-    </div>
-    
-    <!-- Data Pembeli Offline -->
-    <div class="container">
-        <h2>Data Pembeli Offline</h2>
-        <form id="import-form">
-            <label for="excel-file">Import Data Pembeli dari Excel (.xlsx):</label>
-            <input type="file" id="excel-file" name="file" accept=".xlsx" required>
-            <button type="submit">Import</button>
-        </form>
-    </div>
-
-    <!-- Rekap Pembelian Offline -->
-    <div class="container">
-        <h2>Rekap Pembelian Offline</h2>
-        <form id="offline-sale-form">
-            <label for="offline-buyer">Nama Pembeli:</label>
-            <select id="offline-buyer" name="buyer_id" required></select>
-            <label for="offline-book">Kitab:</label>
-            <select id="offline-book" name="book_id" required></select>
-            <label for="offline-price">Harga (otomatis):</label>
-            <input type="text" id="offline-price" disabled>
-            <label for="offline-quantity">Jumlah:</label>
-            <input type="number" id="offline-quantity" name="quantity" min="1" value="1" required>
-            <button type="submit">Tambah Rekap</button>
-        </form>
-    </div>
-
-    <!-- Rekap Pembelian Online -->
-    <div class="container">
-        <h2>Rekap Pembelian Online</h2>
-        <form id="online-sale-form">
-            <label for="online-buyer-name">Nama Pembeli:</label>
-            <input type="text" id="online-buyer-name" name="buyer_name" required>
-            <label for="online-buyer-address">Alamat Pembeli:</label>
-            <input type="text" id="online-buyer-address" name="buyer_address" required>
-            <label for="online-transfer-date">Tanggal Transfer:</label>
-            <input type="date" id="online-transfer-date" name="transfer_date" required>
-            <label for="online-book">Kitab:</label>
-            <label for="online-quantity">Jumlah:</label>
-            <input type="number" id="online-quantity" name="quantity" min="1" value="1" required>
-            <select id="online-book" name="book_id" required></select>
-            <label for="online-price">Harga Kitab (otomatis):</label>
-            <input type="text" id="online-price" disabled>
-            <label for="online-ongkir">Ongkir (otomatis):</label>
-            <input type="text" id="online-ongkir" value="Rp 15.000" disabled>
-            <label for="online-total">Total Harga (otomatis):</label>
-            <input type="text" id="online-total" disabled>
-            <button type="submit">Tambah Rekap</button>
-        </form>
-    </div>
-
-    <!-- Riwayat Transaksi -->
-    <div class="container">
-        <h2>Riwayat Transaksi</h2>
-        <div style="display: flex; gap: 1em; margin-bottom: 1em;">
-            <a href="/api/export-offline-sales" class="button" style="background-color: #1a73e8;">Export Transaksi Offline</a>
-            <a href="/api/export-online-sales" class="button" style="background-color: #28a745;">Export Transaksi Online</a>
-        </div>
-        <h4>Transaksi Offline</h4>
-        <div style="overflow-x: auto;">
-            <table id="all-offline-sales">
-                <thead><tr><th>Tanggal</th><th>Nama Pembeli</th><th>Asrama</th><th>Alamat</th><th>Kitab</th><th>Jml</th><th>Total Harga</th></tr></thead>
-                <tbody></tbody>
-            </table>
-        </div>
-        <hr style="margin: 2em 0;">
-        <h4>Transaksi Online</h4>
-        <div style="overflow-x: auto;">
-            <table id="all-online-sales">
-                <thead><tr><th>Tanggal</th><th>Tgl. Transfer</th><th>Nama Pembeli</th><th>Alamat Kirim</th><th>Kitab</th><th>Jumlah</th><th>Ongkir</th><th>Total Harga</th></tr></thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Modal untuk Edit Kitab -->
+    <!-- Modal Edit Kitab -->
     <div id="edit-book-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>Edit Detail Kitab</h2>
+            <div class="modal-header">
+                <h2>Edit Detail Kitab</h2>
+                <button class="close-button">&times;</button>
+            </div>
             <form id="edit-book-form" enctype="multipart/form-data">
                 <input type="hidden" id="edit-book-id" name="id">
                 <input type="hidden" id="existing-image-filename" name="existing_image_filename">
-                <label for="edit-book-name">Nama Kitab:</label>
-                <input type="text" id="edit-book-name" name="name" required>
-                <label for="edit-book-price">Harga Kitab:</label>
-                <input type="number" id="edit-book-price" name="price" required>
-                <label for="edit-book-availability">Ketersediaan:</label>
-                <select id="edit-book-availability" name="availability" required>
-                    <option value="Tersedia">Tersedia</option>
-                    <option value="Tidak Tersedia">Tidak Tersedia</option>
-                </select>
-                <label for="edit-book-link-ig">Link Instagram:</label>
-                <input type="url" id="edit-book-link-ig" name="link_ig">
-                <label for="edit-book-link-wa">Link WhatsApp:</label>
-                <input type="url" id="edit-book-link-wa" name="link_wa">
-                <label for="edit-book-link-shopee">Link Shopee:</label>
-                <input type="url" id="edit-book-link-shopee" name="link_shopee">
-                <label for="edit-book-link-tiktok">Link TikTok:</label>
-                <input type="url" id="edit-book-link-tiktok" name="link_tiktok">
-                <label for="edit-book-image">Ganti Foto Kitab (biarkan kosong jika tidak diubah):</label>
-                <input type="file" id="edit-book-image" name="image" accept="image/png, image/jpeg, image/webp">
-                <button type="submit">Simpan Perubahan</button>
+                <div class="form-group">
+                    <label for="edit-book-name">Nama Kitab:</label>
+                    <input type="text" id="edit-book-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-book-price">Harga Kitab:</label>
+                    <input type="number" id="edit-book-price" name="price" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-book-availability">Ketersediaan:</label>
+                    <select id="edit-book-availability" name="availability" required>
+                        <option value="Tersedia">Tersedia</option>
+                        <option value="Tidak Tersedia">Tidak Tersedia</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="edit-book-link-ig">Link Instagram:</label>
+                    <input type="url" id="edit-book-link-ig" name="link_ig">
+                </div>
+                <div class="form-group">
+                    <label for="edit-book-link-wa">Link WhatsApp:</label>
+                    <input type="url" id="edit-book-link-wa" name="link_wa">
+                </div>
+                <div class="form-group">
+                    <label for="edit-book-link-shopee">Link Shopee:</label>
+                    <input type="url" id="edit-book-link-shopee" name="link_shopee">
+                </div>
+                <div class="form-group">
+                    <label for="edit-book-link-tiktok">Link TikTok:</label>
+                    <input type="url" id="edit-book-link-tiktok" name="link_tiktok">
+                </div>
+                <div class="form-group">
+                    <label for="edit-book-image">Ganti Foto Kitab (biarkan kosong jika tidak diubah):</label>
+                    <input type="file" id="edit-book-image" name="image" accept="image/png, image/jpeg, image/webp">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Simpan Perubahan
+                </button>
             </form>
         </div>
     </div>
@@ -193,9 +806,211 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        // Global variables
         const messageDiv = document.getElementById('message');
         const books = [];
+        let salesChart = null;
 
+        // Initialize
+        $(document).ready(function() {
+            // Set default dates for chart
+            const today = new Date();
+            const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            $('#startDate').val(lastMonth.toISOString().split('T')[0]);
+            $('#endDate').val(today.toISOString().split('T')[0]);
+
+            // Load initial data
+            loadInitialData();
+            loadDashboardStats();
+            initializeChart();
+
+            // Navigation
+            $('.menu-item').on('click', function(e) {
+                e.preventDefault();
+                const section = $(this).data('section');
+                
+                // Update active menu
+                $('.menu-item').removeClass('active');
+                $(this).addClass('active');
+                
+                // Show corresponding section
+                $('.content-section').removeClass('active');
+                $(`#${section}-section`).addClass('active');
+            });
+
+            // Mobile menu toggle
+            $('#menuToggle').on('click', function() {
+                $('#sidebar').toggleClass('active');
+            });
+
+            // Modal
+            $('.close-button').on('click', () => $('#edit-book-modal').hide());
+            
+            // Form submissions
+            $('#add-book-form').on('submit', function(e) { 
+                e.preventDefault(); 
+                handleFormSubmit(this, '/api/add-book'); 
+            });
+            
+            $('#edit-book-form').on('submit', function(e) { 
+                e.preventDefault(); 
+                handleFormSubmit(this, '/api/update-book'); 
+            });
+            
+            $('#import-form').on('submit', function(e) { 
+                e.preventDefault(); 
+                handleFormSubmit(this, '/api/import-buyers'); 
+            });
+            
+            $('#offline-sale-form').on('submit', function(e) { 
+                e.preventDefault(); 
+                handleRekapSubmit(this, '/api/add-offline-sale'); 
+            });
+            
+            $('#online-sale-form').on('submit', function(e) { 
+                e.preventDefault(); 
+                handleRekapSubmit(this, '/api/add-online-sale'); 
+            });
+
+            // Select change events
+            $('#offline-book, #online-book').on('select2:select', updatePriceDisplay);
+        });
+
+        // Dashboard functions
+        async function loadDashboardStats() {
+            try {
+                // Load books count
+                const booksResponse = await fetch('/api/books/all');
+                const allBooks = await booksResponse.json();
+                $('#totalBooks').text(allBooks.length);
+
+                // Load buyers count
+                const buyersResponse = await fetch('/api/offline-buyers');
+                const buyers = await buyersResponse.json();
+                $('#totalBuyers').text(buyers.length);
+
+                // Load sales totals
+                const offlineResponse = await fetch('/api/recent-offline-sales');
+                const offlineSales = await offlineResponse.json();
+                const totalOffline = offlineSales.reduce((sum, sale) => sum + sale.total_price, 0);
+                $('#totalOfflineSales').text(`Rp ${totalOffline.toLocaleString('id-ID')}`);
+
+                const onlineResponse = await fetch('/api/recent-online-sales');
+                const onlineSales = await onlineResponse.json();
+                const totalOnline = onlineSales.reduce((sum, sale) => sum + sale.total_price, 0);
+                $('#totalOnlineSales').text(`Rp ${totalOnline.toLocaleString('id-ID')}`);
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+
+        function initializeChart() {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Penjualan Offline',
+                        data: [],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.3
+                    }, {
+                        label: 'Penjualan Online',
+                        data: [],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': Rp ' + context.parsed.y.toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + value.toLocaleString('id-ID');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            updateChart();
+        }
+
+        async function updateChart() {
+            const startDate = $('#startDate').val();
+            const endDate = $('#endDate').val();
+            
+            if (!startDate || !endDate) return;
+
+            try {
+                // Fetch sales data
+                const [offlineResponse, onlineResponse] = await Promise.all([
+                    fetch('/api/recent-offline-sales'),
+                    fetch('/api/recent-online-sales')
+                ]);
+                
+                const offlineSales = await offlineResponse.json();
+                const onlineSales = await onlineResponse.json();
+
+                // Process data by date
+                const salesByDate = {};
+                
+                // Process offline sales
+                offlineSales.forEach(sale => {
+                    const date = sale.sale_date_formatted.split(' ')[0];
+                    if (!salesByDate[date]) {
+                        salesByDate[date] = { offline: 0, online: 0 };
+                    }
+                    salesByDate[date].offline += sale.total_price;
+                });
+
+                // Process online sales
+                onlineSales.forEach(sale => {
+                    const date = sale.sale_date_formatted.split(' ')[0];
+                    if (!salesByDate[date]) {
+                        salesByDate[date] = { offline: 0, online: 0 };
+                    }
+                    salesByDate[date].online += sale.total_price;
+                });
+
+                // Filter by date range
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const filteredDates = Object.keys(salesByDate).filter(date => {
+                    const [day, month, year] = date.split('-');
+                    const dateObj = new Date(year, month - 1, day);
+                    return dateObj >= start && dateObj <= end;
+                }).sort();
+
+                // Update chart
+                salesChart.data.labels = filteredDates;
+                salesChart.data.datasets[0].data = filteredDates.map(date => salesByDate[date]?.offline || 0);
+                salesChart.data.datasets[1].data = filteredDates.map(date => salesByDate[date]?.online || 0);
+                salesChart.update();
+            } catch (error) {
+                console.error('Error updating chart:', error);
+            }
+        }
+
+        // Utility functions
         function showMessage(text, type) {
             messageDiv.textContent = text;
             messageDiv.className = '';
@@ -212,18 +1027,16 @@
 
             const selectedOnlineBook = books.find(b => b.id == $('#online-book').val());
             if (selectedOnlineBook) {
-                const quantity = parseInt($('#online-quantity').val()) || 1;
                 const ongkir = 15000;
-                const total = (selectedOnlineBook.price * quantity) + ongkir;
-                
                 $('#online-price').val(formatToRupiah(selectedOnlineBook.price));
                 $('#online-ongkir').val(formatToRupiah(ongkir));
-                $('#online-total').val(formatToRupiah(total));
+                $('#online-total').val(formatToRupiah(selectedOnlineBook.price + ongkir));
             } else {
                 $('#online-price, #online-ongkir, #online-total').val('');
             }
         }
 
+        // CRUD functions
         async function loadBooksTable() {
             const response = await fetch('/api/books/all');
             const allBooks = await response.json();
@@ -241,8 +1054,12 @@
                         <td>${book.availability}</td>
                         <td>
                             <div class="btn-group">
-                                <a href="#" class="button btn-edit" onclick="event.preventDefault(); editBook(${book.id})">Edit</a>
-                                <a href="#" class="button btn-danger" onclick="event.preventDefault(); deleteBook(${book.id}, '${book.name.replace(/'/g, "\\'")}')">Hapus</a>
+                                <button class="btn btn-success" onclick="editBook(${book.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteBook(${book.id}, '${book.name.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
                             </div>
                         </td>
                     </tr>`;
@@ -256,7 +1073,15 @@
             const offTbody = $('#all-offline-sales tbody');
             offTbody.empty();
             offSales.forEach(s => {
-                offTbody.append(`<tr><td>${s.sale_date_formatted}</td><td>${s.buyer_name}</td><td>${s.dormitory || '-'}</td><td>${s.address || '-'}</td><td>${s.book_name}</td><td>${s.quantity}</td><td>Rp ${s.total_price.toLocaleString('id-ID')}</td></tr>`);
+                offTbody.append(`<tr>
+                    <td>${s.sale_date_formatted}</td>
+                    <td>${s.buyer_name}</td>
+                    <td>${s.dormitory || '-'}</td>
+                    <td>${s.address || '-'}</td>
+                    <td>${s.book_name}</td>
+                    <td>${s.quantity}</td>
+                    <td>Rp ${s.total_price.toLocaleString('id-ID')}</td>
+                </tr>`);
             });
 
             const onResponse = await fetch('/api/recent-online-sales');
@@ -264,13 +1089,24 @@
             const onTbody = $('#all-online-sales tbody');
             onTbody.empty();
             onSales.forEach(s => {
-                onTbody.append(`<tr><td>${s.sale_date_formatted}</td><td>${s.transfer_date_formatted || '-'}</td><td>${s.buyer_name}</td><td>${s.buyer_address}</td><td>${s.book_name}</td><td>Rp ${s.shipping_cost.toLocaleString('id-ID')}</td><td>Rp ${s.total_price.toLocaleString('id-ID')}</td></tr>`);
+                onTbody.append(`<tr>
+                    <td>${s.sale_date_formatted}</td>
+                    <td>${s.transfer_date_formatted || '-'}</td>
+                    <td>${s.buyer_name}</td>
+                    <td>${s.buyer_address}</td>
+                    <td>${s.book_name}</td>
+                    <td>Rp ${s.shipping_cost.toLocaleString('id-ID')}</td>
+                    <td>Rp ${s.total_price.toLocaleString('id-ID')}</td>
+                </tr>`);
             });
         }
 
         async function editBook(id) {
             const response = await fetch(`/api/book/${id}`);
-            if (!response.ok) { alert('Gagal memuat data kitab.'); return; }
+            if (!response.ok) { 
+                alert('Gagal memuat data kitab.'); 
+                return; 
+            }
             const book = await response.json();
 
             $('#edit-book-id').val(book.id);
@@ -292,7 +1128,10 @@
                 const response = await fetch(`/api/delete-book/${id}`, { method: 'POST' });
                 const result = await response.json();
                 showMessage(result.message || `Error: ${result.error}`, response.ok ? 'success' : 'error');
-                if (response.ok) loadInitialData();
+                if (response.ok) {
+                    loadInitialData();
+                    loadDashboardStats();
+                }
             } else if (confirmation !== null) {
                 alert("Nama tidak sesuai. Penghapusan dibatalkan.");
             }
@@ -323,46 +1162,39 @@
             updatePriceDisplay();
         }
 
-        $(document).ready(function() {
-            loadInitialData();
+        // Form handlers
+        async function handleFormSubmit(form, url) {
+            const formData = new FormData(form);
+            const response = await fetch(url, { method: 'POST', body: formData });
+            const result = await response.json();
+            showMessage(result.message || `Error: ${result.error}`, response.ok ? 'success' : 'error');
+            if (response.ok) {
+                form.reset();
+                $('#edit-book-modal').hide();
+                loadInitialData();
+                loadDashboardStats();
+                updateChart();
+            }
+        }
 
-            $('#offline-book, #online-book').on('select2:select', updatePriceDisplay);
-
-            $('.close-button').on('click', () => $('#edit-book-modal').hide());
-
-            const handleFormSubmit = async (form, url) => {
-                const formData = new FormData(form);
-                const response = await fetch(url, { method: 'POST', body: formData });
-                const result = await response.json();
-                showMessage(result.message || `Error: ${result.error}`, response.ok ? 'success' : 'error');
-                if (response.ok) {
-                    form.reset();
-                    $('#edit-book-modal').hide();
-                    loadInitialData();
-                }
-            };
-
-            $('#add-book-form').on('submit', function(e) { e.preventDefault(); handleFormSubmit(this, '/api/add-book'); });
-            $('#edit-book-form').on('submit', function(e) { e.preventDefault(); handleFormSubmit(this, '/api/update-book'); });
-            $('#import-form').on('submit', function(e) { e.preventDefault(); handleFormSubmit(this, '/api/import-buyers'); });
-
-            const handleRekapSubmit = async (form, url) => {
-                const data = Object.fromEntries(new FormData(form).entries());
-                const response = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
-                const result = await response.json();
-                showMessage(result.message || `Error: ${result.error}`, response.ok ? 'success' : 'error');
-                if (response.ok) {
-                    form.reset();
-                    $(form).find('select').val(null).trigger('change');
-                    loadRecentSales();
-                    updatePriceDisplay();
-                }
-            };
-
-            $('#offline-sale-form').on('submit', function(e) { e.preventDefault(); handleRekapSubmit(this, '/api/add-offline-sale'); });
-            $('#online-sale-form').on('submit', function(e) { e.preventDefault(); handleRekapSubmit(this, '/api/add-online-sale'); });
-            $('#online-quantity').on('input', updatePriceDisplay);
-        });
+        async function handleRekapSubmit(form, url) {
+            const data = Object.fromEntries(new FormData(form).entries());
+            const response = await fetch(url, { 
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json'}, 
+                body: JSON.stringify(data) 
+            });
+            const result = await response.json();
+            showMessage(result.message || `Error: ${result.error}`, response.ok ? 'success' : 'error');
+            if (response.ok) {
+                form.reset();
+                $(form).find('select').val(null).trigger('change');
+                loadRecentSales();
+                loadDashboardStats();
+                updateChart();
+                updatePriceDisplay();
+            }
+        }
     </script>
 </body>
 </html>

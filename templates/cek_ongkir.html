@@ -5,155 +5,620 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cek Ongkos Kirim - Amtsilati Store</title>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background-color: #f0f2f5; }
-        .header { background-color: #fff; padding: 1.5em; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-bottom: 3px solid #007bff; }
-        .header h1 { margin: 0; color: #007bff; }
-        .container { max-width: 600px; margin: 2em auto; padding: 2em; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        form { display: flex; flex-direction: column; gap: 1.5em; }
-        label { font-weight: 600; }
-        input, select { padding: 0.8em; border-radius: 8px; border: 1px solid #ccc; font-size: 1em; width: 100%; box-sizing: border-box; }
-        button { padding: 1em; background-color: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        button:hover { background-color: #0056b3; }
-        #results { margin-top: 2em; }
-        .result-item { border: 1px solid #e0e0e0; padding: 1em; border-radius: 8px; margin-bottom: 1em; }
-        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .select2-container .select2-selection--single { height: auto !important; padding: 0.5em; }
-        .back-link { display: inline-block; margin-top: 2em; text-decoration: none; color: #007bff; font-weight: 600; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-bg: #f8fafc;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --text-muted: #6b7280;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--white);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        /* Form Card */
+        .form-card {
+            background-color: var(--white);
+            border-radius: 1rem;
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h2 {
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Origin Info */
+        .origin-info {
+            background-color: var(--light-bg);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .origin-info i {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+        }
+
+        .origin-info span {
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        /* Form Styles */
+        form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        input, select {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        input:disabled {
+            background-color: var(--light-bg);
+            cursor: not-allowed;
+        }
+
+        /* Select2 Custom Styles */
+        .select2-container .select2-selection--single {
+            height: auto !important;
+            padding: 0.5rem;
+            border: 2px solid var(--border-color) !important;
+            border-radius: 0.5rem !important;
+        }
+
+        .select2-container--default .select2-selection--single:focus {
+            border-color: var(--primary-color) !important;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            padding: 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-submit:disabled {
+            background-color: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loader */
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .results-header h3 {
+            font-size: 1.125rem;
+            color: var(--dark-color);
+        }
+
+        .result-card {
+            background-color: var(--white);
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .result-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.75rem;
+        }
+
+        .service-name {
+            font-weight: 600;
+            color: var(--dark-color);
+            font-size: 1rem;
+        }
+
+        .service-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .result-details {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .result-details span {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Error State */
+        .error-state {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--white);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0 2rem;
+        }
+
+        .footer p {
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .form-card {
+                padding: 1.5rem;
+            }
+
+            .result-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .result-details {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <header class="header"><h1>Cek Ongkos Kirim</h1></header>
-    <main class="container">
-        <form id="ongkir-form">
-            <div>
-                <label>Kota Asal (Toko):</label>
-                <!-- Mengubah tampilan kota asal sesuai permintaan -->
-                <input type="text" value="Bangsri, Jepara, Jawa Tengah" disabled>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1><i class="fas fa-truck"></i> Cek Ongkos Kirim</h1>
+            <a href="/toko" class="nav-link">
+                <i class="fas fa-arrow-left"></i> Kembali ke Katalog
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Estimasi Biaya Pengiriman</h2>
+                <p>Cek biaya pengiriman kitab ke alamat Anda</p>
             </div>
-            <hr>
-            <div>
-                <label for="dest-province">Provinsi Tujuan:</label>
-                <select id="dest-province" required></select>
+
+            <div class="origin-info">
+                <i class="fas fa-store"></i>
+                <div>
+                    <span>Lokasi Toko:</span>
+                    <p style="color: var(--text-muted); font-size: 0.875rem;">Bangsri, Jepara, Jawa Tengah</p>
+                </div>
             </div>
-            <div>
-                <label for="dest-city">Kota/Kabupaten Tujuan:</label>
-                <select id="dest-city" required disabled></select>
+
+            <form id="ongkir-form">
+                <div class="form-group">
+                    <label for="dest-province">
+                        <i class="fas fa-map-marker-alt"></i> Provinsi Tujuan
+                    </label>
+                    <select id="dest-province" required>
+                        <option value="">Pilih Provinsi...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="dest-city">
+                        <i class="fas fa-city"></i> Kota/Kabupaten Tujuan
+                    </label>
+                    <select id="dest-city" required disabled>
+                        <option value="">Pilih provinsi terlebih dahulu</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="weight">
+                        <i class="fas fa-weight"></i> Berat Paket (gram)
+                    </label>
+                    <input type="number" id="weight" value="1000" min="100" max="30000" required>
+                    <small style="color: var(--text-muted); font-size: 0.75rem;">
+                        Estimasi berat standar untuk 1-2 kitab
+                    </small>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="fas fa-search"></i>
+                    <span>Cek Ongkir</span>
+                    <div id="loader" class="loader"></div>
+                </button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results-section" class="results-section">
+            <div class="results-header">
+                <i class="fas fa-shipping-fast"></i>
+                <h3>Hasil Pengecekan Ongkir</h3>
             </div>
-            <div>
-                <label for="weight">Berat (gram):</label>
-                <input type="number" id="weight" value="1000" min="1" required>
-            </div>
-            <button type="submit">Cek Ongkir <div id="loader" class="loader"></div></button>
-        </form>
-        <div id="results"></div>
-        <a href="/toko" class="back-link">&larr; Kembali ke Katalog</a>
+            <div id="results"></div>
+        </div>
     </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 Amtsilati Store. All Rights Reserved.</p>
+            <p>
+                <a href="{{ url_for('login') }}">
+                    <i class="fas fa-user-shield"></i> Admin Login
+                </a>
+            </p>
+        </div>
+    </footer>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Inisialisasi Select2
+            // Initialize Select2
             $('#dest-province, #dest-city').select2({
-                placeholder: "Pilih salah satu...",
-                width: '100%' // Pastikan lebar sesuai
+                placeholder: function() {
+                    return $(this).find('option:first').text();
+                },
+                width: '100%'
             });
 
-            // Mengisi dropdown provinsi tujuan
-            $.ajax({
-                url: '/api/provinsi',
-                method: 'GET',
-                success: function(provinces) {
-                    $('#dest-province').append(new Option("Pilih Provinsi...", ""));
-                    provinces.forEach(p => {
-                        $('#dest-province').append(new Option(p.province, p.province_id));
-                    });
-                }
-            });
+            // Load provinces
+            loadProvinces();
 
-            // Mengisi dropdown kota tujuan saat provinsi dipilih
+            // Province change event
             $('#dest-province').on('change', function() {
                 const provId = $(this).val();
                 const citySelect = $('#dest-city');
                 
-                // Kosongkan dan nonaktifkan dropdown kota
                 citySelect.empty().prop('disabled', true);
                 
                 if (!provId) {
-                    // Jika tidak ada provinsi yang dipilih, reset placeholder
-                    citySelect.append(new Option("Pilih Provinsi terlebih dahulu", "")).trigger('change');
+                    citySelect.append(new Option("Pilih provinsi terlebih dahulu", ""));
                     return;
                 }
 
-                // Tampilkan status loading
-                citySelect.append(new Option("Memuat kota...", "")).trigger('change');
-
-                $.ajax({
-                    url: `/api/kota/${provId}`,
-                    method: 'GET',
-                    success: function(cities) {
-                        // Kosongkan lagi sebelum diisi data baru
-                        citySelect.empty();
-                        citySelect.append(new Option("Pilih Kota/Kabupaten...", ""));
-                        cities.forEach(c => {
-                            citySelect.append(new Option(`${c.type} ${c.city_name}`, c.city_id));
-                        });
-                        // Aktifkan kembali dropdown kota
-                        citySelect.prop('disabled', false);
-                        // Perbarui tampilan Select2
-                        citySelect.trigger('change');
-                    },
-                    error: function() {
-                        citySelect.empty().append(new Option("Gagal memuat kota", "")).trigger('change');
-                    }
-                });
+                loadCities(provId);
             });
 
-            // Menangani submit form
+            // Form submit
             $('#ongkir-form').on('submit', function(e) {
                 e.preventDefault();
-                $('#loader').show();
-                $('#results').html('');
-
-                const payload = {
-                    origin_city_id: '153', // ID Kabupaten Jepara
-                    destination_city_id: $('#dest-city').val(),
-                    weight: $('#weight').val()
-                };
-
-                $.ajax({
-                    url: '/api/cek-ongkir',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function(costs) {
-                        $('#loader').hide();
-                        if (costs.length === 0) {
-                            $('#results').html('<p>Layanan pengiriman tidak ditemukan untuk tujuan ini.</p>');
-                            return;
-                        }
-                        costs.forEach(cost => {
-                            const price = cost.cost[0].value.toLocaleString('id-ID');
-                            const etd = cost.cost[0].etd.replace(' HARI', '');
-                            const item = `
-                                <div class="result-item">
-                                    <strong>Layanan: ${cost.service} (${cost.description})</strong><br>
-                                    <span>Estimasi: ${etd} hari</span><br>
-                                    <span>Harga: Rp ${price}</span>
-                                </div>
-                            `;
-                            $('#results').append(item);
-                        });
-                    },
-                    error: function() {
-                        $('#loader').hide();
-                        $('#results').html('<p>Terjadi kesalahan. Pastikan API Key Anda benar dan kota tujuan sudah dipilih.</p>');
-                    }
-                });
+                checkOngkir();
             });
         });
+
+        async function loadProvinces() {
+            try {
+                const response = await fetch('/api/provinsi');
+                const provinces = await response.json();
+                
+                provinces.forEach(p => {
+                    $('#dest-province').append(new Option(p.province, p.province_id));
+                });
+            } catch (error) {
+                showError('Gagal memuat data provinsi');
+            }
+        }
+
+        async function loadCities(provId) {
+            const citySelect = $('#dest-city');
+            citySelect.append(new Option("Memuat kota...", ""));
+
+            try {
+                const response = await fetch(`/api/kota/${provId}`);
+                const cities = await response.json();
+                
+                citySelect.empty();
+                citySelect.append(new Option("Pilih Kota/Kabupaten...", ""));
+                
+                cities.forEach(c => {
+                    citySelect.append(new Option(`${c.type} ${c.city_name}`, c.city_id));
+                });
+                
+                citySelect.prop('disabled', false);
+            } catch (error) {
+                citySelect.empty().append(new Option("Gagal memuat kota", ""));
+                showError('Gagal memuat data kota');
+            }
+        }
+
+        async function checkOngkir() {
+            const submitBtn = $('#submitBtn');
+            const loader = $('#loader');
+            const resultsSection = $('#results-section');
+            const results = $('#results');
+            
+            // Show loader
+            submitBtn.prop('disabled', true);
+            loader.show();
+            submitBtn.find('span').text('Mencari...');
+            
+            // Clear previous results
+            results.empty();
+            resultsSection.hide();
+
+            const payload = {
+                origin_city_id: '153',
+                destination_city_id: $('#dest-city').val(),
+                weight: $('#weight').val()
+            };
+
+            try {
+                const response = await fetch('/api/cek-ongkir', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                
+                const costs = await response.json();
+                
+                if (costs.length === 0) {
+                    results.html(`
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <h3>Tidak ada layanan tersedia</h3>
+                            <p>Maaf, tidak ada layanan pengiriman untuk tujuan ini</p>
+                        </div>
+                    `);
+                } else {
+                    costs.forEach(cost => {
+                        const price = cost.cost[0].value.toLocaleString('id-ID');
+                        const etd = cost.cost[0].etd.replace(' HARI', '');
+                        
+                        const resultHtml = `
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div>
+                                        <div class="service-name">${cost.service}</div>
+                                        <div class="service-desc">${cost.description}</div>
+                                    </div>
+                                    <div class="price">Rp ${price}</div>
+                                </div>
+                                <div class="result-details">
+                                    <span><i class="fas fa-clock"></i> ${etd} hari</span>
+                                    <span><i class="fas fa-truck"></i> JNE</span>
+                                </div>
+                            </div>
+                        `;
+                        results.append(resultHtml);
+                    });
+                }
+                
+                resultsSection.show();
+                
+            } catch (error) {
+                showError('Terjadi kesalahan. Silakan coba lagi.');
+            } finally {
+                // Hide loader
+                submitBtn.prop('disabled', false);
+                loader.hide();
+                submitBtn.find('span').text('Cek Ongkir');
+            }
+        }
+
+        function showError(message) {
+            const results = $('#results');
+            results.html(`
+                <div class="error-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    ${message}
+                </div>
+            `);
+            $('#results-section').show();
+        }
     </script>
 </body>
 </html>

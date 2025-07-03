@@ -1,0 +1,28 @@
+# fly.toml app configuration file generated for amtsilati-store on 2025-07-04T01:53:09+07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'amtsilati-store'
+primary_region = 'sin'
+
+[build]
+dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[mounts]
+  source = "amtsilati_data"
+  destination = "/data"
+
