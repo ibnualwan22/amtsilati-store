@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amtsilati Store - Katalog Kitab</title>
+    <title>Amtsilati Store - Katalog Kitab Premium</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,136 +14,279 @@
         }
 
         :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --dark-color: #1f2937;
-            --light-bg: #f8fafc;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
             --white: #ffffff;
-            --border-color: #e5e7eb;
-            --text-muted: #6b7280;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--light-bg);
-            color: var(--dark-color);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-900);
             line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(14, 165, 233, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(245, 158, 11, 0.02) 0%, transparent 50%);
+            z-index: -1;
         }
 
         /* Header */
         .header {
-            background-color: var(--white);
-            box-shadow: var(--shadow-md);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow-md);
         }
 
         .header-content {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
             padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: -0.2rem;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-link {
+            padding: 0.5rem 1rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .admin-link:hover {
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 2rem 3rem;
             text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
         }
 
-        .header h1 {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
+        .hero h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-700) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .header p {
-            color: var(--text-muted);
-            font-size: 1rem;
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
         }
 
-        /* Search Section */
-        .search-section {
-            background-color: var(--white);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1.5rem 0;
-        }
-
+        /* Search Bar */
         .search-container {
             max-width: 600px;
-            margin: 0 auto;
-            padding: 0 2rem;
+            margin: 0 auto 3rem;
             position: relative;
+        }
+
+        .search-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
         }
 
         .search-box {
             width: 100%;
-            padding: 0.75rem 1rem 0.75rem 3rem;
+            padding: 1rem 1rem 1rem 3.5rem;
             font-size: 1rem;
-            border: 2px solid var(--border-color);
-            border-radius: 0.5rem;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            background: white;
             transition: all 0.3s ease;
+            font-weight: 500;
         }
 
         .search-box:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
 
         .search-icon {
             position: absolute;
-            left: 3rem;
+            left: 1.25rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: var(--gray-400);
+            font-size: 1.125rem;
         }
 
-        /* Main Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
+        /* Filter Pills */
+        .filter-container {
+            max-width: 1280px;
+            margin: 0 auto 2rem;
+            padding: 0 2rem;
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-pill {
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            background: white;
+            border: 1px solid var(--gray-200);
+            color: var(--gray-700);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-pill:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .filter-pill.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
         /* Product Grid */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem 4rem;
+        }
+
         .product-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 1.5rem;
             margin-bottom: 3rem;
         }
 
         /* Product Card */
         .product-card {
-            background-color: var(--white);
-            border-radius: 0.75rem;
+            background: white;
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--shadow-xl);
         }
 
         .product-card.out-of-stock {
             opacity: 0.7;
         }
 
-        .product-card.out-of-stock:hover {
-            transform: none;
-            box-shadow: var(--shadow-sm);
-        }
-
         .product-image {
             width: 100%;
-            height: 300px;
-            background-color: #f3f4f6;
+            height: 320px;
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -154,27 +298,37 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.3s ease;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .product-card:hover .product-image img {
-            transform: scale(1.05);
+            transform: scale(1.1);
         }
 
-        .out-of-stock-badge {
+        .badge {
             position: absolute;
             top: 1rem;
             right: 1rem;
-            background-color: var(--danger-color);
-            color: white;
-            padding: 0.25rem 0.75rem;
+            padding: 0.375rem 0.875rem;
             border-radius: 9999px;
             font-size: 0.75rem;
             font-weight: 600;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow);
+        }
+
+        .badge-stock {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        .badge-new {
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
         }
 
         .product-content {
-            padding: 1.25rem;
+            padding: 1.5rem;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -182,16 +336,22 @@
 
         .product-title {
             font-size: 1.125rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--dark-color);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--gray-900);
             line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .product-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 1rem;
         }
 
@@ -200,109 +360,133 @@
         }
 
         .btn {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
             width: 100%;
-            padding: 0.75rem 1rem;
-            text-align: center;
-            text-decoration: none;
-            border-radius: 0.5rem;
+            padding: 0.875rem 1.25rem;
+            border-radius: 12px;
             font-weight: 600;
-            transition: all 0.3s ease;
             font-size: 0.875rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
         }
 
         .btn-primary {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.3);
         }
 
         .btn-primary:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.4);
         }
 
         .btn-disabled {
-            background-color: var(--text-muted);
-            color: white;
+            background: var(--gray-200);
+            color: var(--gray-500);
             cursor: not-allowed;
-        }
-
-        /* Footer */
-        .footer {
-            background-color: var(--white);
-            border-top: 1px solid var(--border-color);
-            padding: 3rem 0;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-            padding: 0 2rem;
-        }
-
-        .footer p {
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
-        }
-
-        .footer a {
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: var(--primary-color);
         }
 
         /* Empty State */
         .empty-state {
             text-align: center;
             padding: 4rem 2rem;
-            color: var(--text-muted);
+            color: var(--gray-500);
         }
 
         .empty-state i {
             font-size: 4rem;
             margin-bottom: 1rem;
-            opacity: 0.5;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--gray-700);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(180deg, rgba(249, 250, 251, 0) 0%, rgba(249, 250, 251, 1) 100%);
+            padding: 4rem 0 2rem;
+            margin-top: 6rem;
+        }
+
+        .footer-content {
+            max-width: 1280px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 0 2rem;
+        }
+
+        .footer-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid var(--gray-200);
+            color: var(--gray-500);
+            font-size: 0.875rem;
         }
 
         /* Loading Animation */
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
         }
 
-        .loading {
-            animation: pulse 1.5s infinite;
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
+            .hero h2 {
+                font-size: 2rem;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 1rem;
+            }
+
             .header-content {
                 padding: 1rem;
             }
 
-            .header h1 {
-                font-size: 1.5rem;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .product-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-                gap: 1rem;
-            }
-
-            .product-image {
-                height: 250px;
+            .logo-text p {
+                display: none;
             }
         }
 
@@ -310,45 +494,122 @@
             .product-grid {
                 grid-template-columns: 1fr;
             }
+
+            .hero {
+                padding: 2rem 1rem;
+            }
+
+            .hero h2 {
+                font-size: 1.75rem;
+            }
         }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card {
+            animation: fadeInUp 0.6s ease forwards;
+            opacity: 0;
+        }
+
+        .product-card:nth-child(1) { animation-delay: 0.1s; }
+        .product-card:nth-child(2) { animation-delay: 0.2s; }
+        .product-card:nth-child(3) { animation-delay: 0.3s; }
+        .product-card:nth-child(4) { animation-delay: 0.4s; }
+        .product-card:nth-child(5) { animation-delay: 0.5s; }
+        .product-card:nth-child(6) { animation-delay: 0.6s; }
     </style>
 </head>
 <body>
-
     <!-- Header -->
-    <header class="header">
+    <header class="header" id="header">
         <div class="header-content">
-            <h1><i class="fas fa-book"></i> Amtsilati Store</h1>
-            <p>Menyediakan Berbagai Macam Kitab Metode Amtsilati dan Pesantren</p>
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Amtsilati Store</h1>
+                    <p>Kitab Metode Pembelajaran Terpercaya</p>
+                </div>
+            </a>
+            <div class="header-actions">
+                <a href="/cek-ongkir" class="admin-link">
+                    <i class="fas fa-truck"></i>
+                    <span>Cek Ongkir</span>
+                </a>
+                <a href="{{ url_for('login') }}" class="admin-link">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admin</span>
+                </a>
+            </div>
         </div>
     </header>
 
-    <!-- Search Section -->
-    <section class="search-section">
+    <!-- Hero Section -->
+    <section class="hero">
+        <h2>Temukan Kitab Pembelajaran Terbaik</h2>
+        <p>Koleksi lengkap kitab metode Amtsilati dan pesantren untuk mendukung perjalanan ilmu Anda</p>
+        
+        <!-- Search Bar -->
         <div class="search-container">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" id="search-box" class="search-box" placeholder="Cari nama kitab...">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-box" class="search-box" placeholder="Cari kitab yang Anda inginkan...">
+            </div>
         </div>
     </section>
+
+    <!-- Filter Pills -->
+    <div class="filter-container">
+        <button class="filter-pill active" data-filter="all">
+            <i class="fas fa-th"></i> Semua Kitab
+        </button>
+        <button class="filter-pill" data-filter="available">
+            <i class="fas fa-check-circle"></i> Tersedia
+        </button>
+        <button class="filter-pill" data-filter="amtsilati">
+            <i class="fas fa-star"></i> Metode Amtsilati
+        </button>
+        <button class="filter-pill" data-filter="pesantren">
+            <i class="fas fa-mosque"></i> Karya Abah yai
+        </button>
+    </div>
 
     <!-- Main Content -->
     <main class="container">
         <div class="product-grid" id="product-grid">
             {% for book in books %}
-            <div class="book-card product-card {% if book.availability != 'Tersedia' %}out-of-stock{% endif %}" data-book-name="{{ book.name|lower }}">
+            <div class="book-card product-card {% if book.availability != 'Tersedia' %}out-of-stock{% endif %}" 
+                 data-book-name="{{ book.name|lower }}"
+                 data-availability="{{ book.availability }}"
+                 data-category="{% if 'amtsilati' in book.name|lower %}amtsilati{% else %}pesantren{% endif %}">
                 <div class="product-image">
                     {% if book.image_filename %}
-                        <img src="{{ url_for('uploaded_file', filename=book.image_filename) }}" 
-                             alt="Foto {{ book.name }}" 
-                             onerror="this.onerror=null; this.src='https://placehold.co/400x600/e2e8f0/4a5568?text=Tidak+Ada+Gambar';">
+                        <div class="product-image">
+    <img src="{{ url_for('uploaded_file', filename=book.image_filename) }}" 
+         alt="{{ book.name }}" 
+         onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\'color: #9ca3af; text-align: center; padding: 2rem;\'><i class=\'fas fa-book\' style=\'font-size: 4rem;\'></i><p style=\'margin-top: 0.5rem;\'>Gambar tidak tersedia</p></div>';">
+</div>
                     {% else %}
-                        <div style="color: #9ca3af;">
-                            <i class="fas fa-book" style="font-size: 3rem;"></i>
-                            <p style="margin-top: 0.5rem;">Gambar tidak tersedia</p>
+                        <div style="color: var(--gray-400);">
+                            <i class="fas fa-book" style="font-size: 4rem;"></i>
+                            <p style="margin-top: 0.5rem; font-size: 0.875rem;">Gambar tidak tersedia</p>
                         </div>
                     {% endif %}
                     {% if book.availability != 'Tersedia' %}
-                        <span class="out-of-stock-badge">Stok Habis</span>
+                        <span class="badge badge-stock">Stok Habis</span>
+                    {% elif loop.index <= 3 %}
+                        <span class="badge badge-new">Baru</span>
                     {% endif %}
                 </div>
                 <div class="product-content">
@@ -357,11 +618,13 @@
                     <div class="product-actions">
                         {% if book.availability == 'Tersedia' %}
                             <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-primary">
-                                <i class="fas fa-shopping-cart"></i> Lihat Detail & Beli
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Lihat Detail</span>
                             </a>
                         {% else %}
                             <button class="btn btn-disabled" disabled>
-                                <i class="fas fa-times-circle"></i> Stok Habis
+                                <i class="fas fa-times-circle"></i>
+                                <span>Stok Habis</span>
                             </button>
                         {% endif %}
                     </div>
@@ -370,23 +633,34 @@
             {% endfor %}
         </div>
 
-        <!-- Empty State (will be shown by JS if no results) -->
+        <!-- Empty State -->
         <div class="empty-state" id="empty-state" style="display: none;">
             <i class="fas fa-search"></i>
             <h3>Tidak ada kitab yang ditemukan</h3>
-            <p>Coba gunakan kata kunci lain</p>
+            <p>Coba gunakan kata kunci lain atau lihat semua koleksi kami</p>
         </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
-            <p>&copy; 2025 Amtsilati Store. All Rights Reserved.</p>
-            <p>
-                <a href="{{ url_for('login') }}">
-                    <i class="fas fa-user-shield"></i> Admin Login
-                </a>
-            </p>
+            <div class="footer-logo">
+                <div class="logo-icon" style="width: 40px; height: 40px;">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <span style="font-weight: 700; font-size: 1.25rem;">Amtsilati Store</span>
+            </div>
+            
+            <div class="footer-links">
+                <a href="/tentang">Tentang Kami</a>
+                <a href="/kontak">Kontak</a>
+                <a href="/bantuan">Bantuan</a>
+                <a href="/syarat-ketentuan">Syarat & Ketentuan</a>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Amtsilati Store. Hak Cipta Dilindungi.</p>
+            </div>
         </div>
     </footer>
 
@@ -396,16 +670,79 @@
             const bookCards = document.querySelectorAll('.book-card');
             const emptyState = document.getElementById('empty-state');
             const productGrid = document.getElementById('product-grid');
+            const filterPills = document.querySelectorAll('.filter-pill');
+            const header = document.getElementById('header');
+
+            // Header scroll effect
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+
+            // Filter functionality
+            filterPills.forEach(pill => {
+                pill.addEventListener('click', function() {
+                    filterPills.forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.dataset.filter;
+                    filterBooks(filter);
+                });
+            });
+
+            function filterBooks(filter) {
+                let visibleCount = 0;
+                
+                bookCards.forEach(card => {
+                    let show = false;
+                    
+                    switch(filter) {
+                        case 'all':
+                            show = true;
+                            break;
+                        case 'available':
+                            show = card.dataset.availability === 'Tersedia';
+                            break;
+                        case 'amtsilati':
+                        case 'pesantren':
+                            show = card.dataset.category === filter;
+                            break;
+                    }
+                    
+                    if (show && (searchBox.value === '' || card.dataset.bookName.includes(searchBox.value.toLowerCase()))) {
+                        card.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+            }
 
             // Search functionality
             searchBox.addEventListener('input', function() {
                 const searchTerm = searchBox.value.toLowerCase();
                 let visibleCount = 0;
+                const activeFilter = document.querySelector('.filter-pill.active').dataset.filter;
 
                 bookCards.forEach(function(card) {
                     const bookName = card.dataset.bookName;
+                    let matchesSearch = bookName.includes(searchTerm);
+                    let matchesFilter = true;
                     
-                    if (bookName.includes(searchTerm)) {
+                    if (activeFilter !== 'all') {
+                        if (activeFilter === 'available') {
+                            matchesFilter = card.dataset.availability === 'Tersedia';
+                        } else {
+                            matchesFilter = card.dataset.category === activeFilter;
+                        }
+                    }
+                    
+                    if (matchesSearch && matchesFilter) {
                         card.style.display = 'flex';
                         visibleCount++;
                     } else {
@@ -413,24 +750,25 @@
                     }
                 });
 
-                // Show/hide empty state
-                if (visibleCount === 0 && searchTerm !== '') {
-                    emptyState.style.display = 'block';
-                } else {
-                    emptyState.style.display = 'none';
-                }
+                emptyState.style.display = visibleCount === 0 && searchTerm !== '' ? 'block' : 'none';
             });
 
-            // Add loading animation to images
-            const images = document.querySelectorAll('.product-image img');
-            images.forEach(img => {
-                img.classList.add('loading');
-                img.addEventListener('load', function() {
-                    this.classList.remove('loading');
+            // Lazy loading for images
+            const imageObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('skeleton');
+                        observer.unobserve(img);
+                    }
                 });
+            });
+
+            document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+                imageObserver.observe(img);
             });
         });
     </script>
-
 </body>
 </html>

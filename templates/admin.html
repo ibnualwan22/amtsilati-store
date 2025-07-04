@@ -6,6 +6,7 @@
     <title>Dashboard Admin - Amtsilati Store</title>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -15,29 +16,44 @@
         }
 
         :root {
-            --primary-color: #2563eb;
-            --secondary-color: #1e40af;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
-            --dark-color: #1f2937;
-            --light-bg: #f8fafc;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #0f172a;
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
             --white: #ffffff;
-            --border-color: #e5e7eb;
-            --text-muted: #6b7280;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --sidebar-width: 260px;
+            --topbar-height: 70px;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background-color: var(--light-bg);
-            color: var(--dark-color);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-900);
             line-height: 1.6;
         }
 
-        /* Layout Structure */
+        /* Layout */
         .admin-wrapper {
             display: flex;
             min-height: 100vh;
@@ -45,35 +61,89 @@
 
         /* Sidebar */
         .sidebar {
-            width: 250px;
-            background-color: var(--dark-color);
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark) 0%, var(--gray-900) 100%);
             color: white;
             position: fixed;
             height: 100vh;
             overflow-y: auto;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
+            box-shadow: var(--shadow-xl);
         }
 
         .sidebar-header {
-            padding: 1.5rem;
-            background-color: rgba(0, 0, 0, 0.2);
+            padding: 1.75rem 1.5rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .sidebar-close {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-logo {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
         }
 
         .sidebar-header h2 {
             font-size: 1.25rem;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .sidebar-menu {
             padding: 1rem 0;
         }
 
+        .menu-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-section-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
         .menu-item {
-            display: block;
-            padding: 0.75rem 1.5rem;
-            color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             transition: all 0.3s ease;
             cursor: pointer;
@@ -81,38 +151,55 @@
             background: none;
             width: 100%;
             text-align: left;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
         }
 
         .menu-item:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             color: white;
             padding-left: 2rem;
         }
 
         .menu-item.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-left: 4px solid white;
+            background: rgba(99, 102, 241, 0.15);
+            color: var(--primary-light);
+            border-left: 4px solid var(--primary);
+        }
+
+        .menu-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.2) 0%, transparent 100%);
         }
 
         .menu-item i {
             width: 20px;
-            margin-right: 0.75rem;
+            margin-right: 0.875rem;
+            font-size: 1.125rem;
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 250px;
+            margin-left: var(--sidebar-width);
             min-height: 100vh;
+            background: var(--gray-50);
         }
 
-        /* Top Bar */
+        /* Topbar */
         .topbar {
-            background-color: white;
-            padding: 1rem 2rem;
-            box-shadow: var(--shadow-sm);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            height: var(--topbar-height);
+            padding: 0 2rem;
+            box-shadow: var(--shadow);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -121,9 +208,25 @@
             z-index: 100;
         }
 
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-700);
+        }
+
         .topbar h1 {
             font-size: 1.5rem;
-            color: var(--dark-color);
+            font-weight: 700;
+            color: var(--gray-900);
         }
 
         .topbar-actions {
@@ -132,18 +235,47 @@
             align-items: center;
         }
 
-        .btn-logout {
-            background-color: var(--danger-color);
-            color: white;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
+            border-radius: 12px;
+            background: var(--gray-100);
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 10px;
             text-decoration: none;
             font-size: 0.875rem;
-            transition: background-color 0.3s ease;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
         }
 
         .btn-logout:hover {
-            background-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
         }
 
         /* Content Area */
@@ -157,118 +289,189 @@
 
         .content-section.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
 
-        /* Cards */
-        .card {
-            background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: var(--shadow-sm);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .card-title {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-
-        /* Dashboard Stats */
+        /* Stats Cards */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .stat-card {
-            background-color: white;
-            padding: 1.5rem;
-            border-radius: 0.5rem;
-            box-shadow: var(--shadow-sm);
-            border-left: 4px solid var(--primary-color);
+            background: white;
+            padding: 1.75rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-100);
         }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .stat-card.success::before { background: linear-gradient(180deg, var(--success) 0%, #059669 100%); }
+        .stat-card.warning::before { background: linear-gradient(180deg, var(--warning) 0%, #d97706 100%); }
+        .stat-card.danger::before { background: linear-gradient(180deg, var(--danger) 0%, #dc2626 100%); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        .stat-card.success .stat-icon { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-card.warning .stat-icon { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .stat-card.danger .stat-icon { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
 
         .stat-card h3 {
             font-size: 0.875rem;
-            color: var(--text-muted);
-            margin-bottom: 0.5rem;
+            color: var(--gray-500);
+            margin-bottom: 0.25rem;
+            font-weight: 500;
         }
 
         .stat-value {
             font-size: 2rem;
-            font-weight: 700;
-            color: var(--dark-color);
+            font-weight: 800;
+            color: var(--gray-900);
+            line-height: 1;
         }
 
-        /* Charts */
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-bottom: 2rem;
-        }
-
-        .date-filter {
-            display: flex;
-            gap: 1rem;
+        .stat-change {
+            display: inline-flex;
             align-items: center;
-            margin-bottom: 1rem;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
         }
 
-        .date-filter input {
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
+        .stat-change.negative {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
         }
 
         /* Forms */
-        form {
+        .form-grid {
             display: grid;
-            gap: 1rem;
+            gap: 1.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
         }
 
         .form-group {
-            display: grid;
+            display: flex;
+            flex-direction: column;
             gap: 0.5rem;
         }
 
         label {
             font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--dark-color);
+            font-weight: 600;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         input, select, textarea {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
             font-size: 0.875rem;
-            transition: border-color 0.3s ease;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: var(--gray-50);
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
         }
 
         /* Buttons */
         .btn {
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
             font-size: 0.875rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             border: none;
@@ -276,36 +479,49 @@
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            text-decoration: none;
         }
 
         .btn-primary {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
         }
 
         .btn-primary:hover {
-            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
         }
 
         .btn-success {
-            background-color: var(--success-color);
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
 
         .btn-danger {
-            background-color: var(--danger-color);
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
         }
 
-        .btn-group {
-            display: flex;
-            gap: 0.5rem;
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+            transform: translateY(-1px);
         }
 
         /* Tables */
-        .table-responsive {
+        .table-container {
             overflow-x: auto;
-            margin-top: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            background: white;
         }
 
         table {
@@ -315,28 +531,39 @@
         }
 
         th {
-            background-color: var(--light-bg);
-            padding: 0.75rem;
+            background: var(--gray-50);
+            padding: 1rem;
             text-align: left;
             font-weight: 600;
-            color: var(--dark-color);
-            border-bottom: 1px solid var(--border-color);
+            color: var(--gray-700);
+            border-bottom: 2px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-100);
         }
 
         tr:hover {
-            background-color: var(--light-bg);
+            background: var(--gray-50);
         }
 
         .table-image {
-            width: 40px;
-            height: 60px;
+            width: 50px;
+            height: 70px;
             object-fit: cover;
-            border-radius: 0.25rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            padding: 1rem;
         }
 
         /* Modal */
@@ -346,21 +573,36 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2000;
+            padding: 1rem;
         }
 
         .modal-content {
-            background-color: white;
+            background: white;
             padding: 2rem;
-            border-radius: 0.5rem;
-            width: 90%;
+            border-radius: 16px;
+            width: 100%;
             max-width: 500px;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
         .modal-header {
@@ -370,42 +612,63 @@
             margin-bottom: 1.5rem;
         }
 
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
         .close-button {
-            font-size: 1.5rem;
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            color: var(--text-muted);
-            background: none;
+            background: var(--gray-100);
             border: none;
+            color: var(--gray-600);
+            transition: all 0.3s ease;
+        }
+
+        .close-button:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
         }
 
         /* Messages */
         #message {
-            padding: 1rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1rem;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
             display: none;
             font-size: 0.875rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         #message.success {
-            background-color: #d1fae5;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
             color: #065f46;
-            border: 1px solid #a7f3d0;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         #message.error {
-            background-color: #fee2e2;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
             color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        /* Mobile Menu Toggle */
-        .mobile-menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         /* Responsive */
@@ -429,18 +692,122 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
+
+            .topbar {
+                padding: 0 1rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
 
-        /* Utilities */
-        .text-muted {
-            color: var(--text-muted);
+        /* Loading */
+        .loading {
+            position: relative;
+            overflow: hidden;
         }
 
-        .mb-0 { margin-bottom: 0; }
-        .mb-1 { margin-bottom: 0.5rem; }
-        .mb-2 { margin-bottom: 1rem; }
-        .mb-3 { margin-bottom: 1.5rem; }
-        .mb-4 { margin-bottom: 2rem; }
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Custom Select2 Styling */
+        .select2-container .select2-selection--single {
+            height: auto !important;
+            padding: 0.65rem 1rem !important;
+            border: 2px solid var(--gray-200) !important;
+            border-radius: 10px !important;
+            background: var(--gray-50) !important;
+            font-weight: 500 !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: var(--primary) !important;
+            background: white !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+        }
+
+        .select2-dropdown {
+            border-radius: 10px !important;
+            border: 2px solid var(--gray-200) !important;
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        .select2-results__option--highlighted {
+            background: var(--primary) !important;
+        }
+
+        /* Date Filter */
+        .date-filter {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .date-filter label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .action-btn-edit {
+            background: var(--success);
+            color: white;
+        }
+
+        .action-btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
     </style>
 </head>
 <body>
@@ -448,49 +815,66 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2><i class="fas fa-book"></i> Amtsilati Store</h2>
+                <div class="sidebar-logo">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <h2>Amtsilati Store</h2>
+                <button class="sidebar-close" id="sidebarClose">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <nav class="sidebar-menu">
-                <a href="#" class="menu-item active" data-section="dashboard">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </a>
-                <a href="#" class="menu-item" data-section="books">
-                    <i class="fas fa-book"></i> Manajemen Kitab
-                </a>
-                <a href="#" class="menu-item" data-section="offline-buyers">
-                    <i class="fas fa-users"></i> Data Pembeli
-                </a>
-                <a href="#" class="menu-item" data-section="offline-sales">
-                    <i class="fas fa-store"></i> Penjualan Offline
-                </a>
-                <a href="#" class="menu-item" data-section="online-sales">
-                    <i class="fas fa-shopping-cart"></i> Penjualan Online
-                </a>
-                <a href="#" class="menu-item" data-section="transactions">
-                    <i class="fas fa-history"></i> Riwayat Transaksi
-                </a>
+                <div class="menu-section">
+                    <div class="menu-section-title">Menu Utama</div>
+                    <a href="#" class="menu-item active" data-section="dashboard">
+                        <i class="fas fa-th-large"></i> Dashboard
+                    </a>
+                    <a href="#" class="menu-item" data-section="books">
+                        <i class="fas fa-book"></i> Manajemen Kitab
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-section-title">Penjualan</div>
+                    <a href="#" class="menu-item" data-section="offline-buyers">
+                        <i class="fas fa-users"></i> Data Pembeli
+                    </a>
+                    <a href="#" class="menu-item" data-section="offline-sales">
+                        <i class="fas fa-store"></i> Penjualan Offline
+                    </a>
+                    <a href="#" class="menu-item" data-section="online-sales">
+                        <i class="fas fa-shopping-cart"></i> Penjualan Online
+                    </a>
+                    <a href="#" class="menu-item" data-section="transactions">
+                        <i class="fas fa-receipt"></i> Riwayat Transaksi
+                    </a>
+                </div>
             </nav>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Top Bar -->
+            <!-- Topbar -->
             <div class="topbar">
-                <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="topbar-left">
                     <button class="mobile-menu-toggle" id="menuToggle">
                         <i class="fas fa-bars"></i>
                     </button>
                     <h1>Dashboard Admin</h1>
                 </div>
                 <div class="topbar-actions">
-                    <span class="text-muted">Admin</span>
+                    <div class="user-info">
+                        <div class="user-avatar">A</div>
+                        <span>Admin</span>
+                    </div>
                     <a href="{{ url_for('logout') }}" class="btn-logout">
-                        <i class="fas fa-sign-out-alt"></i> Logout
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
                     </a>
                 </div>
             </div>
 
-            <!-- Message Area -->
+            <!-- Content -->
             <div class="content">
                 <div id="message"></div>
 
@@ -499,39 +883,87 @@
                     <!-- Stats Cards -->
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <h3>Total Kitab</h3>
-                            <div class="stat-value" id="totalBooks">0</div>
+                            <div class="stat-header">
+                                <div>
+                                    <h3>Total Kitab</h3>
+                                    <div class="stat-value" id="totalBooks">0</div>
+                                    <div class="stat-change">
+                                        <i class="fas fa-arrow-up"></i> 12% dari bulan lalu
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-card" style="border-left-color: var(--success-color);">
-                            <h3>Penjualan Offline</h3>
-                            <div class="stat-value" id="totalOfflineSales">Rp 0</div>
+                        
+                        <div class="stat-card success">
+                            <div class="stat-header">
+                                <div>
+                                    <h3 id="offlineStatTitle">Penjualan Offline</h3>
+                                    <div class="stat-value" id="totalOfflineSales">Rp 0</div>
+                                    <div class="stat-change">
+                                        <i class="fas fa-arrow-up"></i> Pendapatan bulan ini
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-store"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-card" style="border-left-color: var(--warning-color);">
-                            <h3>Penjualan Online</h3>
-                            <div class="stat-value" id="totalOnlineSales">Rp 0</div>
+                        
+                        <div class="stat-card warning">
+                            <div class="stat-header">
+                                <div>
+                                    <h3 id="onlineStatTitle">Penjualan Online</h3>
+                                    <div class="stat-value" id="totalOnlineSales">Rp 0</div>
+                                    <div class="stat-change">
+                                        <i class="fas fa-arrow-up"></i> Pendapatan bulan ini
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                            </div>
                         </div>
-                        <div class="stat-card" style="border-left-color: var(--danger-color);">
-                            <h3>Total Jumlah Santri</h3>
-                            <div class="stat-value" id="transactions">0</div>
+                        
+                        <div class="stat-card danger">
+                            <div class="stat-header">
+                                <div>
+                                    <h3>Total Santri</h3>
+                                    <div class="stat-value" id="totalBuyers">0</div>
+                                    <div class="stat-change">
+                                        <i class="fas fa-arrow-up"></i> 25 santri baru
+                                    </div>
+                                </div>
+                                <div class="stat-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Sales Chart -->
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">Grafik Penjualan</h2>
+                            <h2 class="card-title">
+                                <i class="fas fa-chart-line"></i>
+                                Grafik Penjualan
+                            </h2>
                         </div>
-                        <div class="date-filter">
-                            <label>Dari:</label>
-                            <input type="date" id="startDate">
-                            <label>Sampai:</label>
-                            <input type="date" id="endDate">
-                            <button class="btn btn-primary" onclick="updateChart()">
-                                <i class="fas fa-sync"></i> Update
-                            </button>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="salesChart"></canvas>
+                        <div class="card-body">
+                            <div class="date-filter">
+                                <label>Dari:</label>
+                                <input type="date" id="startDate">
+                                <label>Sampai:</label>
+                                <input type="date" id="endDate">
+                                <button class="btn btn-primary" onclick="updateChart()">
+                                    <i class="fas fa-sync"></i> Update
+                                </button>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="salesChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -540,67 +972,107 @@
                 <section id="books-section" class="content-section">
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">Tambah Kitab Baru</h2>
+                            <h2 class="card-title">
+                                <i class="fas fa-plus-circle"></i>
+                                Tambah Kitab Baru
+                            </h2>
                         </div>
-                        <form id="add-book-form" enctype="multipart/form-data">
-                            <div class="form-group">
-                                <label for="book-name">Nama Kitab:</label>
-                                <input type="text" id="book-name" name="name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="book-price">Harga (angka saja):</label>
-                                <input type="number" id="book-price" name="price" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="book-availability">Ketersediaan:</label>
-                                <select id="book-availability" name="availability" required>
-                                    <option value="Tersedia">Tersedia</option>
-                                    <option value="Tidak Tersedia">Tidak Tersedia</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="book-link-ig">Link Instagram:</label>
-                                <input type="url" id="book-link-ig" name="link_ig" placeholder="https://instagram.com/...">
-                            </div>
-                            <div class="form-group">
-                                <label for="book-link-wa">Link WhatsApp:</label>
-                                <input type="url" id="book-link-wa" name="link_wa" placeholder="https://wa.me/...">
-                            </div>
-                            <div class="form-group">
-                                <label for="book-link-shopee">Link Shopee:</label>
-                                <input type="url" id="book-link-shopee" name="link_shopee" placeholder="https://shopee.co.id/...">
-                            </div>
-                            <div class="form-group">
-                                <label for="book-link-tiktok">Link TikTok:</label>
-                                <input type="url" id="book-link-tiktok" name="link_tiktok" placeholder="https://tiktok.com/...">
-                            </div>
-                            <div class="form-group">
-                                <label for="book-image">Foto Kitab:</label>
-                                <input type="file" id="book-image" name="image" accept="image/png, image/jpeg, image/webp">
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Tambah Kitab
-                            </button>
-                        </form>
+                        <div class="card-body">
+                            <form id="add-book-form" enctype="multipart/form-data">
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-book"></i> Nama Kitab
+                                            </label>
+                                            <input type="text" id="book-name" name="name" required placeholder="Masukkan nama kitab">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-tag"></i> Harga
+                                            </label>
+                                            <input type="number" id="book-price" name="price" required placeholder="Contoh: 25000">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-check-circle"></i> Ketersediaan
+                                            </label>
+                                            <select id="book-availability" name="availability" required>
+                                                <option value="Tersedia">Tersedia</option>
+                                                <option value="Tidak Tersedia">Tidak Tersedia</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-image"></i> Foto Kitab
+                                            </label>
+                                            <input type="file" id="book-image" name="image" accept="image/png, image/jpeg, image/webp">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fab fa-instagram"></i> Link Instagram
+                                            </label>
+                                            <input type="url" id="book-link-ig" name="link_ig" placeholder="https://instagram.com/...">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fab fa-whatsapp"></i> Link WhatsApp
+                                            </label>
+                                            <input type="url" id="book-link-wa" name="link_wa" placeholder="https://wa.me/...">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-shopping-bag"></i> Link Shopee
+                                            </label>
+                                            <input type="url" id="book-link-shopee" name="link_shopee" placeholder="https://shopee.co.id/...">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fab fa-tiktok"></i> Link TikTok
+                                            </label>
+                                            <input type="url" id="book-link-tiktok" name="link_tiktok" placeholder="https://tiktok.com/...">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                                    <i class="fas fa-save"></i> Tambah Kitab
+                                </button>
+                            </form>
+                        </div>
                     </div>
 
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">Daftar Kitab</h2>
+                            <h2 class="card-title">
+                                <i class="fas fa-list"></i>
+                                Daftar Kitab
+                            </h2>
                         </div>
-                        <div class="table-responsive">
-                            <table id="books-table">
-                                <thead>
-                                    <tr>
-                                        <th>Gambar</th>
-                                        <th>Nama Kitab</th>
-                                        <th>Harga</th>
-                                        <th>Status</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="books-table-body"></tbody>
-                            </table>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table id="books-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Gambar</th>
+                                            <th>Nama Kitab</th>
+                                            <th>Harga</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="books-table-body"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -609,17 +1081,50 @@
                 <section id="offline-buyers-section" class="content-section">
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">Import Data Pembeli</h2>
+                            <h2 class="card-title">
+                                <i class="fas fa-file-import"></i>
+                                Import Data Pembeli
+                            </h2>
                         </div>
-                        <form id="import-form">
-                            <div class="form-group">
-                                <label for="excel-file">Import dari Excel (.xlsx):</label>
-                                <input type="file" id="excel-file" name="file" accept=".xlsx" required>
+                        <div class="card-body">
+                            <form id="import-form">
+                                <div class="form-group">
+                                    <label>
+                                        <i class="fas fa-file-excel"></i> Import dari Excel (.xlsx)
+                                    </label>
+                                    <input type="file" id="excel-file" name="file" accept=".xlsx" required>
+                                    <small style="color: var(--gray-500); margin-top: 0.25rem;">
+                                        Format: Kolom harus berisi Nama, Alamat, dan Asrama
+                                    </small>
+                                </div>
+                                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                                    <i class="fas fa-upload"></i> Import Data
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-users"></i>
+                                Daftar Pembeli
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Nama</th>
+                                            <th>Alamat</th>
+                                            <th>Asrama</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="buyers-table-body"></tbody>
+                                </table>
                             </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-upload"></i> Import
-                            </button>
-                        </form>
+                        </div>
                     </div>
                 </section>
 
@@ -627,29 +1132,50 @@
                 <section id="offline-sales-section" class="content-section">
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">Rekap Penjualan Offline</h2>
+                            <h2 class="card-title">
+                                <i class="fas fa-cash-register"></i>
+                                Rekap Penjualan Offline
+                            </h2>
                         </div>
-                        <form id="offline-sale-form">
-                            <div class="form-group">
-                                <label for="offline-buyer">Nama Pembeli:</label>
-                                <select id="offline-buyer" name="buyer_id" required></select>
-                            </div>
-                            <div class="form-group">
-                                <label for="offline-book">Kitab:</label>
-                                <select id="offline-book" name="book_id" required></select>
-                            </div>
-                            <div class="form-group">
-                                <label for="offline-price">Harga (otomatis):</label>
-                                <input type="text" id="offline-price" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label for="offline-quantity">Jumlah:</label>
-                                <input type="number" id="offline-quantity" name="quantity" min="1" value="1" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Tambah Rekap
-                            </button>
-                        </form>
+                        <div class="card-body">
+                            <form id="offline-sale-form">
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-user"></i> Nama Pembeli
+                                            </label>
+                                            <select id="offline-buyer" name="buyer_id" required></select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-book"></i> Kitab
+                                            </label>
+                                            <select id="offline-book" name="book_id" required></select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-tag"></i> Harga
+                                            </label>
+                                            <input type="text" id="offline-price" disabled placeholder="Otomatis terisi">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-sort-numeric-up"></i> Jumlah
+                                            </label>
+                                            <input type="number" id="offline-quantity" name="quantity" min="1" value="1" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                                    <i class="fas fa-plus"></i> Tambah Rekap
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </section>
 
@@ -657,41 +1183,80 @@
                 <section id="online-sales-section" class="content-section">
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">Rekap Penjualan Online</h2>
+                            <h2 class="card-title">
+                                <i class="fas fa-globe"></i>
+                                Rekap Penjualan Online
+                            </h2>
                         </div>
-                        <form id="online-sale-form">
-                            <div class="form-group">
-                                <label for="online-buyer-name">Nama Pembeli:</label>
-                                <input type="text" id="online-buyer-name" name="buyer_name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="online-buyer-address">Alamat Pembeli:</label>
-                                <input type="text" id="online-buyer-address" name="buyer_address" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="online-transfer-date">Tanggal Transfer:</label>
-                                <input type="date" id="online-transfer-date" name="transfer_date" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="online-book">Kitab:</label>
-                                <select id="online-book" name="book_id" required></select>
-                            </div>
-                            <div class="form-group">
-                                <label for="online-price">Harga Kitab (otomatis):</label>
-                                <input type="text" id="online-price" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label for="online-ongkir">Ongkir (otomatis):</label>
-                                <input type="text" id="online-ongkir" value="Rp 15.000" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label for="online-total">Total Harga (otomatis):</label>
-                                <input type="text" id="online-total" disabled>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-plus"></i> Tambah Rekap
-                            </button>
-                        </form>
+                        <div class="card-body">
+                            <form id="online-sale-form">
+                                <div class="form-grid">
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-user"></i> Nama Pembeli
+                                            </label>
+                                            <input type="text" id="online-buyer-name" name="buyer_name" required placeholder="Masukkan nama pembeli">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-map-marker-alt"></i> Alamat Kirim
+                                            </label>
+                                            <input type="text" id="online-buyer-address" name="buyer_address" required placeholder="Alamat lengkap">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-calendar"></i> Tanggal Transfer
+                                            </label>
+                                            <input type="date" id="online-transfer-date" name="transfer_date" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-book"></i> Kitab
+                                            </label>
+                                            <select id="online-book" name="book_id" required></select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-sort-numeric-up"></i> Jumlah
+                                            </label>
+                                            <input type="number" id="online-quantity" name="quantity" min="1" value="1" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-tag"></i> Harga Kitab
+                                            </label>
+                                            <input type="text" id="online-price" disabled placeholder="Otomatis terisi">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-truck"></i> Ongkir
+                                            </label>
+                                            <input type="text" id="online-ongkir" value="Rp 15.000" disabled>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>
+                                                <i class="fas fa-calculator"></i> Total Harga
+                                            </label>
+                                            <input type="text" id="online-total" disabled placeholder="Otomatis terhitung">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                                    <i class="fas fa-plus"></i> Tambah Rekap
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </section>
 
@@ -699,51 +1264,73 @@
                 <section id="transactions-section" class="content-section">
                     <div class="card">
                         <div class="card-header">
-                            <h2 class="card-title">Riwayat Transaksi</h2>
+                            <h2 class="card-title">
+                                <i class="fas fa-history"></i>
+                                Riwayat Transaksi
+                            </h2>
                             <div class="btn-group">
-                                <a href="/api/export-offline-sales" class="btn btn-primary">
+                                <a href="/api/export-offline-sales" class="btn btn-secondary">
                                     <i class="fas fa-download"></i> Export Offline
                                 </a>
-                                <a href="/api/export-online-sales" class="btn btn-success">
+                                <a href="/api/export-online-sales" class="btn btn-secondary">
                                     <i class="fas fa-download"></i> Export Online
                                 </a>
                             </div>
                         </div>
-                        
-                        <h3 style="margin: 1rem 0;">Transaksi Offline</h3>
-                        <div class="table-responsive">
-                            <table id="all-offline-sales">
-                                <thead>
-                                    <tr>
-                                        <th>Tanggal</th>
-                                        <th>Nama Pembeli</th>
-                                        <th>Asrama</th>
-                                        <th>Alamat</th>
-                                        <th>Kitab</th>
-                                        <th>Jml</th>
-                                        <th>Total Harga</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-store"></i>
+                                Transaksi Offline
+                            </h2>
                         </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table id="all-offline-sales">
+                                    <thead>
+                                        <tr>
+                                            <th>Tanggal</th>
+                                            <th>Nama Pembeli</th>
+                                            <th>Asrama</th>
+                                            <th>Alamat</th>
+                                            <th>Kitab</th>
+                                            <th>Jml</th>
+                                            <th>Total Harga</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
-                        <h3 style="margin: 2rem 0 1rem;">Transaksi Online</h3>
-                        <div class="table-responsive">
-                            <table id="all-online-sales">
-                                <thead>
-                                    <tr>
-                                        <th>Tanggal</th>
-                                        <th>Tgl. Transfer</th>
-                                        <th>Nama Pembeli</th>
-                                        <th>Alamat Kirim</th>
-                                        <th>Kitab</th>
-                                        <th>Ongkir</th>
-                                        <th>Total Harga</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">
+                                <i class="fas fa-globe"></i>
+                                Transaksi Online
+                            </h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table id="all-online-sales">
+                                    <thead>
+                                        <tr>
+                                            <th>Tanggal</th>
+                                            <th>Tgl. Transfer</th>
+                                            <th>Nama Pembeli</th>
+                                            <th>Alamat Kirim</th>
+                                            <th>Kitab</th>
+                                            <th>Jml</th>
+                                            <th>Ongkir</th>
+                                            <th>Total Harga</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -755,48 +1342,51 @@
     <div id="edit-book-modal" class="modal-overlay" style="display:none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Edit Detail Kitab</h2>
+                <h2 class="modal-title">Edit Detail Kitab</h2>
                 <button class="close-button">&times;</button>
             </div>
             <form id="edit-book-form" enctype="multipart/form-data">
                 <input type="hidden" id="edit-book-id" name="id">
                 <input type="hidden" id="existing-image-filename" name="existing_image_filename">
-                <div class="form-group">
-                    <label for="edit-book-name">Nama Kitab:</label>
-                    <input type="text" id="edit-book-name" name="name" required>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label><i class="fas fa-book"></i> Nama Kitab</label>
+                        <input type="text" id="edit-book-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> Harga</label>
+                        <input type="number" id="edit-book-price" name="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-circle"></i> Ketersediaan</label>
+                        <select id="edit-book-availability" name="availability" required>
+                            <option value="Tersedia">Tersedia</option>
+                            <option value="Tidak Tersedia">Tidak Tersedia</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-instagram"></i> Link Instagram</label>
+                        <input type="url" id="edit-book-link-ig" name="link_ig">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-whatsapp"></i> Link WhatsApp</label>
+                        <input type="url" id="edit-book-link-wa" name="link_wa">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-shopping-bag"></i> Link Shopee</label>
+                        <input type="url" id="edit-book-link-shopee" name="link_shopee">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-tiktok"></i> Link TikTok</label>
+                        <input type="url" id="edit-book-link-tiktok" name="link_tiktok">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <label><i class="fas fa-image"></i> Ganti Foto</label>
+                        <input type="file" id="edit-book-image" name="image" accept="image/png, image/jpeg, image/webp">
+                        <small style="color: var(--gray-500);">Biarkan kosong jika tidak ingin mengubah foto</small>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="edit-book-price">Harga Kitab:</label>
-                    <input type="number" id="edit-book-price" name="price" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-book-availability">Ketersediaan:</label>
-                    <select id="edit-book-availability" name="availability" required>
-                        <option value="Tersedia">Tersedia</option>
-                        <option value="Tidak Tersedia">Tidak Tersedia</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="edit-book-link-ig">Link Instagram:</label>
-                    <input type="url" id="edit-book-link-ig" name="link_ig">
-                </div>
-                <div class="form-group">
-                    <label for="edit-book-link-wa">Link WhatsApp:</label>
-                    <input type="url" id="edit-book-link-wa" name="link_wa">
-                </div>
-                <div class="form-group">
-                    <label for="edit-book-link-shopee">Link Shopee:</label>
-                    <input type="url" id="edit-book-link-shopee" name="link_shopee">
-                </div>
-                <div class="form-group">
-                    <label for="edit-book-link-tiktok">Link TikTok:</label>
-                    <input type="url" id="edit-book-link-tiktok" name="link_tiktok">
-                </div>
-                <div class="form-group">
-                    <label for="edit-book-image">Ganti Foto Kitab (biarkan kosong jika tidak diubah):</label>
-                    <input type="file" id="edit-book-image" name="image" accept="image/png, image/jpeg, image/webp">
-                </div>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
                     <i class="fas fa-save"></i> Simpan Perubahan
                 </button>
             </form>
@@ -842,9 +1432,19 @@
             $('#menuToggle').on('click', function() {
                 $('#sidebar').toggleClass('active');
             });
+            
+            // Sidebar close button
+            $('#sidebarClose').on('click', function() {
+                $('#sidebar').removeClass('active');
+            });
 
             // Modal
             $('.close-button').on('click', () => $('#edit-book-modal').hide());
+            $(window).on('click', function(e) {
+                if (e.target.id === 'edit-book-modal') {
+                    $('#edit-book-modal').hide();
+                }
+            });
             
             // Form submissions
             $('#add-book-form').on('submit', function(e) { 
@@ -872,13 +1472,23 @@
                 handleRekapSubmit(this, '/api/add-online-sale'); 
             });
 
+            // Quantity change event for online form
+            $('#online-quantity, #online-book').on('change select2:select', updateOnlinePriceDisplay);
+            
             // Select change events
-            $('#offline-book, #online-book').on('select2:select', updatePriceDisplay);
+            $('#offline-book').on('select2:select', updateOfflinePriceDisplay);
         });
 
         // Dashboard functions
         async function loadDashboardStats() {
             try {
+                // Get current month name
+                const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                ];
+                const currentMonth = monthNames[new Date().getMonth()];
+                const currentYear = new Date().getFullYear();
+                
                 // Load books count
                 const booksResponse = await fetch('/api/books/all');
                 const allBooks = await booksResponse.json();
@@ -889,19 +1499,50 @@
                 const buyers = await buyersResponse.json();
                 $('#totalBuyers').text(buyers.length);
 
-                // Load sales totals
+                // Load sales totals for current month
                 const offlineResponse = await fetch('/api/recent-offline-sales');
                 const offlineSales = await offlineResponse.json();
-                const totalOffline = offlineSales.reduce((sum, sale) => sum + sale.total_price, 0);
+                
+                // Filter sales for current month
+                const currentMonthStart = new Date(currentYear, new Date().getMonth(), 1);
+                const currentMonthEnd = new Date(currentYear, new Date().getMonth() + 1, 0);
+                
+                const monthlyOfflineSales = offlineSales.filter(sale => {
+                    const saleDate = parseDateString(sale.sale_date_formatted);
+                    return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
+                });
+                
+                const totalOffline = monthlyOfflineSales.reduce((sum, sale) => sum + sale.total_price, 0);
                 $('#totalOfflineSales').text(`Rp ${totalOffline.toLocaleString('id-ID')}`);
+                
+                // Update stat card title for offline
+                $('#offlineStatTitle').text(`Penjualan Offline ${currentMonth}`);
 
                 const onlineResponse = await fetch('/api/recent-online-sales');
                 const onlineSales = await onlineResponse.json();
-                const totalOnline = onlineSales.reduce((sum, sale) => sum + sale.total_price, 0);
+                
+                const monthlyOnlineSales = onlineSales.filter(sale => {
+                    const saleDate = parseDateString(sale.sale_date_formatted);
+                    return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
+                });
+                
+                const totalOnline = monthlyOnlineSales.reduce((sum, sale) => sum + sale.total_price, 0);
                 $('#totalOnlineSales').text(`Rp ${totalOnline.toLocaleString('id-ID')}`);
+                
+                // Update stat card title for online
+                $('#onlineStatTitle').text(`Penjualan Online ${currentMonth}`);
+                
             } catch (error) {
                 console.error('Error loading dashboard stats:', error);
             }
+        }
+        
+        // Helper function to parse date string
+        function parseDateString(dateStr) {
+            // Parse format: "DD-MM-YYYY HH:MM"
+            const [datePart] = dateStr.split(' ');
+            const [day, month, year] = datePart.split('-');
+            return new Date(year, month - 1, day);
         }
 
         function initializeChart() {
@@ -915,23 +1556,56 @@
                         data: [],
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        tension: 0.3
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 7
                     }, {
                         label: 'Penjualan Online',
                         data: [],
                         borderColor: '#f59e0b',
                         backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        tension: 0.3
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#f59e0b',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointHoverRadius: 7
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
                     plugins: {
                         legend: {
                             position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20,
+                                font: {
+                                    family: 'Plus Jakarta Sans',
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            }
                         },
                         tooltip: {
+                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                            titleColor: '#111827',
+                            bodyColor: '#4b5563',
+                            borderColor: '#e5e7eb',
+                            borderWidth: 1,
+                            padding: 12,
+                            boxPadding: 6,
+                            usePointStyle: true,
                             callbacks: {
                                 label: function(context) {
                                     return context.dataset.label + ': Rp ' + context.parsed.y.toLocaleString('id-ID');
@@ -940,11 +1614,29 @@
                         }
                     },
                     scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: 'Plus Jakarta Sans',
+                                    size: 11
+                                }
+                            }
+                        },
                         y: {
                             beginAtZero: true,
+                            grid: {
+                                color: 'rgba(229, 231, 235, 0.5)'
+                            },
                             ticks: {
                                 callback: function(value) {
                                     return 'Rp ' + value.toLocaleString('id-ID');
+                                },
+                                font: {
+                                    family: 'Plus Jakarta Sans',
+                                    size: 11
                                 }
                             }
                         }
@@ -1019,18 +1711,28 @@
             setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
         }
 
-        function updatePriceDisplay() {
+        function updateOfflinePriceDisplay() {
             const formatToRupiah = (number) => number !== null && number !== undefined ? `Rp ${number.toLocaleString('id-ID')}` : '';
             
             const selectedOfflineBook = books.find(b => b.id == $('#offline-book').val());
             $('#offline-price').val(selectedOfflineBook ? formatToRupiah(selectedOfflineBook.price) : '');
+        }
 
+        function updateOnlinePriceDisplay() {
+            const formatToRupiah = (number) => number !== null && number !== undefined ? `Rp ${number.toLocaleString('id-ID')}` : '';
+            
             const selectedOnlineBook = books.find(b => b.id == $('#online-book').val());
+            const quantity = parseInt($('#online-quantity').val()) || 1;
+            
             if (selectedOnlineBook) {
                 const ongkir = 15000;
-                $('#online-price').val(formatToRupiah(selectedOnlineBook.price));
+                const bookPrice = selectedOnlineBook.price;
+                const totalBookPrice = bookPrice * quantity;
+                const totalPrice = totalBookPrice + ongkir;
+                
+                $('#online-price').val(formatToRupiah(bookPrice));
                 $('#online-ongkir').val(formatToRupiah(ongkir));
-                $('#online-total').val(formatToRupiah(selectedOnlineBook.price + ongkir));
+                $('#online-total').val(formatToRupiah(totalPrice));
             } else {
                 $('#online-price, #online-ongkir, #online-total').val('');
             }
@@ -1046,22 +1748,43 @@
             allBooks.forEach(book => {
                 const formattedPrice = book.price.toLocaleString('id-ID');
                 const imageUrl = book.image_filename ? `/uploads/${book.image_filename}` : 'https://placehold.co/60x80/e2e8f0/4a5568?text=No+Img';
+                const statusBadge = book.availability === 'Tersedia' 
+                    ? '<span style="display: inline-block; padding: 0.25rem 0.75rem; background: rgba(16, 185, 129, 0.1); color: #065f46; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Tersedia</span>'
+                    : '<span style="display: inline-block; padding: 0.25rem 0.75rem; background: rgba(239, 68, 68, 0.1); color: #991b1b; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">Habis</span>';
+                
                 const row = `
                     <tr>
                         <td><img src="${imageUrl}" alt="${book.name}" class="table-image"></td>
-                        <td>${book.name}</td>
-                        <td>Rp ${formattedPrice}</td>
-                        <td>${book.availability}</td>
+                        <td style="font-weight: 600;">${book.name}</td>
+                        <td style="color: var(--primary); font-weight: 700;">Rp ${formattedPrice}</td>
+                        <td>${statusBadge}</td>
                         <td>
-                            <div class="btn-group">
-                                <button class="btn btn-success" onclick="editBook(${book.id})">
+                            <div class="action-buttons">
+                                <button class="action-btn action-btn-edit" onclick="editBook(${book.id})">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
-                                <button class="btn btn-danger" onclick="deleteBook(${book.id}, '${book.name.replace(/'/g, "\\'")}')">
+                                <button class="action-btn action-btn-delete" onclick="deleteBook(${book.id}, '${book.name.replace(/'/g, "\\'")}')">
                                     <i class="fas fa-trash"></i> Hapus
                                 </button>
                             </div>
                         </td>
+                    </tr>`;
+                tableBody.append(row);
+            });
+        }
+
+        async function loadBuyersTable() {
+            const response = await fetch('/api/offline-buyers');
+            const buyers = await response.json();
+            const tableBody = $('#buyers-table-body');
+            tableBody.empty();
+            
+            buyers.forEach(buyer => {
+                const row = `
+                    <tr>
+                        <td style="font-weight: 600;">${buyer.name}</td>
+                        <td>${buyer.address || '-'}</td>
+                        <td>${buyer.dormitory || '-'}</td>
                     </tr>`;
                 tableBody.append(row);
             });
@@ -1075,12 +1798,12 @@
             offSales.forEach(s => {
                 offTbody.append(`<tr>
                     <td>${s.sale_date_formatted}</td>
-                    <td>${s.buyer_name}</td>
+                    <td style="font-weight: 600;">${s.buyer_name}</td>
                     <td>${s.dormitory || '-'}</td>
                     <td>${s.address || '-'}</td>
                     <td>${s.book_name}</td>
-                    <td>${s.quantity}</td>
-                    <td>Rp ${s.total_price.toLocaleString('id-ID')}</td>
+                    <td style="text-align: center;">${s.quantity}</td>
+                    <td style="color: var(--primary); font-weight: 700;">Rp ${s.total_price.toLocaleString('id-ID')}</td>
                 </tr>`);
             });
 
@@ -1092,11 +1815,12 @@
                 onTbody.append(`<tr>
                     <td>${s.sale_date_formatted}</td>
                     <td>${s.transfer_date_formatted || '-'}</td>
-                    <td>${s.buyer_name}</td>
+                    <td style="font-weight: 600;">${s.buyer_name}</td>
                     <td>${s.buyer_address}</td>
                     <td>${s.book_name}</td>
+                    <td style="text-align: center;">${s.quantity || 1}</td>
                     <td>Rp ${s.shipping_cost.toLocaleString('id-ID')}</td>
-                    <td>Rp ${s.total_price.toLocaleString('id-ID')}</td>
+                    <td style="color: var(--primary); font-weight: 700;">Rp ${s.total_price.toLocaleString('id-ID')}</td>
                 </tr>`);
             });
         }
@@ -1138,7 +1862,7 @@
         }
 
         async function loadInitialData() {
-            await Promise.all([loadBooksTable(), loadRecentSales()]);
+            await Promise.all([loadBooksTable(), loadBuyersTable(), loadRecentSales()]);
 
             const bookResponse = await fetch('/api/books');
             const bookData = await bookResponse.json();
@@ -1152,14 +1876,19 @@
                 const select = $(selector);
                 select.empty().append(new Option(placeholder, ''));
                 data.forEach(item => select.append(new Option(item[textKey], item[idKey])));
-                select.select2({ placeholder: placeholder, width: '100%' });
+                select.select2({ 
+                    placeholder: placeholder, 
+                    width: '100%',
+                    theme: 'default'
+                });
             };
 
             initSelect2('#offline-buyer', buyerData, '-- Pilih Pembeli --', 'name', 'id');
             initSelect2('#offline-book', bookData, '-- Pilih Kitab --', 'name', 'id');
             initSelect2('#online-book', bookData, '-- Pilih Kitab --', 'name', 'id');
             
-            updatePriceDisplay();
+            updateOfflinePriceDisplay();
+            updateOnlinePriceDisplay();
         }
 
         // Form handlers
@@ -1192,7 +1921,8 @@
                 loadRecentSales();
                 loadDashboardStats();
                 updateChart();
-                updatePriceDisplay();
+                updateOfflinePriceDisplay();
+                updateOnlinePriceDisplay();
             }
         }
     </script>
