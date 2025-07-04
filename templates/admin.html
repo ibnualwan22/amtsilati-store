@@ -257,46 +257,260 @@
         }
 
         /* Mobile Navigation */
-        .mobile-nav {
-            display: none;
-            position: fixed;
-            top: var(--navbar-height);
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--gray-200);
-            box-shadow: var(--shadow-lg);
-            max-height: calc(100vh - var(--navbar-height));
-            overflow-y: auto;
-            transform: translateY(-100%);
-            transition: transform 0.3s ease;
-        }
+        
+        /* Mobile Bottom Navigation */
+@media (max-width: 968px) {
+    /* Hide desktop nav di mobile */
+    .navbar-nav {
+        display: none !important;
+    }
+    
+    /* Simplify navbar untuk mobile */
+    .navbar {
+        height: 60px;
+        padding: 0;
+    }
+    
+    .navbar-container {
+        padding: 0 1rem;
+        height: 60px;
+    }
+    
+    .navbar-title {
+        font-size: 1rem;
+    }
+    
+    .navbar-logo {
+        width: 35px;
+        height: 35px;
+    }
+    
+    /* Hide user info text, show avatar only */
+    .user-info span {
+        display: none;
+    }
+    
+    .user-info {
+        padding: 0.5rem;
+        background: transparent;
+    }
+    
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid var(--gray-200);
+        box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+        z-index: 1000;
+        padding: 0.5rem 0;
+    }
+    
+    .bottom-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+        color: var(--gray-500);
+        text-decoration: none;
+        font-size: 0.75rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: none;
+        border: none;
+    }
+    
+    .bottom-nav-item i {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .bottom-nav-item.active {
+        color: var(--primary);
+    }
+    
+    .bottom-nav-item:active {
+        transform: scale(0.95);
+    }
+    
+    /* Adjust main content for bottom nav */
+    .main-content {
+        padding-bottom: 80px;
+    }
+    
+    /* Mobile Slide Menu */
+    .mobile-slide-menu {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 300px;
+        height: 100vh;
+        background: white;
+        box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+        z-index: 2000;
+        overflow-y: auto;
+    }
+    
+    .mobile-slide-menu.active {
+        right: 0;
+    }
+    
+    .mobile-menu-header {
+        padding: 1.5rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .mobile-menu-close {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--gray-100);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-menu-close:hover {
+        background: var(--gray-200);
+    }
+    
+    .mobile-menu-content {
+        padding: 1rem;
+    }
+    
+    .mobile-menu-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .mobile-menu-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+    }
+    
+    .mobile-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1rem;
+        border-radius: 10px;
+        color: var(--gray-700);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+    
+    .mobile-menu-item:hover {
+        background: var(--gray-100);
+        color: var(--primary);
+    }
+    
+    .mobile-menu-item.active {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--primary);
+    }
+    
+    .mobile-menu-item.logout {
+        background: var(--danger);
+        color: white;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    /* Overlay */
+    .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1999;
+    }
+    
+    .mobile-menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Responsive adjustments */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1.25rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-header {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    /* Hide desktop-only elements */
+    .btn-logout {
+        display: none;
+    }
+}
 
-        .mobile-nav.active {
-            transform: translateY(0);
-        }
-
-        .mobile-nav-item {
-            display: block;
-            padding: 1rem 2rem;
-            color: var(--gray-700);
-            text-decoration: none;
-            font-weight: 500;
-            border-bottom: 1px solid var(--gray-100);
-            transition: all 0.3s ease;
-        }
-
-        .mobile-nav-item:hover {
-            background: var(--gray-50);
-            color: var(--primary);
-        }
-
-        .mobile-nav-item.active {
-            background: var(--gray-100);
-            color: var(--primary);
-        }
-
+/* Desktop - keep original */
+@media (min-width: 969px) {
+    .bottom-nav,
+    .mobile-slide-menu,
+    .mobile-menu-overlay {
+        display: none !important;
+    }
+}
+@media (max-width: 768px) {
+    /* Simplify forms on mobile */
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Larger touch targets */
+    input, select, textarea, .btn {
+        min-height: 44px;
+    }
+    
+    /* Stack buttons vertically on mobile */
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
         /* Main Content */
         .main-content {
             min-height: calc(100vh - var(--navbar-height));
@@ -794,30 +1008,48 @@
             color: #991b1b;
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
+    
+    /* Tombol toggle scroll */
+          .scroll-toggle {
+        display: none;
+         position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+        font-size: 1.25rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .scroll-toggle:hover {
+        transform: scale(1.1);
+        background: var(--primary-dark);
+    }
+    
+    .scroll-toggle.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
 
-        /* Responsive */
-        @media (max-width: 968px) {
-            .navbar-nav {
-                display: none;
-            }
-
-            .mobile-menu-toggle {
-                display: block;
-            }
-
-            .mobile-nav {
-                display: block;
-            }
-
-            .navbar-user .user-info span {
-                display: none;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
+/* Desktop tetap normal */
+@media (min-width: 969px) {
+    .navbar {
+        transform: none !important;
+    }
+    
+    .scroll-toggle {
+        display: none !important;
+    }
+}
 
             .content {
                 padding: 1rem;
@@ -1002,29 +1234,95 @@
                 <i class="fas fa-bars"></i>
             </button>
         </div>
+        <!-- Mobile Bottom Navigation -->
+<div class="bottom-nav">
+    <button class="bottom-nav-item active" data-section="dashboard">
+        <i class="fas fa-home"></i>
+        <span>Dashboard</span>
+    </button>
+    <button class="bottom-nav-item" data-section="books">
+        <i class="fas fa-book"></i>
+        <span>Kitab</span>
+    </button>
+    <button class="bottom-nav-item" data-section="offline-sales">
+        <i class="fas fa-store"></i>
+        <span>Offline</span>
+    </button>
+    <button class="bottom-nav-item" data-section="online-sales">
+        <i class="fas fa-globe"></i>
+        <span>Online</span>
+    </button>
+    <button class="bottom-nav-item" id="mobileMenuBtn">
+        <i class="fas fa-bars"></i>
+        <span>Menu</span>
+    </button>
+</div>
+
+<!-- Mobile Slide Menu -->
+<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
+<div class="mobile-slide-menu" id="mobileSlideMenu">
+    <div class="mobile-menu-header">
+        <h3 style="margin: 0; font-size: 1.125rem;">Menu</h3>
+        <button class="mobile-menu-close" id="closeMobileMenu">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="mobile-menu-content">
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Navigasi</div>
+            <a href="#" class="mobile-menu-item" data-section="dashboard">
+                <i class="fas fa-th-large"></i>
+                Dashboard
+            </a>
+            <a href="#" class="mobile-menu-item" data-section="books">
+                <i class="fas fa-book"></i>
+                Manajemen Kitab
+            </a>
+            <a href="#" class="mobile-menu-item" data-section="offline-buyers">
+                <i class="fas fa-users"></i>
+                Data Pembeli
+            </a>
+            <a href="#" class="mobile-menu-item" data-section="transactions">
+                <i class="fas fa-receipt"></i>
+                Riwayat Transaksi
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Penjualan</div>
+            <a href="#" class="mobile-menu-item" data-section="offline-sales">
+                <i class="fas fa-store"></i>
+                Penjualan Offline
+            </a>
+            <a href="#" class="mobile-menu-item" data-section="online-sales">
+                <i class="fas fa-shopping-cart"></i>
+                Penjualan Online
+            </a>
+        </div>
+        
+        <div class="mobile-menu-section">
+            <div class="mobile-menu-title">Akun</div>
+            <div style="padding: 1rem; background: var(--gray-50); border-radius: 10px; margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                        A
+                    </div>
+                    <div>
+                        <div style="font-weight: 600;">Admin</div>
+                        <div style="font-size: 0.75rem; color: var(--gray-500);">Administrator</div>
+                    </div>
+                </div>
+            </div>
+            <a href="{{ url_for('logout') }}" class="mobile-menu-item logout">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </div>
+    </div>
+</div>
     </nav>
 
     <!-- Mobile Navigation -->
-    <div class="mobile-nav" id="mobileNav">
-        <a href="#" class="mobile-nav-item active" data-section="dashboard">
-            <i class="fas fa-th-large"></i> Dashboard
-        </a>
-        <a href="#" class="mobile-nav-item" data-section="books">
-            <i class="fas fa-book"></i> Manajemen Kitab
-        </a>
-        <a href="#" class="mobile-nav-item" data-section="offline-buyers">
-            <i class="fas fa-users"></i> Data Pembeli
-        </a>
-        <a href="#" class="mobile-nav-item" data-section="offline-sales">
-            <i class="fas fa-store"></i> Penjualan Offline
-        </a>
-        <a href="#" class="mobile-nav-item" data-section="online-sales">
-            <i class="fas fa-shopping-cart"></i> Penjualan Online
-        </a>
-        <a href="#" class="mobile-nav-item" data-section="transactions">
-            <i class="fas fa-receipt"></i> Riwayat Transaksi
-        </a>
-    </div>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -1569,6 +1867,100 @@
             loadDashboardStats();
             initializeChart();
 
+            if (window.innerWidth <= 968) {
+        let lastScrollTop = 0;
+        let scrollDelta = 5;
+        let navbarHeight = $('.navbar').outerHeight();
+
+        $('.bottom-nav-item[data-section]').on('click', function() {
+    const section = $(this).data('section');
+    
+    // Update active state
+    $('.bottom-nav-item').removeClass('active');
+    $(this).addClass('active');
+    
+    // Navigate to section
+    navigateToSection(section);
+    
+    // Close mobile menu if open
+    closeMobileMenu();
+});
+
+// Mobile Slide Menu
+$('#mobileMenuBtn').on('click', function() {
+    openMobileMenu();
+});
+
+$('#closeMobileMenu, #mobileMenuOverlay').on('click', function() {
+    closeMobileMenu();
+});
+
+// Mobile menu navigation
+$('.mobile-menu-item[data-section]').on('click', function(e) {
+    e.preventDefault();
+    const section = $(this).data('section');
+    
+    // Navigate
+    navigateToSection(section);
+    
+    // Update bottom nav active state
+    $('.bottom-nav-item').removeClass('active');
+    $(`.bottom-nav-item[data-section="${section}"]`).addClass('active');
+    
+    // Close menu
+    closeMobileMenu();
+});
+
+function openMobileMenu() {
+    $('#mobileSlideMenu').addClass('active');
+    $('#mobileMenuOverlay').addClass('active');
+    $('body').css('overflow', 'hidden');
+}
+
+function closeMobileMenu() {
+    $('#mobileSlideMenu').removeClass('active');
+    $('#mobileMenuOverlay').removeClass('active');
+    $('body').css('overflow', '');
+}
+        
+        $(window).scroll(function() {
+            if (window.innerWidth > 968) return; // Skip untuk desktop
+            
+            let st = $(this).scrollTop();
+            
+            // Pastikan scroll lebih dari delta
+            if (Math.abs(lastScrollTop - st) <= scrollDelta) return;
+            
+            if (st > lastScrollTop && st > navbarHeight) {
+                // Scroll down - hide navbar
+                $('.navbar').addClass('hide-mobile');
+                $('#scrollToggle').addClass('show');
+            } else {
+                // Scroll up - show navbar
+                $('.navbar').removeClass('hide-mobile');
+                $('#scrollToggle').removeClass('show');
+            }
+            
+            lastScrollTop = st;
+        });
+        
+        // Toggle navbar dengan tombol
+        $('#scrollToggle').on('click', function() {
+            $('.navbar').toggleClass('hide-mobile');
+            $(this).toggleClass('show');
+        });
+    }
+    
+    // Re-check pada resize
+    $(window).resize(function() {
+        if (window.innerWidth > 968) {
+            $('.navbar').removeClass('hide-mobile');
+            $('#scrollToggle').remove();
+        } else if ($('#scrollToggle').length === 0) {
+            $('body').append('<button class="scroll-toggle" id="scrollToggle"><i class="fas fa-bars"></i></button>');
+        }
+    });
+
             // Navigation for desktop
             $('.nav-link[data-section], .dropdown-item[data-section]').on('click', function(e) {
                 e.preventDefault();
@@ -1630,9 +2022,7 @@
                 handleOnlineRekapSubmit(); 
             });
 
-            // Add first item on load for forms
-            addOfflineBookItem();
-            addOnlineBookItem();
+
 
             // Update total when shipping cost changes
             $('#online-shipping').on('input', updateOnlineTotalPrice);
@@ -1652,7 +2042,8 @@
                 'online-sales': 'Penjualan Online',
                 'transactions': 'Riwayat Transaksi'
             };
-            
+            $('.mobile-menu-item').removeClass('active');
+            $(`.mobile-menu-item[data-section="${section}"]`).addClass('active');
             // Show corresponding section
             $('.content-section').removeClass('active');
             $(`#${section}-section`).addClass('active');
@@ -1660,109 +2051,131 @@
 
         // Multi-item form functions
         function addOfflineBookItem() {
-            offlineItemCount++;
-            const itemHtml = `
-                <div class="book-item" data-item-id="${offlineItemCount}">
-                    <div class="book-item-header">
-                        <span class="book-item-number">Kitab #${offlineItemCount}</span>
-                        ${offlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOfflineItem(${offlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-book"></i> Pilih Kitab</label>
-                            <select class="offline-book-select" data-item="${offlineItemCount}" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
-                            <input type="number" class="offline-quantity" data-item="${offlineItemCount}" min="1" value="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-tag"></i> Harga</label>
-                            <input type="text" class="offline-price" data-item="${offlineItemCount}" disabled>
-                        </div>
-                    </div>
+    offlineItemCount++;
+    const itemHtml = `
+        <div class="book-item" data-item-id="${offlineItemCount}">
+            <div class="book-item-header">
+                <span class="book-item-number">Kitab #${offlineItemCount}</span>
+                ${offlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOfflineItem(${offlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-book"></i> Pilih Kitab</label>
+                    <select class="offline-book-select" data-item="${offlineItemCount}" required></select>
                 </div>
-            `;
-            
-            $('#offline-book-items').append(itemHtml);
-            
-            // Initialize select2 for new item
-            const newSelect = $(`.offline-book-select[data-item="${offlineItemCount}"]`);
-            newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
-            books.forEach(book => {
-                if (book.availability === 'Tersedia') {
-                    newSelect.append(new Option(book.name, book.id));
-                }
-            });
-            newSelect.select2({
-                placeholder: '-- Pilih Kitab --',
-                width: '100%'
-            });
-            
-            // Add change event
-            newSelect.on('change', function() {
-                updateOfflineItemPrice($(this).data('item'));
-                updateOfflineTotalPrice();
-            });
-            
-            // Add quantity change event
-            $(`.offline-quantity[data-item="${offlineItemCount}"]`).on('input', function() {
-                updateOfflineTotalPrice();
-            });
-        }
+                <div class="form-group">
+                    <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
+                    <input type="number" class="offline-quantity" data-item="${offlineItemCount}" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Harga</label>
+                    <input type="text" class="offline-price" data-item="${offlineItemCount}" disabled>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    $('#offline-book-items').append(itemHtml);
+    
+    // Initialize select2 for new item
+    const newSelect = $(`.offline-book-select[data-item="${offlineItemCount}"]`);
+    newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
+    
+    console.log('Available books for offline item:', books);
+    console.log('Books array length:', books.length);
+    
+    if (books && books.length > 0) {
+        books.forEach(book => {
+            if (book.availability === 'Tersedia') {
+                console.log('Adding book to select:', book.name);
+                newSelect.append(new Option(book.name, book.id));
+            }
+        });
+    } else {
+        console.warn('No books available or books array is empty');
+        newSelect.append(new Option('Tidak ada kitab tersedia', ''));
+    }
+    
+    newSelect.select2({
+        placeholder: '-- Pilih Kitab --',
+        width: '100%'
+    });
+    
+    // Add change event
+    newSelect.on('change', function() {
+        updateOfflineItemPrice($(this).data('item'));
+        updateOfflineTotalPrice();
+    });
+    
+    // Add quantity change event
+    $(`.offline-quantity[data-item="${offlineItemCount}"]`).on('input', function() {
+        updateOfflineTotalPrice();
+    });
+}
+
 
         function addOnlineBookItem() {
-            onlineItemCount++;
-            const itemHtml = `
-                <div class="book-item" data-item-id="${onlineItemCount}">
-                    <div class="book-item-header">
-                        <span class="book-item-number">Kitab #${onlineItemCount}</span>
-                        ${onlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOnlineItem(${onlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label><i class="fas fa-book"></i> Pilih Kitab</label>
-                            <select class="online-book-select" data-item="${onlineItemCount}" required></select>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
-                            <input type="number" class="online-quantity" data-item="${onlineItemCount}" min="1" value="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label><i class="fas fa-tag"></i> Harga</label>
-                            <input type="text" class="online-price" data-item="${onlineItemCount}" disabled>
-                        </div>
-                    </div>
+    onlineItemCount++;
+    const itemHtml = `
+        <div class="book-item" data-item-id="${onlineItemCount}">
+            <div class="book-item-header">
+                <span class="book-item-number">Kitab #${onlineItemCount}</span>
+                ${onlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOnlineItem(${onlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label><i class="fas fa-book"></i> Pilih Kitab</label>
+                    <select class="online-book-select" data-item="${onlineItemCount}" required></select>
                 </div>
-            `;
-            
-            $('#online-book-items').append(itemHtml);
-            
-            // Initialize select2 for new item
-            const newSelect = $(`.online-book-select[data-item="${onlineItemCount}"]`);
-            newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
-            books.forEach(book => {
-                if (book.availability === 'Tersedia') {
-                    newSelect.append(new Option(book.name, book.id));
-                }
-            });
-            newSelect.select2({
-                placeholder: '-- Pilih Kitab --',
-                width: '100%'
-            });
-            
-            // Add change event
-            newSelect.on('change', function() {
-                updateOnlineItemPrice($(this).data('item'));
-                updateOnlineTotalPrice();
-            });
-            
-            // Add quantity change event
-            $(`.online-quantity[data-item="${onlineItemCount}"]`).on('input', function() {
-                updateOnlineTotalPrice();
-            });
-        }
-
+                <div class="form-group">
+                    <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
+                    <input type="number" class="online-quantity" data-item="${onlineItemCount}" min="1" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-tag"></i> Harga</label>
+                    <input type="text" class="online-price" data-item="${onlineItemCount}" disabled>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    $('#online-book-items').append(itemHtml);
+    
+    // Initialize select2 for new item
+    const newSelect = $(`.online-book-select[data-item="${onlineItemCount}"]`);
+    newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
+    
+    console.log('Available books for online item:', books);
+    console.log('Books array length:', books.length);
+    
+    if (books && books.length > 0) {
+        books.forEach(book => {
+            if (book.availability === 'Tersedia') {
+                console.log('Adding book to select:', book.name);
+                newSelect.append(new Option(book.name, book.id));
+            }
+        });
+    } else {
+        console.warn('No books available or books array is empty');
+        newSelect.append(new Option('Tidak ada kitab tersedia', ''));
+    }
+    
+    newSelect.select2({
+        placeholder: '-- Pilih Kitab --',
+        width: '100%'
+    });
+    
+    // Add change event
+    newSelect.on('change', function() {
+        updateOnlineItemPrice($(this).data('item'));
+        updateOnlineTotalPrice();
+    });
+    
+    // Add quantity change event
+    $(`.online-quantity[data-item="${onlineItemCount}"]`).on('input', function() {
+        updateOnlineTotalPrice();
+    });
+}
         function removeOfflineItem(itemId) {
             $(`.book-item[data-item-id="${itemId}"]`).remove();
             updateOfflineTotalPrice();
@@ -1834,71 +2247,68 @@
         }
 
         async function handleOfflineRekapSubmit() {
-            const buyerId = $('#offline-buyer').val();
-            if (!buyerId) {
-                showMessage('Pilih pembeli terlebih dahulu', 'error');
-                return;
-            }
+    const buyerId = $('#offline-buyer').val();
+    if (!buyerId) {
+        showMessage('Pilih pembeli terlebih dahulu', 'error');
+        return;
+    }
 
-            const items = [];
-            let hasValidItem = false;
+    const items = [];
+    let hasValidItem = false;
 
-            $('.book-item').each(function() {
-                const bookId = $(this).find('.offline-book-select').val();
-                const quantity = $(this).find('.offline-quantity').val();
-                
-                if (bookId && quantity) {
-                    items.push({
-                        book_id: bookId,
-                        quantity: parseInt(quantity)
-                    });
-                    hasValidItem = true;
-                }
+    $('.book-item').each(function() {
+        const bookId = $(this).find('.offline-book-select').val();
+        const quantity = $(this).find('.offline-quantity').val();
+        
+        if (bookId && quantity) {
+            items.push({
+                book_id: bookId,
+                quantity: parseInt(quantity)
             });
-
-            if (!hasValidItem) {
-                showMessage('Tambahkan minimal satu kitab', 'error');
-                return;
-            }
-
-            try {
-                // Submit each item separately (to maintain compatibility with existing backend)
-                for (const item of items) {
-                    const response = await fetch('/api/add-offline-sale', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({
-                            buyer_id: buyerId,
-                            book_id: item.book_id,
-                            quantity: item.quantity
-                        })
-                    });
-                    
-                    if (!response.ok) {
-                        const result = await response.json();
-                        throw new Error(result.error || 'Gagal menyimpan transaksi');
-                    }
-                }
-
-                showMessage('Transaksi offline berhasil disimpan!', 'success');
-                
-                // Reset form
-                $('#offline-sale-form')[0].reset();
-                $('#offline-buyer').val(null).trigger('change');
-                $('#offline-book-items').empty();
-                offlineItemCount = 0;
-                addOfflineBookItem();
-                updateOfflineTotalPrice();
-                
-                // Reload data
-                loadRecentSales();
-                loadDashboardStats();
-                updateChart();
-                
-            } catch (error) {
-                showMessage(error.message, 'error');
-            }
+            hasValidItem = true;
         }
+    });
+
+    if (!hasValidItem) {
+        showMessage('Tambahkan minimal satu kitab', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/add-offline-sale', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                buyer_id: buyerId,
+                items: items  // Kirim sebagai array items
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Gagal menyimpan transaksi');
+        }
+
+        showMessage('Transaksi offline berhasil disimpan!', 'success');
+        
+        // Reset form
+        $('#offline-sale-form')[0].reset();
+        $('#offline-buyer').val(null).trigger('change');
+        $('#offline-book-items').empty();
+        offlineItemCount = 0;
+        addOfflineBookItem();
+        updateOfflineTotalPrice();
+        
+        // Reload data
+        loadRecentSales();
+        loadDashboardStats();
+        updateChart();
+        
+    } catch (error) {
+        showMessage(error.message, 'error');
+    }
+}
 
         async function handleOnlineRekapSubmit() {
             const buyerName = $('#online-buyer-name').val();
@@ -2360,6 +2770,8 @@
             books.length = 0;
             books.push(...bookData);
 
+            console.log('Books loaded:', books.length, 'items');
+
             const buyerResponse = await fetch('/api/offline-buyers');
             const buyerData = await buyerResponse.json();
             
@@ -2371,6 +2783,8 @@
                 placeholder: '-- Pilih Pembeli --', 
                 width: '100%'
             });
+            addOfflineBookItem();
+            addOnlineBookItem();
         }
 
         // Form handlers
