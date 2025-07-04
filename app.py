@@ -83,9 +83,11 @@ def shop_page():
 def book_detail(book_id):
     conn = get_db_connection()
     book = conn.execute('SELECT * FROM books WHERE id = ?', (book_id,)).fetchone()
+    books = conn.execute("SELECT * FROM books ORDER BY name").fetchall()
     conn.close()
-    if book is None: return "Kitab tidak ditemukan.", 404
-    return render_template('book_detail.html', book=book)
+    if book is None: 
+        return "Kitab tidak ditemukan.", 404
+    return render_template('book_detail.html', book=book, books=books)
 
 @app.route('/cek-ongkir')
 def cek_ongkir_page():
@@ -330,45 +332,79 @@ def import_buyers():
 @login_required
 def add_offline_sale():
     data = request.json
-    try:
-        conn = get_db_connection()
-        book = conn.execute('SELECT price FROM books WHERE id = ?', (data['book_id'],)).fetchone()
-        if not book: return jsonify({'error': 'Kitab tidak ditemukan'}), 404
-        
-        total_price = book['price'] * int(data['quantity'])
-        
-        conn.execute(
-            'INSERT INTO offline_sales (buyer_id, book_id, quantity, total_price) VALUES (?, ?, ?, ?)',
-            (data['buyer_id'], data['book_id'], data['quantity'], total_price)
-        )
-        conn.commit()
-        conn.close()
-        return jsonify({'message': 'Rekap offline berhasil ditambahkan!'})
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    buyer_id = data.get('buyer_id')
+    items = data.get('items', [])
 
+    if not buyer_id or not items:
+        return jsonify({'error': 'Data tidak lengkap'}), 400
+
+    conn = get_db_connection()
+    try:
+        for item in items:
+            book = conn.execute('SELECT price FROM books WHERE id = ?', (item['book_id'],)).fetchone()
+            if not book:
+                raise ValueError(f"Kitab dengan ID {item['book_id']} tidak ditemukan")
+            
+            total_price = book['price'] * int(item['quantity'])
+            conn.execute(
+                'INSERT INTO offline_sales (buyer_id, book_id, quantity, total_price) VALUES (?, ?, ?, ?)',
+                (buyer_id, item['book_id'], item['quantity'], total_price)
+            )
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+    
+    return jsonify({'message': 'Transaksi offline berhasil disimpan!'})
+
+# === API BARU: Penjualan Online Multi-Item ===
 @app.route('/api/add-online-sale', methods=['POST'])
 @login_required
 def add_online_sale():
     data = request.json
-    try:
-        conn = get_db_connection()
-        book = conn.execute('SELECT price FROM books WHERE id = ?', (data['book_id'],)).fetchone()
-        if not book: return jsonify({'error': 'Kitab tidak ditemukan'}), 404
-        
-        quantity = int(data.get('quantity', 1))
-        shipping_cost = 15000
-        total_price = (book['price'] * quantity) + shipping_cost
+    buyer_name = data.get('buyer_name')
+    buyer_address = data.get('buyer_address')
+    transfer_date = data.get('transfer_date')
+    shipping_cost = data.get('shipping_cost', 0)
+    items = data.get('items', [])
 
-        conn.execute(
-            'INSERT INTO online_sales (buyer_name, buyer_address, book_id, shipping_cost, total_price, transfer_date, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            (data['buyer_name'], data['buyer_address'], data['book_id'], shipping_cost, total_price, data['transfer_date'], quantity)
-        )
+    if not all([buyer_name, buyer_address, transfer_date, items]):
+        return jsonify({'error': 'Data tidak lengkap'}), 400
+
+    conn = get_db_connection()
+    try:
+        # Bagi ongkir ke setiap item (atau bisa juga ditambahkan di akhir)
+        # Di sini, kita asumsikan ongkir adalah biaya tetap untuk seluruh transaksi
+        total_items_price = 0
+        for item in items:
+            book = conn.execute('SELECT price FROM books WHERE id = ?', (item['book_id'],)).fetchone()
+            if not book:
+                raise ValueError(f"Kitab dengan ID {item['book_id']} tidak ditemukan")
+            total_items_price += book['price'] * int(item['quantity'])
+
+        # Simpan setiap item sebagai entri terpisah tapi dengan referensi yang sama (jika diperlukan)
+        # Untuk kesederhanaan, kita bisa simpan satu entri dengan total, atau per item.
+        # Di sini kita tetap simpan per item agar konsisten.
+        for item in items:
+            book = conn.execute('SELECT price FROM books WHERE id = ?', (item['book_id'],)).fetchone()
+            # Kalkulasi total per item (harga kitab * jumlah) + (ongkir / jumlah item)
+            item_total_price = (book['price'] * int(item['quantity'])) + (shipping_cost / len(items))
+            
+            conn.execute(
+                'INSERT INTO online_sales (buyer_name, buyer_address, book_id, shipping_cost, total_price, transfer_date, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)',
+                (buyer_name, buyer_address, item['book_id'], (shipping_cost / len(items)), item_total_price, transfer_date, item['quantity'])
+            )
         conn.commit()
-        conn.close()
-        return jsonify({'message': 'Rekap online berhasil ditambahkan!'})
     except Exception as e:
+        conn.rollback()
         return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+        
+    return jsonify({'message': 'Transaksi online berhasil disimpan!'})
+
 
 @app.route('/api/recent-offline-sales')
 @login_required
@@ -451,6 +487,40 @@ def export_online():
     output.seek(0)
     
     return send_file(output, download_name='semua_rekap_online.xlsx', as_attachment=True)
+
+
+@app.route('/api/dashboard-stats')
+@login_required
+def get_dashboard_stats():
+    conn = get_db_connection()
+    
+    # Total Kitab
+    total_books = conn.execute('SELECT COUNT(id) FROM books').fetchone()[0]
+    
+    # Total Pembeli
+    total_buyers = conn.execute('SELECT COUNT(id) FROM offline_buyers').fetchone()[0]
+    
+    # Penjualan bulan ini
+    current_month = datetime.now().strftime('%Y-%m')
+    
+    total_offline_sales = conn.execute(
+        "SELECT SUM(total_price) FROM offline_sales WHERE strftime('%Y-%m', sale_date) = ?", 
+        (current_month,)
+    ).fetchone()[0] or 0
+
+    total_online_sales = conn.execute(
+        "SELECT SUM(total_price) FROM online_sales WHERE strftime('%Y-%m', sale_date) = ?", 
+        (current_month,)
+    ).fetchone()[0] or 0
+
+    conn.close()
+    
+    return jsonify({
+        'total_books': total_books,
+        'total_buyers': total_buyers,
+        'total_offline_sales': total_offline_sales,
+        'total_online_sales': total_online_sales
+    })
 
 # --- API Publik untuk Ongkir ---
 @app.route('/api/cari-area', methods=['GET'])

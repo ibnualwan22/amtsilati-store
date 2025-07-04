@@ -3,8 +3,7 @@ import sqlite3
 connection = sqlite3.connect('instance/store.db')
 cursor = connection.cursor()
 
-# --- MODIFIKASI DI SINI ---
-# Membuat tabel untuk data kitab dengan kolom baru
+# Membuat tabel untuk data kitab dengan kolom lengkap
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS books (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -14,18 +13,22 @@ CREATE TABLE IF NOT EXISTS books (
     link_ig TEXT,
     link_wa TEXT,
     link_shopee TEXT,
-    link_tiktok TEXT
+    link_tiktok TEXT,
+    image_filename TEXT
 )
 ''')
-# -------------------------
 
-# Tabel lainnya tetap sama
+# Tabel untuk pembeli offline dengan kolom tambahan
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS offline_buyers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE
+    name TEXT NOT NULL UNIQUE,
+    address TEXT,
+    dormitory TEXT
 )
 ''')
+
+# Tabel untuk penjualan offline
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS offline_sales (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,16 +41,29 @@ CREATE TABLE IF NOT EXISTS offline_sales (
     FOREIGN KEY (book_id) REFERENCES books (id)
 )
 ''')
+
+# Tabel untuk penjualan online dengan kolom tambahan
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS online_sales (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     buyer_name TEXT NOT NULL,
     buyer_address TEXT NOT NULL,
     book_id INTEGER,
+    quantity INTEGER NOT NULL DEFAULT 1,
     shipping_cost REAL NOT NULL,
     total_price REAL NOT NULL,
+    transfer_date DATE,
     sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (book_id) REFERENCES books (id)
+)
+''')
+
+# Tabel untuk admin users
+cursor.execute('''
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL
 )
 ''')
 
@@ -68,4 +84,4 @@ except sqlite3.IntegrityError:
 connection.commit()
 connection.close()
 
-print("Database dan tabel berhasil dibuat ulang di instance/store.db")
+print("Database dan tabel berhasil dibuat di instance/store.db")
