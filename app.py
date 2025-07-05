@@ -7,31 +7,31 @@ import requests
 import functools
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
+from config import get_config
 
 # --- Inisialisasi Aplikasi Flask ---
 app = Flask(__name__)
 
-# Konfigurasi folder upload dengan path absolut
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Max 16MB file size
-app.config['SECRET_KEY'] = 'kunci-rahasia-yang-sangat-sulit-ditebak'
+# Load konfigurasi berdasarkan environment
+config = get_config()
+app.config.from_object(config)
 
 # Buat folder uploads jika belum ada
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-    print(f"Created upload folder at: {UPLOAD_FOLDER}")
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+    print(f"Created upload folder at: {app.config['UPLOAD_FOLDER']}")
+
+# Buat folder instance jika belum ada (untuk database)
+instance_dir = os.path.dirname(app.config['DATABASE_PATH'])
+if not os.path.exists(instance_dir) and instance_dir != '':
+    os.makedirs(instance_dir)
+    print(f"Created instance folder at: {instance_dir}")
 
 # Ekstensi file yang diperbolehkan
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-# --- Konfigurasi RajaOngkir ---
-BITESHIP_API_KEY = "biteship_live.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYW10c2lsYXRpIHN0b3JlIiwidXNlcklkIjoiNjg2NWNhNGI4MzA3ZjgwMDEzNzY5NWQ5IiwiaWF0IjoxNzUxNjEwMzQ1fQ.hJAwHsYKTUWmhB6UvOeoLHGFIq0OA7y3yEAW4U5pwBA"
-BITESHIP_BASE_URL = "https://api.biteship.com"
 
 # --- Custom Filter Rupiah ---
 @app.template_filter('rupiah')
@@ -42,7 +42,8 @@ def format_rupiah(value):
 
 # --- Fungsi Koneksi Database ---
 def get_db_connection():
-    conn = sqlite3.connect('instance/store.db')
+    """Membuat koneksi ke database sesuai environment"""
+    conn = sqlite3.connect(app.config['DATABASE_PATH'])
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -290,42 +291,114 @@ def get_offline_buyers():
     conn.close()
     return jsonify([dict(row) for row in buyers])
 
+
 @app.route('/api/import-buyers', methods=['POST'])
 @login_required
 def import_buyers():
     if 'file' not in request.files:
         return jsonify({'error': 'File tidak ditemukan'}), 400
+    
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'Tidak ada file yang dipilih'}), 400
 
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file.filename))
-    file.save(filepath)
-
     try:
+        # Baca file langsung dari memory
+        file_content = file.read()
+        
         NAMA_KOLOM = 'Nama'
         ALAMAT_KOLOM = 'Alamat'
-        ASRAMA_KOLOM = 'Asrama'
-        df = pd.read_excel(filepath, dtype=str).fillna('')
+        
+        df = pd.read_excel(io.BytesIO(file_content), dtype=str).fillna('')
+        
         conn = get_db_connection()
+        imported = 0
+        updated = 0
         
         for index, row in df.iterrows():
             try:
-                name = row[NAMA_KOLOM]
-                address = row[ALAMAT_KOLOM]
-                dormitory = row[ASRAMA_KOLOM]
-                conn.execute('INSERT INTO offline_buyers (name, address, dormitory) VALUES (?, ?, ?)', (name, address, dormitory))
-            except sqlite3.IntegrityError:
-                conn.execute('UPDATE offline_buyers SET address = ?, dormitory = ? WHERE name = ?', (address, dormitory, name))
+                name = row.get(NAMA_KOLOM, '')
+                address = row.get(ALAMAT_KOLOM, '')
+                
+                if not name:  # Skip jika nama kosong
+                    continue
+                    
+                try:
+                    conn.execute('INSERT INTO offline_buyers (name, address) VALUES (?, ?)', 
+                               (name, address))
+                    imported += 1
+                except sqlite3.IntegrityError:
+                    conn.execute('UPDATE offline_buyers SET address = ? WHERE name = ?', 
+                               (address, name))
+                    updated += 1
+                    
             except KeyError as e:
-                return jsonify({'error': f"Kolom '{e.args[0]}' tidak ditemukan di file Excel."}), 400
+                conn.close()
+                return jsonify({'error': f"Kolom '{e}' tidak ditemukan di file Excel."}), 400
         
         conn.commit()
         conn.close()
-        os.remove(filepath)
-        return jsonify({'message': 'Data pembeli berhasil diimpor/diupdate!'})
+        
+        return jsonify({'message': f'Data berhasil diimpor! Ditambahkan: {imported}, Diupdate: {updated}'})
+        
     except Exception as e:
+        return jsonify({'error': f"Error memproses file: {str(e)}"}), 500
+    
+@app.route('/api/update-buyer', methods=['POST'])
+@login_required
+def update_buyer():
+    data = request.json
+    conn = get_db_connection()
+    try:
+        conn.execute('UPDATE offline_buyers SET name = ?, address = ? WHERE id = ?', 
+                    (data['name'], data['address'], data['id']))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Data pembeli berhasil diupdate!'})
+    except Exception as e:
+        conn.close()
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/delete-buyer/<int:buyer_id>', methods=['POST'])
+@login_required
+def delete_buyer(buyer_id):
+    conn = get_db_connection()
+    try:
+        # Cek transaksi
+        sales = conn.execute('SELECT COUNT(*) FROM offline_sales WHERE buyer_id = ?', 
+                           (buyer_id,)).fetchone()[0]
+        if sales > 0:
+            return jsonify({'error': f'Tidak bisa hapus. Pembeli punya {sales} transaksi.'}), 400
+        
+        conn.execute('DELETE FROM offline_buyers WHERE id = ?', (buyer_id,))
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Pembeli berhasil dihapus.'})
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/delete-all-buyers', methods=['POST'])
+@login_required
+def delete_all_buyers():
+    # Extra confirmation
+    confirm = request.json.get('confirm')
+    if confirm != 'DELETE_ALL_BUYERS':
+        return jsonify({'error': 'Konfirmasi tidak valid'}), 400
+    
+    conn = get_db_connection()
+    try:
+        # Hapus semua transaksi dulu
+        conn.execute('DELETE FROM offline_sales')
+        # Lalu hapus semua pembeli
+        conn.execute('DELETE FROM offline_buyers')
+        conn.commit()
+        conn.close()
+        return jsonify({'message': 'Semua data pembeli berhasil dihapus!'})
+    except Exception as e:
+        conn.close()
+        return jsonify({'error': str(e)}), 500
+    
 
 # --- API UNTUK REKAP PENJUALAN (Dilindungi) ---
 @app.route('/api/add-offline-sale', methods=['POST'])
@@ -420,7 +493,7 @@ def add_online_sale():
 def get_all_offline_sales():
     conn = get_db_connection()
     query = """
-    SELECT os.id, ob.name as buyer_name, ob.address, ob.dormitory, b.name as book_name, 
+    SELECT os.id, ob.name as buyer_name, ob.address, b.name as book_name, 
            os.quantity, os.total_price, strftime('%d-%m-%Y %H:%M', os.sale_date) as sale_date_formatted
     FROM offline_sales os
     JOIN offline_buyers ob ON os.buyer_id = ob.id
@@ -454,10 +527,15 @@ def get_all_online_sales():
 @login_required
 def export_offline():
     conn = get_db_connection()
+    # Update query - HAPUS ob.dormitory
     query = """
-    SELECT strftime('%d-%m-%Y %H:%M', os.sale_date) as 'Tanggal Transaksi', ob.name as 'Nama Pembeli', 
-           ob.address as 'Alamat', ob.dormitory as 'Asrama', b.name as 'Nama Kitab', os.quantity as 'Jumlah', 
-           b.price as 'Harga Satuan', os.total_price as 'Total Harga'
+    SELECT strftime('%d-%m-%Y %H:%M', os.sale_date) as 'Tanggal Transaksi', 
+           ob.name as 'Nama Pembeli', 
+           ob.address as 'Alamat', 
+           b.name as 'Nama Kitab', 
+           os.quantity as 'Jumlah', 
+           b.price as 'Harga Satuan', 
+           os.total_price as 'Total Harga'
     FROM offline_sales os
     JOIN offline_buyers ob ON os.buyer_id = ob.id
     JOIN books b ON os.book_id = b.id
@@ -465,10 +543,12 @@ def export_offline():
     """
     df = pd.read_sql_query(query, conn)
     conn.close()
+    
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Rekap Offline')
     output.seek(0)
+    
     return send_file(output, download_name='semua_rekap_offline.xlsx', as_attachment=True)
 
 @app.route('/api/export-online-sales')
@@ -504,8 +584,8 @@ def search_areas():
     if not query:
         return jsonify([])
 
-    headers = {'Authorization': f'Bearer {BITESHIP_API_KEY}'}
-    url = f"{BITESHIP_BASE_URL}/v1/maps/areas?countries=ID&input={query}&type=single"
+    headers = {'Authorization': f'Bearer {app.config["BITESHIP_API_KEY"]}'}
+    url = f"{app.config['BITESHIP_BASE_URL']}/v1/maps/areas?countries=ID&input={query}&type=single"
     
     try:
         response = requests.get(url, headers=headers)
@@ -521,7 +601,7 @@ def search_areas():
 def post_cek_ongkir_biteship():
     data = request.json
     headers = {
-        'Authorization': f'Bearer {BITESHIP_API_KEY}',
+        'Authorization': f'Bearer {app.config["BITESHIP_API_KEY"]}',
         'Content-Type': 'application/json'
     }
     payload = {
@@ -540,7 +620,7 @@ def post_cek_ongkir_biteship():
     }
     
     try:
-        response = requests.post(f"{BITESHIP_BASE_URL}/v1/rates/couriers", headers=headers, json=payload)
+        response = requests.post(f"{app.config['BITESHIP_BASE_URL']}/v1/rates/couriers", headers=headers, json=payload)
         result = response.json()
 
         if response.status_code == 200 and result.get('success'):
@@ -568,9 +648,24 @@ def check_uploads():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/debug/check-config')
+@login_required
+def check_config():
+    """Route untuk debugging - cek konfigurasi yang digunakan"""
+    return jsonify({
+        'environment': os.environ.get('FLASK_ENV', 'development'),
+        'database_path': app.config['DATABASE_PATH'],
+        'upload_folder': app.config['UPLOAD_FOLDER'],
+        'debug': app.config['DEBUG'],
+        'testing': app.config['TESTING']
+    })
+
 # --- BLOK UNTUK MENJALANKAN SERVER ---
 if __name__ == '__main__':
     # Print informasi penting saat server start
+    print(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
+    print(f"Database path: {app.config['DATABASE_PATH']}")
     print(f"Upload folder: {app.config['UPLOAD_FOLDER']}")
     print(f"Upload folder exists: {os.path.exists(app.config['UPLOAD_FOLDER'])}")
-    app.run(debug=True, port=5001)
+    app.run(debug=app.config['DEBUG'], port=5001)
+

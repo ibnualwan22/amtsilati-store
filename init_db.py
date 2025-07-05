@@ -114,16 +114,12 @@ def create_default_admin(conn):
 
 def main():
     """Fungsi utama untuk menjalankan inisialisasi."""
-    # Gunakan config untuk mendapatkan path yang benar
-    config = get_config()
-    DB_PATH = config.DATABASE_PATH
-    
-    # Buat direktori jika belum ada
-    db_dir = os.path.dirname(DB_PATH)
-    if db_dir and not os.path.exists(db_dir):
-        os.makedirs(db_dir)
-        print(f"Created directory: {db_dir}")
-    
+    # Hapus file DB lama untuk memastikan skema bersih (opsional, hati-hati!)
+    if os.path.exists(DB_PATH):
+        print(f"Menemukan database lama di {DB_PATH}. Skema akan ditambahkan jika belum ada.")
+        # os.remove(DB_PATH) # Hilangkan komentar jika ingin selalu membuat file baru
+        # print("Database lama dihapus.")
+
     conn = None
     try:
         conn = sqlite3.connect(DB_PATH)

@@ -1,16 +1,67 @@
-# Virtual Environment
-venv/
-
-# Folder instance (berisi database)
-instance/
-
-# Folder upload file
-uploads/
-
-# Folder cache Python
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
 
-# File sistem operasi
+# Flask
+instance/
+*.db
+.webassets-cache
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Uploads
+uploads/
+uploads_dev/
+uploads_prod/
+!uploads/.gitkeep
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+*.db.backup*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
+
+# Export files
+*_data_export_*.json
+*_data_export_*.sql
+
+# Backup files
+*.backup
+*.bak
+
+# Test coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Distribution
+dist/
+build/
+*.egg-info/

@@ -1560,7 +1560,7 @@
                                 </label>
                                 <input type="file" id="excel-file" name="file" accept=".xlsx" required>
                                 <small style="color: var(--gray-500); margin-top: 0.25rem;">
-                                    Format: Kolom harus berisi Nama, Alamat, dan Asrama
+                                    Format: Kolom harus berisi Nama dan Alamat
                                 </small>
                             </div>
                             <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
@@ -1584,7 +1584,7 @@
                                     <tr>
                                         <th>Nama</th>
                                         <th>Alamat</th>
-                                        <th>Asrama</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id="buyers-table-body"></tbody>
@@ -1745,7 +1745,6 @@
                                     <tr>
                                         <th>Tanggal</th>
                                         <th>Nama Pembeli</th>
-                                        <th>Asrama</th>
                                         <th>Alamat</th>
                                         <th>Kitab</th>
                                         <th>Jml</th>
@@ -1848,6 +1847,69 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         // Global variables
+// Fungsi untuk edit
+            function editBuyer(id, name, address) {
+    const newName = prompt('Nama:', name);
+    if (newName === null) return; // User cancel
+    
+    const newAddress = prompt('Alamat:', address || '');
+    if (newAddress === null) return; // User cancel
+    
+    // Hanya update jika ada perubahan
+    if (newName !== name || newAddress !== address) {
+        fetch('/api/update-buyer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: id,
+                name: newName,
+                address: newAddress || ''
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                showMessage(data.message, 'success');
+                loadBuyersTable(); // Reload table
+            } else {
+                showMessage(data.error || 'Gagal update data', 'error');
+            }
+        })
+        .catch(error => {
+            showMessage('Error: ' + error.message, 'error');
+        });
+    }
+}
+// Fungsi untuk hapus
+function deleteBuyer(id, name) {
+    if (!confirm(`Yakin ingin menghapus ${name}?`)) {
+        return;
+    }
+    
+    fetch(`/api/delete-buyer/${id}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            showMessage(data.message, 'success');
+            loadBuyersTable(); // Reload table
+        } else {
+            showMessage(data.error || 'Gagal hapus data', 'error');
+        }
+    })
+    .catch(error => {
+        showMessage('Error: ' + error.message, 'error');
+    });
+}
+
+
+
         const messageDiv = document.getElementById('message');
         const books = [];
         let salesChart = null;
@@ -2252,6 +2314,7 @@ function closeMobileMenu() {
         showMessage('Pilih pembeli terlebih dahulu', 'error');
         return;
     }
+    
 
     const items = [];
     let hasValidItem = false;
@@ -2445,7 +2508,6 @@ function closeMobileMenu() {
             const [day, month, year] = datePart.split('-');
             return new Date(year, month - 1, day);
         }
-
         function initializeChart() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             salesChart = new Chart(ctx, {
@@ -2547,6 +2609,8 @@ function closeMobileMenu() {
             updateChart();
         }
 
+        
+
         async function updateChart() {
             const startDate = $('#startDate').val();
             const endDate = $('#endDate').val();
@@ -2632,12 +2696,19 @@ function closeMobileMenu() {
 
         // Utility functions
         function showMessage(text, type) {
-            messageDiv.textContent = text;
-            messageDiv.className = '';
-            messageDiv.classList.add(type);
-            messageDiv.style.display = 'block';
-            setTimeout(() => { messageDiv.style.display = 'none'; }, 5000);
-        }
+    const messageDiv = document.getElementById('message');
+    if (messageDiv) {
+        messageDiv.textContent = text;
+        messageDiv.className = type;
+        messageDiv.style.display = 'block';
+        setTimeout(() => { 
+            messageDiv.style.display = 'none'; 
+        }, 5000);
+    } else {
+        // Fallback ke alert jika message div tidak ada
+        alert(text);
+    }
+}
 
         // CRUD functions
         async function loadBooksTable() {
@@ -2675,21 +2746,30 @@ function closeMobileMenu() {
         }
 
         async function loadBuyersTable() {
-            const response = await fetch('/api/offline-buyers');
-            const buyers = await response.json();
-            const tableBody = $('#buyers-table-body');
-            tableBody.empty();
-            
-            buyers.forEach(buyer => {
-                const row = `
-                    <tr>
-                        <td style="font-weight: 600;">${buyer.name}</td>
-                        <td>${buyer.address || '-'}</td>
-                        <td>${buyer.dormitory || '-'}</td>
-                    </tr>`;
-                tableBody.append(row);
-            });
-        }
+    const response = await fetch('/api/offline-buyers');
+    const buyers = await response.json();
+    const tableBody = $('#buyers-table-body');
+    tableBody.empty();
+    
+    buyers.forEach(buyer => {
+        const row = `
+            <tr>
+                <td style="font-weight: 600;">${buyer.name}</td>
+                <td>${buyer.address || '-'}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="action-btn action-btn-edit" onclick="editBuyer(${buyer.id}, '${buyer.name.replace(/'/g, "\\'")}', '${(buyer.address || '').replace(/'/g, "\\'")}')">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn action-btn-delete" onclick="deleteBuyer(${buyer.id}, '${buyer.name.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash"></i> Hapus
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        tableBody.append(row);
+    });
+}
 
         async function loadRecentSales() {
             const offResponse = await fetch('/api/recent-offline-sales');
@@ -2700,7 +2780,6 @@ function closeMobileMenu() {
                 offTbody.append(`<tr>
                     <td>${s.sale_date_formatted}</td>
                     <td style="font-weight: 600;">${s.buyer_name}</td>
-                    <td>${s.dormitory || '-'}</td>
                     <td>${s.address || '-'}</td>
                     <td>${s.book_name}</td>
                     <td style="text-align: center;">${s.quantity}</td>
@@ -2778,14 +2857,19 @@ function closeMobileMenu() {
             // Initialize offline buyer select
             const buyerSelect = $('#offline-buyer');
             buyerSelect.empty().append(new Option('-- Pilih Pembeli --', ''));
-            buyerData.forEach(buyer => buyerSelect.append(new Option(buyer.name, buyer.id)));
+            buyerData.forEach(buyer => {
+        const displayText = buyer.address ? `${buyer.name} - ${buyer.address}` : buyer.name;
+        buyerSelect.append(new Option(displayText, buyer.id));
+    });
             buyerSelect.select2({ 
                 placeholder: '-- Pilih Pembeli --', 
                 width: '100%'
             });
+            
             addOfflineBookItem();
             addOnlineBookItem();
         }
+        
 
         // Form handlers
         async function handleFormSubmit(form, url) {
