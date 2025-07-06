@@ -604,6 +604,164 @@ def get_all_online_sales():
     sales = conn.execute(query).fetchall()
     conn.close()
     return jsonify([dict(row) for row in sales])
+# TAMBAHKAN ENDPOINT INI DI app.py setelah endpoint transaksi yang sudah ada
+
+# --- API UNTUK EDIT/HAPUS TRANSAKSI OFFLINE ---
+@app.route('/api/update-offline-sale', methods=['POST'])
+@login_required
+def update_offline_sale():
+    try:
+        data = request.json
+        sale_id = data.get('id')
+        buyer_id = data.get('buyer_id')
+        book_id = data.get('book_id')
+        quantity = data.get('quantity')
+        
+        if not all([sale_id, buyer_id, book_id, quantity]):
+            return jsonify({'error': 'Data tidak lengkap'}), 400
+        
+        conn = get_db_connection()
+        
+        # Get book price
+        book = conn.execute('SELECT price FROM books WHERE id = ?', (book_id,)).fetchone()
+        if not book:
+            conn.close()
+            return jsonify({'error': 'Kitab tidak ditemukan'}), 404
+        
+        # Calculate new total
+        total_price = book['price'] * int(quantity)
+        
+        # Update transaction
+        conn.execute('''
+            UPDATE offline_sales 
+            SET buyer_id = ?, book_id = ?, quantity = ?, total_price = ?
+            WHERE id = ?
+        ''', (buyer_id, book_id, quantity, total_price, sale_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Transaksi offline berhasil diupdate!'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/delete-offline-sale/<int:sale_id>', methods=['POST'])
+@login_required
+def delete_offline_sale(sale_id):
+    try:
+        conn = get_db_connection()
+        conn.execute('DELETE FROM offline_sales WHERE id = ?', (sale_id,))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Transaksi offline berhasil dihapus!'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/get-offline-sale/<int:sale_id>', methods=['GET'])
+@login_required
+def get_offline_sale(sale_id):
+    try:
+        conn = get_db_connection()
+        sale = conn.execute('''
+            SELECT os.*, ob.name as buyer_name, b.name as book_name
+            FROM offline_sales os
+            JOIN offline_buyers ob ON os.buyer_id = ob.id
+            JOIN books b ON os.book_id = b.id
+            WHERE os.id = ?
+        ''', (sale_id,)).fetchone()
+        conn.close()
+        
+        if not sale:
+            return jsonify({'error': 'Transaksi tidak ditemukan'}), 404
+        
+        return jsonify(dict(sale))
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# --- API UNTUK EDIT/HAPUS TRANSAKSI ONLINE ---
+@app.route('/api/update-online-sale', methods=['POST'])
+@login_required
+def update_online_sale():
+    try:
+        data = request.json
+        sale_id = data.get('id')
+        buyer_name = data.get('buyer_name')
+        buyer_address = data.get('buyer_address')
+        book_id = data.get('book_id')
+        quantity = data.get('quantity', 1)
+        shipping_cost = data.get('shipping_cost')
+        transfer_date = data.get('transfer_date')
+        
+        if not all([sale_id, buyer_name, buyer_address, book_id, shipping_cost]):
+            return jsonify({'error': 'Data tidak lengkap'}), 400
+        
+        conn = get_db_connection()
+        
+        # Get book price
+        book = conn.execute('SELECT price FROM books WHERE id = ?', (book_id,)).fetchone()
+        if not book:
+            conn.close()
+            return jsonify({'error': 'Kitab tidak ditemukan'}), 404
+        
+        # Calculate new total
+        total_price = (book['price'] * int(quantity)) + float(shipping_cost)
+        
+        # Update transaction
+        conn.execute('''
+            UPDATE online_sales 
+            SET buyer_name = ?, buyer_address = ?, book_id = ?, 
+                quantity = ?, shipping_cost = ?, total_price = ?, transfer_date = ?
+            WHERE id = ?
+        ''', (buyer_name, buyer_address, book_id, quantity, 
+              shipping_cost, total_price, transfer_date, sale_id))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Transaksi online berhasil diupdate!'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/delete-online-sale/<int:sale_id>', methods=['POST'])
+@login_required
+def delete_online_sale(sale_id):
+    try:
+        conn = get_db_connection()
+        conn.execute('DELETE FROM online_sales WHERE id = ?', (sale_id,))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Transaksi online berhasil dihapus!'})
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/get-online-sale/<int:sale_id>', methods=['GET'])
+@login_required
+def get_online_sale(sale_id):
+    try:
+        conn = get_db_connection()
+        sale = conn.execute('''
+            SELECT os.*, b.name as book_name,
+                   strftime('%Y-%m-%d', os.transfer_date) as transfer_date_formatted
+            FROM online_sales os
+            JOIN books b ON os.book_id = b.id
+            WHERE os.id = ?
+        ''', (sale_id,)).fetchone()
+        conn.close()
+        
+        if not sale:
+            return jsonify({'error': 'Transaksi tidak ditemukan'}), 404
+        
+        return jsonify(dict(sale))
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # --- API UNTUK EXPORT EXCEL (Dilindungi) ---
 @app.route('/api/export-offline-sales')
