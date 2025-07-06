@@ -837,6 +837,11 @@
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
         }
 
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
         .btn-danger {
             background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
             color: white;
@@ -1008,61 +1013,6 @@
             color: #991b1b;
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
-    
-    /* Tombol toggle scroll */
-          .scroll-toggle {
-        display: none;
-         position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 50px;
-        height: 50px;
-        background: var(--primary);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        box-shadow: var(--shadow-lg);
-        z-index: 1000;
-        font-size: 1.25rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-    
-    .scroll-toggle:hover {
-        transform: scale(1.1);
-        background: var(--primary-dark);
-    }
-    
-    .scroll-toggle.show {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-}
-
-/* Desktop tetap normal */
-@media (min-width: 969px) {
-    .navbar {
-        transform: none !important;
-    }
-    
-    .scroll-toggle {
-        display: none !important;
-    }
-}
-
-            .content {
-                padding: 1rem;
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .navbar-container {
-                padding: 0 1rem;
-            }
-        }
 
         /* Loading */
         .loading {
@@ -1166,6 +1116,94 @@
             transform: translateY(-1px);
             box-shadow: var(--shadow-md);
         }
+
+        .availability-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .availability-badge.available {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .availability-badge.unavailable {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        #message {
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    display: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-line; /* Untuk menampilkan line breaks */
+    line-height: 1.6;
+}
+
+#message.success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+#message.error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+    color: #991b1b;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Style untuk warnings dalam pesan */
+#message.success:has-text("⚠") {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+    color: #92400e;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+/* Scrollbar styling untuk pesan */
+#message::-webkit-scrollbar {
+    width: 6px;
+}
+
+#message::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+}
+
+#message::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+#message::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Loading state untuk buttons */
+button[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Spinner animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.fa-spinner.fa-spin {
+    animation: spin 1s linear infinite;
     </style>
 </head>
 <body>
@@ -1188,6 +1226,10 @@
                 <a href="#" class="nav-link" data-section="books">
                     <i class="fas fa-book"></i>
                     <span>Kitab</span>
+                </a>
+                <a href="#" class="nav-link" data-section="cash-records">
+                    <i class="fas fa-wallet"></i>
+                    <span>Rekap Kas</span>
                 </a>
                 <div class="nav-item dropdown">
                     <button class="nav-link">
@@ -1244,6 +1286,10 @@
         <i class="fas fa-book"></i>
         <span>Kitab</span>
     </button>
+    <button class="bottom-nav-item" data-section="cash-records">
+        <i class="fas fa-wallet"></i>
+        <span>Kas</span>
+    </button>
     <button class="bottom-nav-item" data-section="offline-sales">
         <i class="fas fa-store"></i>
         <span>Offline</span>
@@ -1277,6 +1323,10 @@
             <a href="#" class="mobile-menu-item" data-section="books">
                 <i class="fas fa-book"></i>
                 Manajemen Kitab
+            </a>
+            <a href="#" class="mobile-menu-item" data-section="cash-records">
+                <i class="fas fa-wallet"></i>
+                Rekap Kas
             </a>
             <a href="#" class="mobile-menu-item" data-section="offline-buyers">
                 <i class="fas fa-users"></i>
@@ -1429,6 +1479,36 @@
                 <div class="page-header">
                     <h1 class="page-title">Manajemen Kitab</h1>
                     <p class="page-subtitle">Kelola daftar kitab yang tersedia</p>
+                </div>
+
+                <!-- Import Excel Section -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-file-excel"></i>
+                            Import Kitab dari Excel
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="import-books-form">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-file-upload"></i> File Excel (.xlsx)
+                                </label>
+                                <input type="file" id="books-excel-file" name="file" accept=".xlsx" required>
+                                <small style="color: var(--gray-500); margin-top: 0.25rem;">
+                                    Format kolom: Nama, Harga, Ketersediaan, Link Instagram, Link WhatsApp, Link Shopee, Link TikTok
+                                    <br>
+                                    <a href="/api/template-import-books" style="color: var(--primary);">
+                                        <i class="fas fa-download"></i> Download Template Excel
+                                    </a>
+                                </small>
+                            </div>
+                            <button type="submit" class="btn btn-success" style="margin-top: 1rem;">
+                                <i class="fas fa-upload"></i> Import Kitab
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -1714,6 +1794,65 @@
                     <p class="page-subtitle">Lihat semua transaksi penjualan</p>
                 </div>
 
+                <!-- Import Transactions -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-file-import"></i>
+                            Import Transaksi Offline
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="import-transactions-form">
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-file-excel"></i> File Excel (.xlsx)
+                                </label>
+                                <input type="file" id="transactions-excel-file" name="file" accept=".xlsx" required>
+                                <small style="color: var(--gray-500); margin-top: 0.25rem;">
+                                    Format kolom: Nama Pembeli, Nama Kitab, Jumlah
+                                    <br>
+                                    Jika Anda Memasukkan Nama Baru Maka Jangan Lupa Tambahkan Kolom Alamat Dan Akan Otomatis Terinput Di Data Pembeli Offline
+                                    <br>
+                                </small>
+                            </div>
+                            <button type="submit" class="btn btn-success" style="margin-top: 1rem;">
+                                <i class="fas fa-upload"></i> Import Transaksi
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+    <div class="card-header">
+        <h2 class="card-title">
+            <i class="fas fa-file-import"></i>
+            Import Transaksi Online
+        </h2>
+    </div>
+    <div class="card-body">
+        <form id="import-transactions-form-online">
+            <div class="form-group">
+                <label>
+                    <i class="fas fa-file-excel"></i> File Excel (.xlsx)
+                </label>
+                <input type="file" id="transactions-excel-file-online" name="file" accept=".xlsx,.xls" required>
+                <small style="color: var(--gray-500); margin-top: 0.25rem;">
+                    Format kolom wajib: Nama Pembeli, Nama Kitab, Jumlah
+                    <br>
+                    Format kolom opsional: Alamat Kirim, Ongkir, Tanggal Transfer
+                    <br>
+                </small>
+            </div>
+            <button type="submit" class="btn btn-success" style="margin-top: 1rem;">
+                <i class="fas fa-upload"></i> Import Transaksi Online
+            </button>
+        </form>
+    </div>
+</div>
+
+                
+
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">
@@ -1785,6 +1924,174 @@
                     </div>
                 </div>
             </section>
+
+            <!-- Cash Records Section -->
+            <section id="cash-records-section" class="content-section">
+                <div class="page-header">
+                    <h1 class="page-title">Rekap Kas</h1>
+                    <p class="page-subtitle">Kelola catatan kas masuk dan keluar</p>
+                </div>
+
+                <!-- Cash Summary Cards -->
+                <div class="stats-grid" style="margin-bottom: 2rem;">
+                    <div class="stat-card success">
+                        <div class="stat-header">
+                            <div>
+                                <h3>Total Debit</h3>
+                                <div class="stat-value" id="totalDebit">Rp 0</div>
+                                <div class="stat-change">
+                                    <i class="fas fa-arrow-down"></i> Kas Masuk
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-arrow-circle-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card danger">
+                        <div class="stat-header">
+                            <div>
+                                <h3>Total Kredit</h3>
+                                <div class="stat-value" id="totalKredit">Rp 0</div>
+                                <div class="stat-change">
+                                    <i class="fas fa-arrow-up"></i> Kas Keluar
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-arrow-circle-up"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <h3>Saldo Kas</h3>
+                                <div class="stat-value" id="saldoKas">Rp 0</div>
+                                <div class="stat-change" id="saldoStatus">
+                                    <i class="fas fa-wallet"></i> Saldo Akhir
+                                </div>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="fas fa-wallet"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add Cash Record Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-plus-circle"></i>
+                            Tambah Catatan Kas
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="add-cash-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        <i class="fas fa-exchange-alt"></i> Jenis Transaksi
+                                    </label>
+                                    <select id="cash-type" name="type" required>
+                                        <option value="debit">Debit (Kas Masuk)</option>
+                                        <option value="kredit">Kredit (Kas Keluar)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <i class="fas fa-calendar"></i> Tanggal
+                                    </label>
+                                    <input type="date" id="cash-date" name="record_date" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        <i class="fas fa-money-bill"></i> Jumlah
+                                    </label>
+                                    <input type="number" id="cash-amount" name="amount" min="0" required placeholder="Contoh: 100000">
+                                </div>
+                                <div class="form-group">
+                                    <label>
+                                        <i class="fas fa-tags"></i> Kategori
+                                    </label>
+                                    <select id="cash-category" name="category">
+                                        <option value="">-- Pilih Kategori --</option>
+                                        <option value="Penjualan">Penjualan</option>
+                                        <option value="Operasional">Operasional</option>
+                                        <option value="Gaji">Gaji</option>
+                                        <option value="Listrik">Listrik</option>
+                                        <option value="Internet">Internet</option>
+                                        <option value="Transportasi">Transportasi</option>
+                                        <option value="Lainnya">Lainnya</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>
+                                    <i class="fas fa-sticky-note"></i> Keterangan
+                                </label>
+                                <textarea id="cash-description" name="description" rows="3" required placeholder="Masukkan keterangan transaksi"></textarea>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Simpan Catatan
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Cash Records Table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="fas fa-list"></i>
+                            Daftar Catatan Kas
+                        </h2>
+                        <button class="btn btn-secondary" onclick="exportCashRecords()">
+                            <i class="fas fa-download"></i> Export Excel
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Filter -->
+                        <div class="date-filter" style="margin-bottom: 1.5rem;">
+                            <label>Dari:</label>
+                            <input type="date" id="cashStartDate">
+                            <label>Sampai:</label>
+                            <input type="date" id="cashEndDate">
+                            <select id="cashTypeFilter" style="margin-left: 1rem;">
+                                <option value="">Semua Jenis</option>
+                                <option value="debit">Debit Saja</option>
+                                <option value="kredit">Kredit Saja</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="loadCashRecords()">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                        </div>
+                        
+                        <div class="table-container">
+                            <table id="cash-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tanggal</th>
+                                        <th>Jenis</th>
+                                        <th>Keterangan</th>
+                                        <th>Kategori</th>
+                                        <th>Jumlah</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cash-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -1847,74 +2154,99 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         // Global variables
-// Fungsi untuk edit
-            function editBuyer(id, name, address) {
-    const newName = prompt('Nama:', name);
-    if (newName === null) return; // User cancel
-    
-    const newAddress = prompt('Alamat:', address || '');
-    if (newAddress === null) return; // User cancel
-    
-    // Hanya update jika ada perubahan
-    if (newName !== name || newAddress !== address) {
-        fetch('/api/update-buyer', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: id,
-                name: newName,
-                address: newAddress || ''
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message) {
-                showMessage(data.message, 'success');
-                loadBuyersTable(); // Reload table
-            } else {
-                showMessage(data.error || 'Gagal update data', 'error');
-            }
-        })
-        .catch(error => {
-            showMessage('Error: ' + error.message, 'error');
-        });
-    }
-}
-// Fungsi untuk hapus
-function deleteBuyer(id, name) {
-    if (!confirm(`Yakin ingin menghapus ${name}?`)) {
-        return;
-    }
-    
-    fetch(`/api/delete-buyer/${id}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message) {
-            showMessage(data.message, 'success');
-            loadBuyersTable(); // Reload table
-        } else {
-            showMessage(data.error || 'Gagal hapus data', 'error');
-        }
-    })
-    .catch(error => {
-        showMessage('Error: ' + error.message, 'error');
-    });
-}
-
-
-
         const messageDiv = document.getElementById('message');
         const books = [];
         let salesChart = null;
         let offlineItemCount = 0;
         let onlineItemCount = 0;
+
+        // Fungsi untuk edit
+        function editBuyer(id, name, address) {
+            const newName = prompt('Nama:', name);
+            if (newName === null) return; // User cancel
+            
+            const newAddress = prompt('Alamat:', address || '');
+            if (newAddress === null) return; // User cancel
+            
+            // Hanya update jika ada perubahan
+            if (newName !== name || newAddress !== address) {
+                fetch('/api/update-buyer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        id: id,
+                        name: newName,
+                        address: newAddress || ''
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        showMessage(data.message, 'success');
+                        loadBuyersTable(); // Reload table
+                    } else {
+                        showMessage(data.error || 'Gagal update data', 'error');
+                    }
+                })
+                .catch(error => {
+                    showMessage('Error: ' + error.message, 'error');
+                });
+            }
+        }
+
+        // Fungsi untuk hapus
+        function deleteBuyer(id, name) {
+            if (!confirm(`Yakin ingin menghapus ${name}?`)) {
+                return;
+            }
+            
+            fetch(`/api/delete-buyer/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    showMessage(data.message, 'success');
+                    loadBuyersTable(); // Reload table
+                } else {
+                    showMessage(data.error || 'Gagal hapus data', 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('Error: ' + error.message, 'error');
+            });
+        }
+        function validateExcelFile(fileInput) {
+    const file = fileInput.files[0];
+    if (!file) {
+        showMessage('Pilih file terlebih dahulu', 'error');
+        return false;
+    }
+    
+    const validExtensions = ['xlsx', 'xls'];
+    const fileExtension = file.name.split('.').pop().toLowerCase();
+    
+    if (!validExtensions.includes(fileExtension)) {
+        showMessage('File harus berformat Excel (.xlsx atau .xls)', 'error');
+        fileInput.value = '';
+        return false;
+    }
+    
+    // Check file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+        showMessage('Ukuran file maksimal 5MB', 'error');
+        fileInput.value = '';
+        return false;
+    }
+    
+    return true;
+}
 
         // Initialize
         $(document).ready(function() {
@@ -1930,98 +2262,98 @@ function deleteBuyer(id, name) {
             initializeChart();
 
             if (window.innerWidth <= 968) {
-        let lastScrollTop = 0;
-        let scrollDelta = 5;
-        let navbarHeight = $('.navbar').outerHeight();
+                let lastScrollTop = 0;
+                let scrollDelta = 5;
+                let navbarHeight = $('.navbar').outerHeight();
 
-        $('.bottom-nav-item[data-section]').on('click', function() {
-    const section = $(this).data('section');
-    
-    // Update active state
-    $('.bottom-nav-item').removeClass('active');
-    $(this).addClass('active');
-    
-    // Navigate to section
-    navigateToSection(section);
-    
-    // Close mobile menu if open
-    closeMobileMenu();
-});
+                $('.bottom-nav-item[data-section]').on('click', function() {
+                    const section = $(this).data('section');
+                    
+                    // Update active state
+                    $('.bottom-nav-item').removeClass('active');
+                    $(this).addClass('active');
+                    
+                    // Navigate to section
+                    navigateToSection(section);
+                    
+                    // Close mobile menu if open
+                    closeMobileMenu();
+                });
 
-// Mobile Slide Menu
-$('#mobileMenuBtn').on('click', function() {
-    openMobileMenu();
-});
+                // Mobile Slide Menu
+                $('#mobileMenuBtn').on('click', function() {
+                    openMobileMenu();
+                });
 
-$('#closeMobileMenu, #mobileMenuOverlay').on('click', function() {
-    closeMobileMenu();
-});
+                $('#closeMobileMenu, #mobileMenuOverlay').on('click', function() {
+                    closeMobileMenu();
+                });
 
-// Mobile menu navigation
-$('.mobile-menu-item[data-section]').on('click', function(e) {
-    e.preventDefault();
-    const section = $(this).data('section');
-    
-    // Navigate
-    navigateToSection(section);
-    
-    // Update bottom nav active state
-    $('.bottom-nav-item').removeClass('active');
-    $(`.bottom-nav-item[data-section="${section}"]`).addClass('active');
-    
-    // Close menu
-    closeMobileMenu();
-});
+                // Mobile menu navigation
+                $('.mobile-menu-item[data-section]').on('click', function(e) {
+                    e.preventDefault();
+                    const section = $(this).data('section');
+                    
+                    // Navigate
+                    navigateToSection(section);
+                    
+                    // Update bottom nav active state
+                    $('.bottom-nav-item').removeClass('active');
+                    $(`.bottom-nav-item[data-section="${section}"]`).addClass('active');
+                    
+                    // Close menu
+                    closeMobileMenu();
+                });
 
-function openMobileMenu() {
-    $('#mobileSlideMenu').addClass('active');
-    $('#mobileMenuOverlay').addClass('active');
-    $('body').css('overflow', 'hidden');
-}
+                function openMobileMenu() {
+                    $('#mobileSlideMenu').addClass('active');
+                    $('#mobileMenuOverlay').addClass('active');
+                    $('body').css('overflow', 'hidden');
+                }
 
-function closeMobileMenu() {
-    $('#mobileSlideMenu').removeClass('active');
-    $('#mobileMenuOverlay').removeClass('active');
-    $('body').css('overflow', '');
-}
-        
-        $(window).scroll(function() {
-            if (window.innerWidth > 968) return; // Skip untuk desktop
-            
-            let st = $(this).scrollTop();
-            
-            // Pastikan scroll lebih dari delta
-            if (Math.abs(lastScrollTop - st) <= scrollDelta) return;
-            
-            if (st > lastScrollTop && st > navbarHeight) {
-                // Scroll down - hide navbar
-                $('.navbar').addClass('hide-mobile');
-                $('#scrollToggle').addClass('show');
-            } else {
-                // Scroll up - show navbar
-                $('.navbar').removeClass('hide-mobile');
-                $('#scrollToggle').removeClass('show');
+                function closeMobileMenu() {
+                    $('#mobileSlideMenu').removeClass('active');
+                    $('#mobileMenuOverlay').removeClass('active');
+                    $('body').css('overflow', '');
+                }
+                
+                $(window).scroll(function() {
+                    if (window.innerWidth > 968) return; // Skip untuk desktop
+                    
+                    let st = $(this).scrollTop();
+                    
+                    // Pastikan scroll lebih dari delta
+                    if (Math.abs(lastScrollTop - st) <= scrollDelta) return;
+                    
+                    if (st > lastScrollTop && st > navbarHeight) {
+                        // Scroll down - hide navbar
+                        $('.navbar').addClass('hide-mobile');
+                        $('#scrollToggle').addClass('show');
+                    } else {
+                        // Scroll up - show navbar
+                        $('.navbar').removeClass('hide-mobile');
+                        $('#scrollToggle').removeClass('show');
+                    }
+                    
+                    lastScrollTop = st;
+                });
+                
+                // Toggle navbar dengan tombol
+                $('#scrollToggle').on('click', function() {
+                    $('.navbar').toggleClass('hide-mobile');
+                    $(this).toggleClass('show');
+                });
             }
             
-            lastScrollTop = st;
-        });
-        
-        // Toggle navbar dengan tombol
-        $('#scrollToggle').on('click', function() {
-            $('.navbar').toggleClass('hide-mobile');
-            $(this).toggleClass('show');
-        });
-    }
-    
-    // Re-check pada resize
-    $(window).resize(function() {
-        if (window.innerWidth > 968) {
-            $('.navbar').removeClass('hide-mobile');
-            $('#scrollToggle').remove();
-        } else if ($('#scrollToggle').length === 0) {
-            $('body').append('<button class="scroll-toggle" id="scrollToggle"><i class="fas fa-bars"></i></button>');
-        }
-    });
+            // Re-check pada resize
+            $(window).resize(function() {
+                if (window.innerWidth > 968) {
+                    $('.navbar').removeClass('hide-mobile');
+                    $('#scrollToggle').remove();
+                } else if ($('#scrollToggle').length === 0) {
+                    $('body').append('<button class="scroll-toggle" id="scrollToggle"><i class="fas fa-bars"></i></button>');
+                }
+            });
 
             // Navigation for desktop
             $('.nav-link[data-section], .dropdown-item[data-section]').on('click', function(e) {
@@ -2074,6 +2406,30 @@ function closeMobileMenu() {
                 handleFormSubmit(this, '/api/import-buyers'); 
             });
             
+            $('#import-books-form').on('submit', function(e) { 
+                e.preventDefault(); 
+                handleFormSubmit(this, '/api/import-books'); 
+            });
+
+            $('#excel-file, #books-excel-file, #transactions-excel-file').on('change', function() {
+                validateExcelFile(this);
+            });
+
+            $('#import-transactions-form-online').find('input[type="file"]').on('change', function() {
+                validateExcelFile(this);
+            });
+            
+            $('#import-transactions-form').on('submit', function(e) { 
+                e.preventDefault(); 
+                handleFormSubmit(this, '/api/import-offline-sales'); 
+            });
+
+             $('#import-transactions-form-online').on('submit', function(e) { 
+                e.preventDefault(); 
+                handleFormSubmit(this, '/api/import-online-sales'); 
+            });
+            
+            
             $('#offline-sale-form').on('submit', function(e) { 
                 e.preventDefault(); 
                 handleOfflineRekapSubmit(); 
@@ -2084,7 +2440,13 @@ function closeMobileMenu() {
                 handleOnlineRekapSubmit(); 
             });
 
+            $('#add-cash-form').on('submit', function(e) { 
+                e.preventDefault(); 
+                handleAddCashRecord(); 
+            });
 
+            // Set default date for cash record
+            $('#cash-date').val(new Date().toISOString().split('T')[0]);
 
             // Update total when shipping cost changes
             $('#online-shipping').on('input', updateOnlineTotalPrice);
@@ -2102,142 +2464,339 @@ function closeMobileMenu() {
                 'offline-buyers': 'Data Pembeli',
                 'offline-sales': 'Penjualan Offline',
                 'online-sales': 'Penjualan Online',
-                'transactions': 'Riwayat Transaksi'
+                'transactions': 'Riwayat Transaksi',
+                'cash-records': 'Rekap Kas'
             };
             $('.mobile-menu-item').removeClass('active');
             $(`.mobile-menu-item[data-section="${section}"]`).addClass('active');
             // Show corresponding section
             $('.content-section').removeClass('active');
             $(`#${section}-section`).addClass('active');
+
+            // Load data for specific sections
+            if (section === 'cash-records') {
+                loadCashRecords();
+            }
+        }
+
+        // Cash Records Functions
+        async function loadCashRecords() {
+            try {
+                const params = new URLSearchParams();
+                const startDate = $('#cashStartDate').val();
+                const endDate = $('#cashEndDate').val();
+                const type = $('#cashTypeFilter').val();
+                
+                if (startDate) params.append('start_date', startDate);
+                if (endDate) params.append('end_date', endDate);
+                if (type) params.append('type', type);
+                
+                const response = await fetch(`/api/cash-records?${params}`);
+                const data = await response.json();
+                
+                // Update summary cards
+                $('#totalDebit').text(`Rp ${data.summary.total_debit.toLocaleString('id-ID')}`);
+                $('#totalKredit').text(`Rp ${data.summary.total_kredit.toLocaleString('id-ID')}`);
+                $('#saldoKas').text(`Rp ${data.summary.total_kas.toLocaleString('id-ID')}`);
+                
+                // Update saldo status color
+                if (data.summary.total_kas >= 0) {
+                    $('#saldoStatus').html('<i class="fas fa-check-circle"></i> Saldo Positif').css('color', 'var(--success)');
+                } else {
+                    $('#saldoStatus').html('<i class="fas fa-exclamation-circle"></i> Saldo Negatif').css('color', 'var(--danger)');
+                }
+                
+                // Update table
+                const tbody = $('#cash-table-body');
+                tbody.empty();
+                
+                data.records.forEach(record => {
+                    const typeClass = record.type === 'debit' ? 'success' : 'danger';
+                    const typeIcon = record.type === 'debit' ? 'arrow-down' : 'arrow-up';
+                    const typeText = record.type === 'debit' ? 'Debit' : 'Kredit';
+                    
+                    const row = `
+                        <tr>
+                            <td>${record.record_date_formatted}</td>
+                            <td>
+                                <span class="availability-badge ${typeClass === 'success' ? 'available' : 'unavailable'}">
+                                    <i class="fas fa-${typeIcon}"></i> ${typeText}
+                                </span>
+                            </td>
+                            <td>${record.description}</td>
+                            <td>${record.category || '-'}</td>
+                            <td style="color: var(--${typeClass}); font-weight: 700;">
+                                Rp ${record.amount.toLocaleString('id-ID')}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn action-btn-edit" onclick="editCashRecord(${record.id})">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <button class="action-btn action-btn-delete" onclick="deleteCashRecord(${record.id})">
+                                        <i class="fas fa-trash"></i> Hapus
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    tbody.append(row);
+                });
+                
+                if (data.records.length === 0) {
+                    tbody.append('<tr><td colspan="6" style="text-align: center; color: var(--gray-500);">Tidak ada data kas</td></tr>');
+                }
+            } catch (error) {
+                console.error('Error loading cash records:', error);
+                showMessage('Gagal memuat data kas', 'error');
+            }
+        }
+
+        async function handleAddCashRecord() {
+            const formData = {
+                type: $('#cash-type').val(),
+                description: $('#cash-description').val(),
+                amount: parseFloat($('#cash-amount').val()),
+                category: $('#cash-category').val(),
+                record_date: $('#cash-date').val()
+            };
+
+            try {
+                const response = await fetch('/api/add-cash-record', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage(result.message, 'success');
+                    $('#add-cash-form')[0].reset();
+                    $('#cash-date').val(new Date().toISOString().split('T')[0]);
+                    loadCashRecords();
+                } else {
+                    showMessage(result.error || 'Gagal menambah catatan kas', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function editCashRecord(id) {
+            // Fetch record details
+            const response = await fetch('/api/cash-records');
+            const data = await response.json();
+            const record = data.records.find(r => r.id === id);
+            
+            if (!record) return;
+            
+            // Populate form
+            $('#cash-type').val(record.type);
+            $('#cash-description').val(record.description);
+            $('#cash-amount').val(record.amount);
+            $('#cash-category').val(record.category || '');
+            $('#cash-date').val(record.record_date_formatted.split('-').reverse().join('-')); // Convert DD-MM-YYYY to YYYY-MM-DD
+            
+            // Change form behavior to update
+            $('#add-cash-form').off('submit').on('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    id: id,
+                    type: $('#cash-type').val(),
+                    description: $('#cash-description').val(),
+                    amount: parseFloat($('#cash-amount').val()),
+                    category: $('#cash-category').val(),
+                    record_date: $('#cash-date').val()
+                };
+                
+                try {
+                    const response = await fetch('/api/update-cash-record', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        showMessage(result.message, 'success');
+                        $('#add-cash-form')[0].reset();
+                        $('#cash-date').val(new Date().toISOString().split('T')[0]);
+                        
+                        // Restore original form behavior
+                        $('#add-cash-form').off('submit').on('submit', function(e) {
+                            e.preventDefault();
+                            handleAddCashRecord();
+                        });
+                        
+                        loadCashRecords();
+                    } else {
+                        showMessage(result.error || 'Gagal update catatan kas', 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error: ' + error.message, 'error');
+                }
+            });
+            
+            // Scroll to form
+            $('html, body').animate({
+                scrollTop: $('#add-cash-form').offset().top - 100
+            }, 500);
+        }
+
+        async function deleteCashRecord(id) {
+            if (!confirm('Yakin ingin menghapus catatan kas ini?')) return;
+            
+            try {
+                const response = await fetch(`/api/delete-cash-record/${id}`, {
+                    method: 'POST'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage(result.message, 'success');
+                    loadCashRecords();
+                } else {
+                    showMessage(result.error || 'Gagal menghapus', 'error');
+                }
+            } catch (error) {
+                showMessage('Error: ' + error.message, 'error');
+            }
+        }
+
+        function exportCashRecords() {
+            window.location.href = '/api/export-cash-records';
         }
 
         // Multi-item form functions
         function addOfflineBookItem() {
-    offlineItemCount++;
-    const itemHtml = `
-        <div class="book-item" data-item-id="${offlineItemCount}">
-            <div class="book-item-header">
-                <span class="book-item-number">Kitab #${offlineItemCount}</span>
-                ${offlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOfflineItem(${offlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label><i class="fas fa-book"></i> Pilih Kitab</label>
-                    <select class="offline-book-select" data-item="${offlineItemCount}" required></select>
+            offlineItemCount++;
+            const itemHtml = `
+                <div class="book-item" data-item-id="${offlineItemCount}">
+                    <div class="book-item-header">
+                        <span class="book-item-number">Kitab #${offlineItemCount}</span>
+                        ${offlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOfflineItem(${offlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-book"></i> Pilih Kitab</label>
+                            <select class="offline-book-select" data-item="${offlineItemCount}" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
+                            <input type="number" class="offline-quantity" data-item="${offlineItemCount}" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> Harga</label>
+                            <input type="text" class="offline-price" data-item="${offlineItemCount}" disabled>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
-                    <input type="number" class="offline-quantity" data-item="${offlineItemCount}" min="1" value="1" required>
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-tag"></i> Harga</label>
-                    <input type="text" class="offline-price" data-item="${offlineItemCount}" disabled>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    $('#offline-book-items').append(itemHtml);
-    
-    // Initialize select2 for new item
-    const newSelect = $(`.offline-book-select[data-item="${offlineItemCount}"]`);
-    newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
-    
-    console.log('Available books for offline item:', books);
-    console.log('Books array length:', books.length);
-    
-    if (books && books.length > 0) {
-        books.forEach(book => {
-            if (book.availability === 'Tersedia') {
-                console.log('Adding book to select:', book.name);
-                newSelect.append(new Option(book.name, book.id));
+            `;
+            
+            $('#offline-book-items').append(itemHtml);
+            
+            // Initialize select2 for new item
+            const newSelect = $(`.offline-book-select[data-item="${offlineItemCount}"]`);
+            newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
+            
+            console.log('Available books for offline item:', books);
+            console.log('Books array length:', books.length);
+            
+            if (books && books.length > 0) {
+                books.forEach(book => {
+                    if (book.availability === 'Tersedia') {
+                        console.log('Adding book to select:', book.name);
+                        newSelect.append(new Option(book.name, book.id));
+                    }
+                });
+            } else {
+                console.warn('No books available or books array is empty');
+                newSelect.append(new Option('Tidak ada kitab tersedia', ''));
             }
-        });
-    } else {
-        console.warn('No books available or books array is empty');
-        newSelect.append(new Option('Tidak ada kitab tersedia', ''));
-    }
-    
-    newSelect.select2({
-        placeholder: '-- Pilih Kitab --',
-        width: '100%'
-    });
-    
-    // Add change event
-    newSelect.on('change', function() {
-        updateOfflineItemPrice($(this).data('item'));
-        updateOfflineTotalPrice();
-    });
-    
-    // Add quantity change event
-    $(`.offline-quantity[data-item="${offlineItemCount}"]`).on('input', function() {
-        updateOfflineTotalPrice();
-    });
-}
-
+            
+            newSelect.select2({
+                placeholder: '-- Pilih Kitab --',
+                width: '100%'
+            });
+            
+            // Add change event
+            newSelect.on('change', function() {
+                updateOfflineItemPrice($(this).data('item'));
+                updateOfflineTotalPrice();
+            });
+            
+            // Add quantity change event
+            $(`.offline-quantity[data-item="${offlineItemCount}"]`).on('input', function() {
+                updateOfflineTotalPrice();
+            });
+        }
 
         function addOnlineBookItem() {
-    onlineItemCount++;
-    const itemHtml = `
-        <div class="book-item" data-item-id="${onlineItemCount}">
-            <div class="book-item-header">
-                <span class="book-item-number">Kitab #${onlineItemCount}</span>
-                ${onlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOnlineItem(${onlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label><i class="fas fa-book"></i> Pilih Kitab</label>
-                    <select class="online-book-select" data-item="${onlineItemCount}" required></select>
+            onlineItemCount++;
+            const itemHtml = `
+                <div class="book-item" data-item-id="${onlineItemCount}">
+                    <div class="book-item-header">
+                        <span class="book-item-number">Kitab #${onlineItemCount}</span>
+                        ${onlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOnlineItem(${onlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-book"></i> Pilih Kitab</label>
+                            <select class="online-book-select" data-item="${onlineItemCount}" required></select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
+                            <input type="number" class="online-quantity" data-item="${onlineItemCount}" min="1" value="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> Harga</label>
+                            <input type="text" class="online-price" data-item="${onlineItemCount}" disabled>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
-                    <input type="number" class="online-quantity" data-item="${onlineItemCount}" min="1" value="1" required>
-                </div>
-                <div class="form-group">
-                    <label><i class="fas fa-tag"></i> Harga</label>
-                    <input type="text" class="online-price" data-item="${onlineItemCount}" disabled>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    $('#online-book-items').append(itemHtml);
-    
-    // Initialize select2 for new item
-    const newSelect = $(`.online-book-select[data-item="${onlineItemCount}"]`);
-    newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
-    
-    console.log('Available books for online item:', books);
-    console.log('Books array length:', books.length);
-    
-    if (books && books.length > 0) {
-        books.forEach(book => {
-            if (book.availability === 'Tersedia') {
-                console.log('Adding book to select:', book.name);
-                newSelect.append(new Option(book.name, book.id));
+            `;
+            
+            $('#online-book-items').append(itemHtml);
+            
+            // Initialize select2 for new item
+            const newSelect = $(`.online-book-select[data-item="${onlineItemCount}"]`);
+            newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
+            
+            console.log('Available books for online item:', books);
+            console.log('Books array length:', books.length);
+            
+            if (books && books.length > 0) {
+                books.forEach(book => {
+                    if (book.availability === 'Tersedia') {
+                        console.log('Adding book to select:', book.name);
+                        newSelect.append(new Option(book.name, book.id));
+                    }
+                });
+            } else {
+                console.warn('No books available or books array is empty');
+                newSelect.append(new Option('Tidak ada kitab tersedia', ''));
             }
-        });
-    } else {
-        console.warn('No books available or books array is empty');
-        newSelect.append(new Option('Tidak ada kitab tersedia', ''));
-    }
-    
-    newSelect.select2({
-        placeholder: '-- Pilih Kitab --',
-        width: '100%'
-    });
-    
-    // Add change event
-    newSelect.on('change', function() {
-        updateOnlineItemPrice($(this).data('item'));
-        updateOnlineTotalPrice();
-    });
-    
-    // Add quantity change event
-    $(`.online-quantity[data-item="${onlineItemCount}"]`).on('input', function() {
-        updateOnlineTotalPrice();
-    });
-}
+            
+            newSelect.select2({
+                placeholder: '-- Pilih Kitab --',
+                width: '100%'
+            });
+            
+            // Add change event
+            newSelect.on('change', function() {
+                updateOnlineItemPrice($(this).data('item'));
+                updateOnlineTotalPrice();
+            });
+            
+            // Add quantity change event
+            $(`.online-quantity[data-item="${onlineItemCount}"]`).on('input', function() {
+                updateOnlineTotalPrice();
+            });
+        }
+
         function removeOfflineItem(itemId) {
             $(`.book-item[data-item-id="${itemId}"]`).remove();
             updateOfflineTotalPrice();
@@ -2309,69 +2868,68 @@ function closeMobileMenu() {
         }
 
         async function handleOfflineRekapSubmit() {
-    const buyerId = $('#offline-buyer').val();
-    if (!buyerId) {
-        showMessage('Pilih pembeli terlebih dahulu', 'error');
-        return;
-    }
-    
+            const buyerId = $('#offline-buyer').val();
+            if (!buyerId) {
+                showMessage('Pilih pembeli terlebih dahulu', 'error');
+                return;
+            }
+            
+            const items = [];
+            let hasValidItem = false;
 
-    const items = [];
-    let hasValidItem = false;
-
-    $('.book-item').each(function() {
-        const bookId = $(this).find('.offline-book-select').val();
-        const quantity = $(this).find('.offline-quantity').val();
-        
-        if (bookId && quantity) {
-            items.push({
-                book_id: bookId,
-                quantity: parseInt(quantity)
+            $('#offline-book-items .book-item').each(function() {
+                const bookId = $(this).find('.offline-book-select').val();
+                const quantity = $(this).find('.offline-quantity').val();
+                
+                if (bookId && quantity) {
+                    items.push({
+                        book_id: bookId,
+                        quantity: parseInt(quantity)
+                    });
+                    hasValidItem = true;
+                }
             });
-            hasValidItem = true;
+
+            if (!hasValidItem) {
+                showMessage('Tambahkan minimal satu kitab', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/add-offline-sale', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        buyer_id: buyerId,
+                        items: items  // Kirim sebagai array items
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Gagal menyimpan transaksi');
+                }
+
+                showMessage('Transaksi offline berhasil disimpan!', 'success');
+                
+                // Reset form
+                $('#offline-sale-form')[0].reset();
+                $('#offline-buyer').val(null).trigger('change');
+                $('#offline-book-items').empty();
+                offlineItemCount = 0;
+                addOfflineBookItem();
+                updateOfflineTotalPrice();
+                
+                // Reload data
+                loadRecentSales();
+                loadDashboardStats();
+                updateChart();
+                
+            } catch (error) {
+                showMessage(error.message, 'error');
+            }
         }
-    });
-
-    if (!hasValidItem) {
-        showMessage('Tambahkan minimal satu kitab', 'error');
-        return;
-    }
-
-    try {
-        const response = await fetch('/api/add-offline-sale', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                buyer_id: buyerId,
-                items: items  // Kirim sebagai array items
-            })
-        });
-        
-        const result = await response.json();
-        
-        if (!response.ok) {
-            throw new Error(result.error || 'Gagal menyimpan transaksi');
-        }
-
-        showMessage('Transaksi offline berhasil disimpan!', 'success');
-        
-        // Reset form
-        $('#offline-sale-form')[0].reset();
-        $('#offline-buyer').val(null).trigger('change');
-        $('#offline-book-items').empty();
-        offlineItemCount = 0;
-        addOfflineBookItem();
-        updateOfflineTotalPrice();
-        
-        // Reload data
-        loadRecentSales();
-        loadDashboardStats();
-        updateChart();
-        
-    } catch (error) {
-        showMessage(error.message, 'error');
-    }
-}
 
         async function handleOnlineRekapSubmit() {
             const buyerName = $('#online-buyer-name').val();
@@ -2387,7 +2945,7 @@ function closeMobileMenu() {
             const items = [];
             let hasValidItem = false;
 
-            $('.book-item').each(function() {
+            $('#online-book-items .book-item').each(function() {
                 const bookId = $(this).find('.online-book-select').val();
                 const quantity = $(this).find('.online-quantity').val();
                 
@@ -2508,6 +3066,7 @@ function closeMobileMenu() {
             const [day, month, year] = datePart.split('-');
             return new Date(year, month - 1, day);
         }
+
         function initializeChart() {
             const ctx = document.getElementById('salesChart').getContext('2d');
             salesChart = new Chart(ctx, {
@@ -2609,8 +3168,6 @@ function closeMobileMenu() {
             updateChart();
         }
 
-        
-
         async function updateChart() {
             const startDate = $('#startDate').val();
             const endDate = $('#endDate').val();
@@ -2696,19 +3253,20 @@ function closeMobileMenu() {
 
         // Utility functions
         function showMessage(text, type) {
-    const messageDiv = document.getElementById('message');
-    if (messageDiv) {
-        messageDiv.textContent = text;
-        messageDiv.className = type;
-        messageDiv.style.display = 'block';
-        setTimeout(() => { 
-            messageDiv.style.display = 'none'; 
-        }, 5000);
-    } else {
-        // Fallback ke alert jika message div tidak ada
-        alert(text);
-    }
-}
+            const messageDiv = document.getElementById('message');
+            if (messageDiv) {
+                // Replace newlines with <br> for HTML display
+                messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+                messageDiv.className = type;
+                messageDiv.style.display = 'block';
+                setTimeout(() => { 
+                    messageDiv.style.display = 'none'; 
+                }, 10000); // Increased timeout for longer messages
+            } else {
+                // Fallback ke alert jika message div tidak ada
+                alert(text);
+            }
+        }
 
         // CRUD functions
         async function loadBooksTable() {
@@ -2746,23 +3304,23 @@ function closeMobileMenu() {
         }
 
         async function loadBuyersTable() {
-    const response = await fetch('/api/offline-buyers');
-    const buyers = await response.json();
-    const tableBody = $('#buyers-table-body');
-    tableBody.empty();
-    
-    buyers.forEach(buyer => {
-        const row = `
-            <tr>
-                <td style="font-weight: 600;">${buyer.name}</td>
-                <td>${buyer.address || '-'}</td>
-                <td>
-                    <div class="action-buttons">
-                        <button class="action-btn action-btn-edit" onclick="editBuyer(${buyer.id}, '${buyer.name.replace(/'/g, "\\'")}', '${(buyer.address || '').replace(/'/g, "\\'")}')">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="action-btn action-btn-delete" onclick="deleteBuyer(${buyer.id}, '${buyer.name.replace(/'/g, "\\'")}')">
-                            <i class="fas fa-trash"></i> Hapus
+            const response = await fetch('/api/offline-buyers');
+            const buyers = await response.json();
+            const tableBody = $('#buyers-table-body');
+            tableBody.empty();
+            
+            buyers.forEach(buyer => {
+                const row = `
+                    <tr>
+                        <td style="font-weight: 600;">${buyer.name}</td>
+                        <td>${buyer.address || '-'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn action-btn-edit" onclick="editBuyer(${buyer.id}, '${buyer.name.replace(/'/g, "\\'")}', '${(buyer.address || '').replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="action-btn action-btn-delete" onclick="deleteBuyer(${buyer.id}, '${buyer.name.replace(/'/g, "\\'")}')">
+                                <i class="fas fa-trash"></i> Hapus
                         </button>
                     </div>
                 </td>
@@ -2873,18 +3431,66 @@ function closeMobileMenu() {
 
         // Form handlers
         async function handleFormSubmit(form, url) {
-            const formData = new FormData(form);
-            const response = await fetch(url, { method: 'POST', body: formData });
-            const result = await response.json();
-            showMessage(result.message || `Error: ${result.error}`, response.ok ? 'success' : 'error');
-            if (response.ok) {
-                form.reset();
-                $('#edit-book-modal').hide();
-                loadInitialData();
-                loadDashboardStats();
-                updateChart();
+    const submitButton = $(form).find('button[type="submit"]');
+    const originalText = submitButton.html();
+    
+    // Show loading state
+    submitButton.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Memproses...');
+    
+    try {
+        const formData = new FormData(form);
+        const response = await fetch(url, { method: 'POST', body: formData });
+        const result = await response.json();
+        
+        // Handle response with detailed information
+        if (response.ok) {
+            let message = result.message || 'Operasi berhasil!';
+            
+            // Add import statistics if available
+            if (result.imported !== undefined) {
+                message += `\n✓ Berhasil diimport: ${result.imported} data`;
             }
+            if (result.skipped !== undefined && result.skipped > 0) {
+                message += `\n⚠ Dilewati: ${result.skipped} data`;
+            }
+            if (result.updated !== undefined && result.updated > 0) {
+                message += `\n↻ Diupdate: ${result.updated} data`;
+            }
+            
+            // Add warnings if any
+            if (result.warnings && result.warnings.length > 0) {
+                message += '\n\n⚠️ Peringatan:';
+                result.warnings.forEach(warning => {
+                    message += '\n• ' + warning;
+                });
+            }
+            
+            showMessage(message, 'success');
+            form.reset();
+            
+            // Close modal if open
+            $('#edit-book-modal').hide();
+            
+            // Reload relevant data
+            loadInitialData();
+            loadDashboardStats();
+            updateChart();
+            
+            // Reload transactions if on transactions page
+            if ($('#transactions-section').hasClass('active')) {
+                loadRecentSales();
+            }
+        } else {
+            const errorMessage = result.error || 'Terjadi kesalahan';
+            showMessage(errorMessage, 'error');
         }
+    } catch (error) {
+        showMessage('Error: ' + error.message, 'error');
+    } finally {
+        // Restore button state
+        submitButton.prop('disabled', false).html(originalText);
+    }
+}
     </script>
 </body>
 </html>

@@ -84,6 +84,40 @@ def create_tables(conn):
     conn.commit()
     print("\nSemua tabel berhasil disiapkan.")
 
+    # 5. Tabel Penjualan Online
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS online_sales (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        buyer_name TEXT NOT NULL,
+        buyer_address TEXT NOT NULL,
+        book_id INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        shipping_cost REAL,
+        total_price REAL NOT NULL,
+        transfer_date DATE,
+        sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (book_id) REFERENCES books (id)
+    );
+    """)
+    print("- Tabel 'online_sales' siap.")
+
+    # 6. Tabel Rekap Kas
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS cash_records (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        type TEXT NOT NULL CHECK(type IN ('debit', 'kredit')),
+        description TEXT NOT NULL,
+        amount REAL NOT NULL,
+        category TEXT,
+        record_date DATE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+    print("- Tabel 'cash_records' siap.")
+
+    conn.commit()
+    print("\nSemua tabel berhasil disiapkan.")
+
 def create_default_admin(conn):
     """Fungsi untuk membuat pengguna admin default jika belum ada."""
     cursor = conn.cursor()

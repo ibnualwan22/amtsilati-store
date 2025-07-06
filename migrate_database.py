@@ -176,6 +176,35 @@ class DatabaseMigration:
             self.connection.rollback()
             raise
     
+    def migration_006_create_cash_records_table(self):
+        """Membuat tabel cash_records untuk rekap kas"""
+        if not self.check_table_exists('cash_records'):
+            self.cursor.execute("""
+            CREATE TABLE cash_records (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                type TEXT NOT NULL CHECK(type IN ('debit', 'kredit')),
+                description TEXT NOT NULL,
+                amount REAL NOT NULL,
+                category TEXT,
+                record_date DATE NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            """)
+            print("  ✓ Tabel 'cash_records' berhasil dibuat")
+            
+            # Create indexes for better performance
+            self.cursor.execute("""
+            CREATE INDEX idx_cash_records_date ON cash_records(record_date DESC)
+            """)
+            self.cursor.execute("""
+            CREATE INDEX idx_cash_records_type ON cash_records(type)
+            """)
+            print("  ✓ Index untuk 'cash_records' berhasil dibuat")
+            
+            self.connection.commit()
+        else:
+            print("  ⚠️  Tabel 'cash_records' sudah ada")
+    
     def run_all_migrations(self):
         """Jalankan semua migrasi yang belum dijalankan"""
         print("\n=== RUNNING DATABASE MIGRATIONS ===")
@@ -183,33 +212,81 @@ class DatabaseMigration:
         print(f"Database: {self.database_path}")
         
         # Backup database terlebih dahulu
-        self.backup_database()
+        backup_path = self.backup_database()
         
-        # Connect ke database
-        self.connect()
-        
-        # Buat tabel migrations
-        self.create_migration_table()
-        
-        # Daftar semua migrasi
-        migrations = [
-            ('001_add_address_dormitory', self.migration_001_add_address_dormitory),
-            ('002_add_transfer_date', self.migration_002_add_transfer_date),
-            ('003_add_image_filename', self.migration_003_add_image_filename),
-            ('004_add_quantity_online_sales', self.migration_004_add_quantity_online_sales),
-            ('005_remove_dormitory_column', self.migration_005_remove_dormitory_column),
-        ]
-        
-        # Jalankan migrasi
-        applied_count = 0
-        for name, func in migrations:
-            if self.run_migration(name, func):
-                applied_count += 1
-        
-        # Disconnect
-        self.disconnect()
-        
-        print(f"\n✅ Migrasi selesai! {applied_count} migrasi diterapkan.")
+        try:
+            # Connect ke database
+            self.connect()
+            
+            # Buat tabel migrations
+            self.create_migration_table()
+            
+            # Daftar semua migrasi
+            migrations = [
+                ('001_add_address_dormitory', self.migration_001_add_address_dormitory),
+                ('002_add_transfer_date', self.migration_002_add_transfer_date),
+                ('003_add_image_filename', self.migration_003_add_image_filename),
+                ('004_add_quantity_online_sales', self.migration_004_add_quantity_online_sales),
+                ('005_remove_dormitory_column', self.migration_005_remove_dormitory_column),
+                ('006_create_cash_records_table', self.migration_006_create_cash_records_table),
+            ]
+            
+            # Jalankan migrasi
+            applied_count = 0
+            for name, func in migrations:
+                if self.run_migration(name, func):
+                    applied_count += 1
+            
+            # Disconnect
+            self.disconnect()
+            
+            print(f"\n✅ Migrasi selesai! {applied_count} migrasi diterapkan.")
+            
+        except Exception as e:
+            print(f"\n❌ ERROR FATAL: {str(e)}")
+            print(f"⚠️  Database mungkin dalam kondisi tidak konsisten!")
+            
+            if backup_path and os.path.exists(backup_path):
+                print(f"\n📋 Untuk restore dari backup, jalankan:")
+                print(f"   cp {backup_path} {self.database_path}")
+            
+            raise
+
+def verify_database():
+    """Verifikasi struktur database setelah migrasi"""
+    print("\n=== VERIFIKASI DATABASE ===")
+    
+    config = get_config()
+    conn = sqlite3.connect(config.DATABASE_PATH)
+    cursor = conn.cursor()
+    
+    # Cek semua tabel
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+    tables = cursor.fetchall()
+    print("\n📋 Daftar Tabel:")
+    for table in tables:
+        print(f"   ✓ {table[0]}")
+    
+    # Cek struktur cash_records jika ada
+    if 'cash_records' in [t[0] for t in tables]:
+        print("\n📊 Struktur tabel 'cash_records':")
+        cursor.execute("PRAGMA table_info(cash_records)")
+        columns = cursor.fetchall()
+        for col in columns:
+            nullable = "NULL" if col[3] == 0 else "NOT NULL"
+            default = f"DEFAULT {col[4]}" if col[4] else ""
+            print(f"   - {col[1]} ({col[2]}) {nullable} {default}")
+    
+    # Cek jumlah data
+    print("\n📈 Statistik Data:")
+    for table in tables:
+        table_name = table[0]
+        if table_name != 'migrations':
+            cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+            count = cursor.fetchone()[0]
+            print(f"   - {table_name}: {count} records")
+    
+    conn.close()
 
 def main():
     """Main function"""
@@ -217,8 +294,12 @@ def main():
     
     # Set environment jika diberikan sebagai argument
     if len(sys.argv) > 1:
-        os.environ['FLASK_ENV'] = sys.argv[1]
-        print(f"Setting FLASK_ENV to: {sys.argv[1]}")
+        if sys.argv[1] == 'verify':
+            verify_database()
+            return
+        else:
+            os.environ['FLASK_ENV'] = sys.argv[1]
+            print(f"Setting FLASK_ENV to: {sys.argv[1]}")
     
     # Konfirmasi sebelum menjalankan migrasi
     print("\n⚠️  PERHATIAN: Anda akan menjalankan migrasi database!")
@@ -232,6 +313,11 @@ def main():
     # Jalankan migrasi
     migration = DatabaseMigration()
     migration.run_all_migrations()
+    
+    # Verifikasi hasil
+    response = input("\nTampilkan verifikasi database? (y/n): ")
+    if response.lower() == 'y':
+        verify_database()
 
 if __name__ == '__main__':
     main()

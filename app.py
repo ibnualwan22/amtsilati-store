@@ -8,6 +8,7 @@ import functools
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from config import get_config
+from datetime import datetime, date
 
 # --- Inisialisasi Aplikasi Flask ---
 app = Flask(__name__)
@@ -282,12 +283,94 @@ def get_book_details(book_id):
         return jsonify({'error': 'Kitab tidak ditemukan'}), 404
     return jsonify(dict(book))
 
+# --- API UNTUK MANAJEMEN KITAB (Dilindungi) ---
+@app.route('/api/import-books', methods=['POST'])
+@login_required
+def import_books():
+    if 'file' not in request.files:
+        return jsonify({'error': 'File tidak ditemukan'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'Tidak ada file yang dipilih'}), 400
+
+    try:
+        # Baca file Excel
+        file_content = file.read()
+        df = pd.read_excel(io.BytesIO(file_content), dtype=str).fillna('')
+        
+        conn = get_db_connection()
+        imported = 0
+        updated = 0
+        
+        # Kolom yang diharapkan
+        required_columns = ['Nama', 'Harga']
+        
+        # Cek kolom yang ada
+        missing_columns = [col for col in required_columns if col not in df.columns]
+        if missing_columns:
+            conn.close()
+            return jsonify({'error': f"Kolom berikut tidak ditemukan: {', '.join(missing_columns)}"}), 400
+        
+        for index, row in df.iterrows():
+            try:
+                name = row.get('Nama', '').strip()
+                price = float(row.get('Harga', 0))
+                availability = row.get('Ketersediaan', 'Tersedia').strip()
+                link_ig = row.get('Link Instagram', '').strip()
+                link_wa = row.get('Link WhatsApp', '').strip()
+                link_shopee = row.get('Link Shopee', '').strip()
+                link_tiktok = row.get('Link TikTok', '').strip()
+                
+                if not name or price <= 0:
+                    continue
+                
+                # Coba insert dulu
+                try:
+                    conn.execute(
+                        """INSERT INTO books (name, price, availability, link_ig, link_wa, link_shopee, link_tiktok)
+                           VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                        (name, price, availability, link_ig, link_wa, link_shopee, link_tiktok)
+                    )
+                    imported += 1
+                except sqlite3.IntegrityError:
+                    # Jika gagal karena nama sudah ada, update
+                    conn.execute(
+                        """UPDATE books SET price = ?, availability = ?, link_ig = ?, 
+                           link_wa = ?, link_shopee = ?, link_tiktok = ?
+                           WHERE name = ?""",
+                        (price, availability, link_ig, link_wa, link_shopee, link_tiktok, name)
+                    )
+                    updated += 1
+                    
+            except Exception as e:
+                print(f"Error processing row {index}: {str(e)}")
+                continue
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': f'Import berhasil! Ditambah: {imported}, Diupdate: {updated}'})
+        
+    except Exception as e:
+        return jsonify({'error': f"Error memproses file: {str(e)}"}), 500
+
+@app.route('/api/add-book', methods=['POST'])
+
 # --- API UNTUK PEMBELI & IMPORT (Dilindungi) ---
 @app.route('/api/offline-buyers', methods=['GET'])
 @login_required
 def get_offline_buyers():
     conn = get_db_connection()
     buyers = conn.execute('SELECT * FROM offline_buyers ORDER BY name').fetchall()
+    conn.close()
+    return jsonify([dict(row) for row in buyers])
+
+@app.route('/api/online-buyers', methods=['GET'])
+@login_required
+def get_online_buyers():
+    conn = get_db_connection()
+    buyers = conn.execute('SELECT * FROM online_buyers ORDER BY name').fetchall()
     conn.close()
     return jsonify([dict(row) for row in buyers])
 
@@ -551,6 +634,206 @@ def export_offline():
     
     return send_file(output, download_name='semua_rekap_offline.xlsx', as_attachment=True)
 
+# 1. PERBAIKAN DI app.py - Ganti fungsi import_offline() yang ada dengan ini:
+
+@app.route('/api/import-offline-sales', methods=['POST'])
+@login_required
+def import_offline_sales():
+    if 'file' not in request.files:
+        return jsonify({'error': 'Tidak ada file yang di-upload'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'File tidak dipilih'}), 400
+    
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        return jsonify({'error': 'File harus berformat Excel (.xlsx atau .xls)'}), 400
+    
+    try:
+        # Baca file Excel
+        df = pd.read_excel(file)
+        
+        # Pastikan kolom yang dibutuhkan ada
+        required_columns = ['Nama Pembeli', 'Nama Kitab', 'Jumlah']
+        if not all(col in df.columns for col in required_columns):
+            return jsonify({'error': f'File harus memiliki kolom: {", ".join(required_columns)}'}), 400
+        
+        conn = get_db_connection()
+        imported = 0
+        skipped = 0
+        warnings = []
+        
+        for index, row in df.iterrows():
+            try:
+                nama_pembeli = str(row['Nama Pembeli']).strip()
+                nama_kitab = str(row['Nama Kitab']).strip()
+                jumlah = int(row['Jumlah'])
+                
+                if not nama_pembeli or not nama_kitab or jumlah <= 0:
+                    skipped += 1
+                    continue
+                
+                # Cari atau buat pembeli
+                buyer = conn.execute('SELECT id FROM offline_buyers WHERE name = ?', (nama_pembeli,)).fetchone()
+                if not buyer:
+                    # Tambah pembeli baru
+                    cursor = conn.execute('INSERT INTO offline_buyers (name, address) VALUES (?, ?)', 
+                                         (nama_pembeli, ''))
+                    buyer_id = cursor.lastrowid
+                else:
+                    buyer_id = buyer['id']
+                
+                # Cari kitab
+                book = conn.execute('SELECT id, price FROM books WHERE name = ?', (nama_kitab,)).fetchone()
+                if not book:
+                    warnings.append(f"Baris {index+2}: Kitab '{nama_kitab}' tidak ditemukan")
+                    skipped += 1
+                    continue
+                
+                # Hitung total harga
+                total_price = book['price'] * jumlah
+                
+                # Insert transaksi
+                conn.execute(
+                    'INSERT INTO offline_sales (buyer_id, book_id, quantity, total_price) VALUES (?, ?, ?, ?)',
+                    (buyer_id, book['id'], jumlah, total_price)
+                )
+                imported += 1
+                
+            except Exception as e:
+                warnings.append(f"Baris {index+2}: {str(e)}")
+                skipped += 1
+                continue
+        
+        conn.commit()
+        conn.close()
+        
+        message = f'Import selesai! Berhasil: {imported} transaksi'
+        if skipped > 0:
+            message += f', Dilewati: {skipped} baris'
+        
+        return jsonify({
+            'message': message,
+            'imported': imported,
+            'skipped': skipped,
+            'warnings': warnings
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Error memproses file: {str(e)}'}), 500
+
+
+# 2. TAMBAHKAN fungsi baru untuk import online sales di app.py:
+
+@app.route('/api/import-online-sales', methods=['POST'])
+@login_required
+def import_online_sales():
+    if 'file' not in request.files:
+        return jsonify({'error': 'Tidak ada file yang di-upload'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'File tidak dipilih'}), 400
+    
+    if not file.filename.endswith(('.xlsx', '.xls')):
+        return jsonify({'error': 'File harus berformat Excel (.xlsx atau .xls)'}), 400
+    
+    try:
+        # Baca file Excel
+        df = pd.read_excel(file)
+        
+        # Kolom yang dibutuhkan
+        required_columns = ['Nama Pembeli', 'Alamat Kirim', 'Nama Kitab', 'Jumlah', 'Ongkir', 'Tanggal Transfer']
+        
+        # Cek kolom minimal (Nama Pembeli, Nama Kitab, Jumlah)
+        minimal_columns = ['Nama Pembeli', 'Nama Kitab', 'Jumlah']
+        if not all(col in df.columns for col in minimal_columns):
+            return jsonify({'error': f'File minimal harus memiliki kolom: {", ".join(minimal_columns)}'}), 400
+        
+        conn = get_db_connection()
+        imported = 0
+        skipped = 0
+        warnings = []
+        
+        for index, row in df.iterrows():
+            try:
+                nama_pembeli = str(row['Nama Pembeli']).strip()
+                nama_kitab = str(row['Nama Kitab']).strip()
+                jumlah = int(row['Jumlah'])
+                
+                # Kolom opsional dengan default value
+                alamat_kirim = str(row.get('Alamat Kirim', '')).strip()
+                ongkir = float(row.get('Ongkir', 15000))  # Default ongkir 15000
+                
+                # Handle tanggal transfer
+                tanggal_transfer = row.get('Tanggal Transfer', None)
+                if pd.notna(tanggal_transfer):
+                    # Jika ada tanggal, konversi ke format yang sesuai
+                    if isinstance(tanggal_transfer, str):
+                        # Coba parse berbagai format tanggal
+                        from datetime import datetime
+                        for fmt in ['%Y-%m-%d', '%d-%m-%Y', '%d/%m/%Y']:
+                            try:
+                                tanggal_transfer = datetime.strptime(tanggal_transfer, fmt).strftime('%Y-%m-%d')
+                                break
+                            except:
+                                continue
+                    else:
+                        # Jika sudah datetime object
+                        tanggal_transfer = tanggal_transfer.strftime('%Y-%m-%d')
+                else:
+                    # Jika tidak ada tanggal, gunakan hari ini
+                    from datetime import date
+                    tanggal_transfer = date.today().strftime('%Y-%m-%d')
+                
+                if not nama_pembeli or not nama_kitab or jumlah <= 0:
+                    skipped += 1
+                    continue
+                
+                # Cari kitab
+                book = conn.execute('SELECT id, price FROM books WHERE name = ?', (nama_kitab,)).fetchone()
+                if not book:
+                    warnings.append(f"Baris {index+2}: Kitab '{nama_kitab}' tidak ditemukan")
+                    skipped += 1
+                    continue
+                
+                # Hitung total harga
+                total_price = (book['price'] * jumlah) + ongkir
+                
+                # Insert transaksi online
+                conn.execute(
+                    '''INSERT INTO online_sales 
+                       (buyer_name, buyer_address, book_id, quantity, shipping_cost, total_price, transfer_date) 
+                       VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                    (nama_pembeli, alamat_kirim, book['id'], jumlah, ongkir, total_price, tanggal_transfer)
+                )
+                imported += 1
+                
+            except Exception as e:
+                warnings.append(f"Baris {index+2}: {str(e)}")
+                skipped += 1
+                continue
+        
+        conn.commit()
+        conn.close()
+        
+        message = f'Import selesai! Berhasil: {imported} transaksi'
+        if skipped > 0:
+            message += f', Dilewati: {skipped} baris'
+        
+        return jsonify({
+            'message': message,
+            'imported': imported,
+            'skipped': skipped,
+            'warnings': warnings
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Error memproses file: {str(e)}'}), 500
+
+
+
+
 @app.route('/api/export-online-sales')
 @login_required
 def export_online():
@@ -576,6 +859,229 @@ def export_online():
     output.seek(0)
     
     return send_file(output, download_name='semua_rekap_online.xlsx', as_attachment=True)
+
+# TAMBAHKAN ENDPOINT INI DI app.py setelah endpoint yang sudah ada
+
+# --- API UNTUK CASH RECORDS (Dilindungi) ---
+@app.route('/api/cash-records', methods=['GET'])
+@login_required
+def get_cash_records():
+    try:
+        conn = get_db_connection()
+        
+        # Get filter parameters
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        record_type = request.args.get('type')
+        
+        # Base query
+        query = "SELECT * FROM cash_records WHERE 1=1"
+        params = []
+        
+        # Add filters
+        if start_date:
+            query += " AND date(record_date) >= date(?)"
+            params.append(start_date)
+        if end_date:
+            query += " AND date(record_date) <= date(?)"
+            params.append(end_date)
+        if record_type:
+            query += " AND type = ?"
+            params.append(record_type)
+            
+        query += " ORDER BY record_date DESC, id DESC"
+        
+        records = conn.execute(query, params).fetchall()
+        
+        # Calculate summary with filters
+        summary_query_debit = "SELECT COALESCE(SUM(amount), 0) FROM cash_records WHERE type = 'debit'"
+        summary_query_kredit = "SELECT COALESCE(SUM(amount), 0) FROM cash_records WHERE type = 'kredit'"
+        summary_params = []
+        
+        if start_date:
+            summary_query_debit += " AND date(record_date) >= date(?)"
+            summary_query_kredit += " AND date(record_date) >= date(?)"
+            summary_params.append(start_date)
+        if end_date:
+            summary_query_debit += " AND date(record_date) <= date(?)"
+            summary_query_kredit += " AND date(record_date) <= date(?)"
+            summary_params.append(end_date)
+            
+        total_debit = conn.execute(summary_query_debit, summary_params).fetchone()[0]
+        total_kredit = conn.execute(summary_query_kredit, summary_params).fetchone()[0]
+        
+        total_kas = total_debit - total_kredit
+        
+        conn.close()
+        
+        # Format records for response
+        formatted_records = []
+        for record in records:
+            # Handle date formatting
+            date_formatted = ''
+            if record['record_date']:
+                try:
+                    # If it's already a string, parse it
+                    if isinstance(record['record_date'], str):
+                        from datetime import datetime
+                        date_obj = datetime.strptime(record['record_date'].split()[0], '%Y-%m-%d')
+                        date_formatted = date_obj.strftime('%d-%m-%Y')
+                    else:
+                        date_formatted = record['record_date'].strftime('%d-%m-%Y')
+                except Exception as e:
+                    date_formatted = str(record['record_date'])
+                    
+            formatted_records.append({
+                'id': record['id'],
+                'type': record['type'],
+                'amount': float(record['amount']),
+                'description': record['description'],
+                'category': record['category'],
+                'record_date_formatted': date_formatted
+            })
+        
+        return jsonify({
+            'records': formatted_records,
+            'summary': {
+                'total_debit': float(total_debit),
+                'total_kredit': float(total_kredit),
+                'total_kas': float(total_kas)
+            }
+        })
+        
+    except Exception as e:
+        print(f"Error getting cash records: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/add-cash-record', methods=['POST'])
+@login_required
+def add_cash_record():
+    try:
+        data = request.json
+        
+        conn = get_db_connection()
+        conn.execute(
+            """INSERT INTO cash_records (type, amount, description, category, record_date)
+               VALUES (?, ?, ?, ?, ?)""",
+            (data['type'], data['amount'], data['description'], 
+             data.get('category', ''), data['record_date'])
+        )
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Catatan kas berhasil ditambahkan!'})
+        
+    except Exception as e:
+        print(f"Error adding cash record: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/update-cash-record', methods=['POST'])
+@login_required
+def update_cash_record():
+    try:
+        data = request.json
+        
+        conn = get_db_connection()
+        conn.execute(
+            """UPDATE cash_records 
+               SET type = ?, amount = ?, description = ?, category = ?, record_date = ?
+               WHERE id = ?""",
+            (data['type'], data['amount'], data['description'], 
+             data.get('category', ''), data['record_date'], data['id'])
+        )
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Catatan kas berhasil diupdate!'})
+        
+    except Exception as e:
+        print(f"Error updating cash record: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/delete-cash-record/<int:record_id>', methods=['POST'])
+@login_required
+def delete_cash_record(record_id):
+    try:
+        conn = get_db_connection()
+        conn.execute('DELETE FROM cash_records WHERE id = ?', (record_id,))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'message': 'Catatan kas berhasil dihapus!'})
+        
+    except Exception as e:
+        print(f"Error deleting cash record: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/export-cash-records')
+@login_required
+def export_cash_records():
+    try:
+        conn = get_db_connection()
+        
+        query = """
+        SELECT 
+            strftime('%d-%m-%Y', record_date) as 'Tanggal',
+            CASE 
+                WHEN type = 'debit' THEN 'Debit (Kas Masuk)'
+                ELSE 'Kredit (Kas Keluar)'
+            END as 'Jenis Transaksi',
+            description as 'Keterangan',
+            category as 'Kategori',
+            amount as 'Jumlah'
+        FROM cash_records
+        ORDER BY record_date DESC, id DESC
+        """
+        
+        df = pd.read_sql_query(query, conn)
+        
+        # Calculate summary
+        total_debit = conn.execute(
+            "SELECT COALESCE(SUM(amount), 0) FROM cash_records WHERE type = 'debit'"
+        ).fetchone()[0]
+        
+        total_kredit = conn.execute(
+            "SELECT COALESCE(SUM(amount), 0) FROM cash_records WHERE type = 'kredit'"
+        ).fetchone()[0]
+        
+        conn.close()
+        
+        # Add summary row
+        summary_df = pd.DataFrame([
+            {'Tanggal': '', 'Jenis Transaksi': '', 'Keterangan': '', 'Kategori': '', 'Jumlah': ''},
+            {'Tanggal': 'RINGKASAN', 'Jenis Transaksi': '', 'Keterangan': '', 'Kategori': '', 'Jumlah': ''},
+            {'Tanggal': 'Total Debit', 'Jenis Transaksi': '', 'Keterangan': '', 'Kategori': '', 'Jumlah': float(total_debit)},
+            {'Tanggal': 'Total Kredit', 'Jenis Transaksi': '', 'Keterangan': '', 'Kategori': '', 'Jumlah': float(total_kredit)},
+            {'Tanggal': 'Saldo Akhir', 'Jenis Transaksi': '', 'Keterangan': '', 'Kategori': '', 'Jumlah': float(total_debit - total_kredit)}
+        ])
+        
+        # Combine data
+        final_df = pd.concat([df, summary_df], ignore_index=True)
+        
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            final_df.to_excel(writer, index=False, sheet_name='Rekap Kas')
+            
+            # Format the Excel file
+            worksheet = writer.sheets['Rekap Kas']
+            
+            # Set column widths
+            worksheet.column_dimensions['A'].width = 15  # Tanggal
+            worksheet.column_dimensions['B'].width = 20  # Jenis
+            worksheet.column_dimensions['C'].width = 40  # Keterangan
+            worksheet.column_dimensions['D'].width = 15  # Kategori
+            worksheet.column_dimensions['E'].width = 15  # Jumlah
+            
+        output.seek(0)
+        
+        from datetime import datetime
+        filename = f'rekap_kas_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx'
+        
+        return send_file(output, download_name=filename, as_attachment=True)
+        
+    except Exception as e:
+        print(f"Error exporting cash records: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 # --- API Publik untuk Ongkir ---
 @app.route('/api/cari-area', methods=['GET'])

@@ -590,9 +590,145 @@
             <div class="hero-icon">
                 <i class="fas fa-truck"></i>
             </div>
-            <h1>Cek Ongkos Kirim</h1>
-            <p>Estimasi biaya pengiriman kitab ke seluruh Indonesia</p>
-        </div>
+            <!-- Tambahkan kode ini setelah div page-header di file cek_ongkir.html -->
+
+<div class="page-header">
+    <h1>Cek Ongkos Kirim</h1>
+    <p>Estimasi biaya pengiriman kitab ke seluruh Indonesia</p>
+</div>
+
+<!-- TAMBAHKAN PERINGATAN INI -->
+<div class="warning-box" style="
+    background-color: #fef2f2;
+    border: 2px solid #ef4444;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    animation: slideIn 0.3s ease;
+">
+    <div style="
+        background-color: #ef4444;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    ">
+        <i class="fas fa-exclamation-triangle" style="font-size: 20px;"></i>
+    </div>
+    
+    <div style="flex: 1;">
+        <h3 style="
+            color: #dc2626;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-weight: 700;
+        ">
+            <i class="fas fa-tools"></i> Fitur Dalam Pengembangan
+        </h3>
+        <p style="
+            color: #991b1b;
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            line-height: 1.6;
+        ">
+            Mohon maaf, fitur cek ongkir otomatis masih dalam tahap pengembangan dan mungkin belum sepenuhnya akurat.
+        </p>
+        <p style="
+            color: #7f1d1d;
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+        ">
+            Untuk informasi ongkir yang lebih akurat, silakan hubungi kami melalui:
+        </p>
+        <a href="https://wa.me/6282332176464?text=Halo%20Amtsilati%20Store,%20saya%20ingin%20menanyakan%20ongkir%20untuk%20pengiriman%20kitab" 
+           target="_blank" 
+           style="
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background-color: #25d366;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        "
+        onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(37, 211, 102, 0.4)'"
+        onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(37, 211, 102, 0.3)'"
+        >
+            <i class="fab fa-whatsapp" style="font-size: 20px;"></i>
+            WhatsApp Amtsilati Store
+        </a>
+    </div>
+</div>
+
+<!-- Alternatif design yang lebih simple -->
+<!-- Gunakan ini jika ingin tampilan yang lebih sederhana -->
+<!--
+<div style="
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+    border-left: 4px solid #ef4444;
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+">
+    <p style="
+        color: #dc2626;
+        margin: 0;
+        font-weight: 600;
+        font-size: 16px;
+    ">
+        <i class="fas fa-info-circle"></i> 
+        Fitur cek ongkir masih dalam pengembangan. 
+        Untuk info ongkir lebih akurat, 
+        <a href="https://wa.me/6285156875405" target="_blank" style="color: #25d366; font-weight: 700;">
+            hubungi WhatsApp kami
+        </a>
+    </p>
+</div>
+-->
+
+<!-- CSS Animation -->
+<style>
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive untuk mobile */
+@media (max-width: 768px) {
+    .warning-box {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .warning-box > div:first-child {
+        margin: 0 auto 15px;
+    }
+    
+    .warning-box a {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
 
         <!-- Form Card -->
         <div class="form-card">
