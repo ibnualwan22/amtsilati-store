@@ -490,6 +490,7 @@ def add_offline_sale():
     data = request.json
     buyer_id = data.get('buyer_id')
     items = data.get('items', [])
+    payment_status = data.get('payment_status', 'Lunas')  # Get payment status with default
 
     if not buyer_id or not items:
         return jsonify({'error': 'Data tidak lengkap'}), 400
@@ -503,8 +504,8 @@ def add_offline_sale():
             
             total_price = book['price'] * int(item['quantity'])
             conn.execute(
-                'INSERT INTO offline_sales (buyer_id, book_id, quantity, total_price) VALUES (?, ?, ?, ?)',
-                (buyer_id, item['book_id'], item['quantity'], total_price)
+                'INSERT INTO offline_sales (buyer_id, book_id, quantity, total_price, payment_status) VALUES (?, ?, ?, ?, ?)',
+                (buyer_id, item['book_id'], item['quantity'], total_price, payment_status)
             )
         conn.commit()
     except Exception as e:
@@ -514,6 +515,7 @@ def add_offline_sale():
         conn.close()
     
     return jsonify({'message': 'Transaksi offline berhasil disimpan!'})
+
 
 @app.route('/api/add-online-sale', methods=['POST'])
 @login_required
@@ -575,36 +577,92 @@ def add_online_sale():
 @login_required
 def get_all_offline_sales():
     conn = get_db_connection()
+    
+    # Base query
     query = """
     SELECT os.id, ob.name as buyer_name, ob.address, b.name as book_name, 
-           os.quantity, os.total_price, strftime('%d-%m-%Y %H:%M', os.sale_date) as sale_date_formatted
+           os.quantity, os.total_price, os.payment_status,
+           strftime('%d-%m-%Y %H:%M', os.sale_date) as sale_date_formatted,
+           os.sale_date
     FROM offline_sales os
     JOIN offline_buyers ob ON os.buyer_id = ob.id
     JOIN books b ON os.book_id = b.id
-    ORDER BY os.id DESC
+    WHERE 1=1
     """
-    sales = conn.execute(query).fetchall()
+    
+    params = []
+    
+    # Apply filters
+    payment_status = request.args.get('payment_status')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    
+    if payment_status and payment_status != 'all':
+        query += " AND os.payment_status = ?"
+        params.append(payment_status)
+    
+    if start_date:
+        query += " AND date(os.sale_date) >= date(?)"
+        params.append(start_date)
+    
+    if end_date:
+        query += " AND date(os.sale_date) <= date(?)"
+        params.append(end_date)
+    
+    query += " ORDER BY os.id DESC"
+    
+    sales = conn.execute(query, params).fetchall()
     conn.close()
-    return jsonify([dict(row) for row in sales])
+    
+    # Convert to dict and ensure payment_status is included
+    result = []
+    for sale in sales:
+        sale_dict = dict(sale)
+        if 'payment_status' not in sale_dict or sale_dict['payment_status'] is None:
+            sale_dict['payment_status'] = 'Lunas'  # Default value for old data
+        result.append(sale_dict)
+    
+    return jsonify(result)
+# TAMBAHKAN ENDPOINT INI DI app.py setelah endpoint transaksi yang sudah ada
 
 @app.route('/api/recent-online-sales')
 @login_required
 def get_all_online_sales():
     conn = get_db_connection()
+    
+    # Base query
     query = """
     SELECT 
         os.id, os.buyer_name, os.buyer_address, b.name as book_name, os.shipping_cost, 
         os.total_price, os.quantity,
         strftime('%d-%m-%Y %H:%M', os.sale_date) as sale_date_formatted,
-        strftime('%d-%m-%Y', os.transfer_date) as transfer_date_formatted
+        strftime('%d-%m-%Y', os.transfer_date) as transfer_date_formatted,
+        os.sale_date
     FROM online_sales os
     JOIN books b ON os.book_id = b.id
-    ORDER BY os.id DESC
+    WHERE 1=1
     """
-    sales = conn.execute(query).fetchall()
+    
+    params = []
+    
+    # Apply filters
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    
+    if start_date:
+        query += " AND date(os.transfer_date) >= date(?)"
+        params.append(start_date)
+    
+    if end_date:
+        query += " AND date(os.transfer_date) <= date(?)"
+        params.append(end_date)
+    
+    query += " ORDER BY os.id DESC"
+    
+    sales = conn.execute(query, params).fetchall()
     conn.close()
+    
     return jsonify([dict(row) for row in sales])
-# TAMBAHKAN ENDPOINT INI DI app.py setelah endpoint transaksi yang sudah ada
 
 # --- API UNTUK EDIT/HAPUS TRANSAKSI OFFLINE ---
 @app.route('/api/update-offline-sale', methods=['POST'])
@@ -616,6 +674,7 @@ def update_offline_sale():
         buyer_id = data.get('buyer_id')
         book_id = data.get('book_id')
         quantity = data.get('quantity')
+        payment_status = data.get('payment_status', 'Lunas')  # Get payment status
         
         if not all([sale_id, buyer_id, book_id, quantity]):
             return jsonify({'error': 'Data tidak lengkap'}), 400
@@ -631,12 +690,12 @@ def update_offline_sale():
         # Calculate new total
         total_price = book['price'] * int(quantity)
         
-        # Update transaction
+        # Update transaction with payment status
         conn.execute('''
             UPDATE offline_sales 
-            SET buyer_id = ?, book_id = ?, quantity = ?, total_price = ?
+            SET buyer_id = ?, book_id = ?, quantity = ?, total_price = ?, payment_status = ?
             WHERE id = ?
-        ''', (buyer_id, book_id, quantity, total_price, sale_id))
+        ''', (buyer_id, book_id, quantity, total_price, payment_status, sale_id))
         
         conn.commit()
         conn.close()
@@ -677,7 +736,12 @@ def get_offline_sale(sale_id):
         if not sale:
             return jsonify({'error': 'Transaksi tidak ditemukan'}), 404
         
-        return jsonify(dict(sale))
+        # Convert to dict and ensure payment_status is included
+        sale_dict = dict(sale)
+        if 'payment_status' not in sale_dict:
+            sale_dict['payment_status'] = 'Lunas'  # Default value
+        
+        return jsonify(sale_dict)
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -768,7 +832,8 @@ def get_online_sale(sale_id):
 @login_required
 def export_offline():
     conn = get_db_connection()
-    # Update query - HAPUS ob.dormitory
+    
+    # Base query dengan payment_status
     query = """
     SELECT strftime('%d-%m-%Y %H:%M', os.sale_date) as 'Tanggal Transaksi', 
            ob.name as 'Nama Pembeli', 
@@ -776,24 +841,74 @@ def export_offline():
            b.name as 'Nama Kitab', 
            os.quantity as 'Jumlah', 
            b.price as 'Harga Satuan', 
-           os.total_price as 'Total Harga'
+           os.total_price as 'Total Harga',
+           CASE 
+               WHEN os.payment_status IS NULL THEN 'Lunas'
+               ELSE os.payment_status 
+           END as 'Status Pembayaran'
     FROM offline_sales os
     JOIN offline_buyers ob ON os.buyer_id = ob.id
     JOIN books b ON os.book_id = b.id
-    ORDER BY os.id DESC
+    WHERE 1=1
     """
-    df = pd.read_sql_query(query, conn)
+    
+    # Apply filters if any
+    params = []
+    payment_status = request.args.get('payment_status')
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    
+    if payment_status and payment_status != 'all':
+        query += " AND os.payment_status = ?"
+        params.append(payment_status)
+    
+    if start_date:
+        query += " AND date(os.sale_date) >= date(?)"
+        params.append(start_date)
+    
+    if end_date:
+        query += " AND date(os.sale_date) <= date(?)"
+        params.append(end_date)
+    
+    query += " ORDER BY os.id DESC"
+    
+    df = pd.read_sql_query(query, conn, params=params)
     conn.close()
     
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Rekap Offline')
+        
+        # Format the Excel file
+        worksheet = writer.sheets['Rekap Offline']
+        
+        # Set column widths
+        worksheet.column_dimensions['A'].width = 18  # Tanggal
+        worksheet.column_dimensions['B'].width = 25  # Nama Pembeli
+        worksheet.column_dimensions['C'].width = 30  # Alamat
+        worksheet.column_dimensions['D'].width = 25  # Nama Kitab
+        worksheet.column_dimensions['E'].width = 10  # Jumlah
+        worksheet.column_dimensions['F'].width = 15  # Harga Satuan
+        worksheet.column_dimensions['G'].width = 15  # Total Harga
+        worksheet.column_dimensions['H'].width = 18  # Status Pembayaran
+        
     output.seek(0)
     
-    return send_file(output, download_name='semua_rekap_offline.xlsx', as_attachment=True)
+    # Generate filename with filter info
+    filename_parts = ['rekap_offline']
+    if payment_status and payment_status != 'all':
+        filename_parts.append(payment_status.lower().replace(' ', '_'))
+    if start_date or end_date:
+        filename_parts.append('filtered')
+    filename_parts.append(datetime.now().strftime('%Y%m%d'))
+    
+    filename = '_'.join(filename_parts) + '.xlsx'
+    
+    return send_file(output, download_name=filename, as_attachment=True)
 
 # 1. PERBAIKAN DI app.py - Ganti fungsi import_offline() yang ada dengan ini:
 
+# UPDATE endpoint /api/import-offline-sales di app.py
 @app.route('/api/import-offline-sales', methods=['POST'])
 @login_required
 def import_offline_sales():
@@ -827,6 +942,13 @@ def import_offline_sales():
                 nama_kitab = str(row['Nama Kitab']).strip()
                 jumlah = int(row['Jumlah'])
                 
+                # Check for optional payment status column
+                payment_status = 'Lunas'  # Default
+                if 'Status Pembayaran' in df.columns:
+                    status = str(row.get('Status Pembayaran', 'Lunas')).strip()
+                    if status in ['Lunas', 'Belum Lunas']:
+                        payment_status = status
+                
                 if not nama_pembeli or not nama_kitab or jumlah <= 0:
                     skipped += 1
                     continue
@@ -834,9 +956,14 @@ def import_offline_sales():
                 # Cari atau buat pembeli
                 buyer = conn.execute('SELECT id FROM offline_buyers WHERE name = ?', (nama_pembeli,)).fetchone()
                 if not buyer:
+                    # Check if address column exists
+                    alamat = ''
+                    if 'Alamat' in df.columns:
+                        alamat = str(row.get('Alamat', '')).strip()
+                    
                     # Tambah pembeli baru
                     cursor = conn.execute('INSERT INTO offline_buyers (name, address) VALUES (?, ?)', 
-                                         (nama_pembeli, ''))
+                                         (nama_pembeli, alamat))
                     buyer_id = cursor.lastrowid
                 else:
                     buyer_id = buyer['id']
@@ -851,10 +978,10 @@ def import_offline_sales():
                 # Hitung total harga
                 total_price = book['price'] * jumlah
                 
-                # Insert transaksi
+                # Insert transaksi dengan payment_status
                 conn.execute(
-                    'INSERT INTO offline_sales (buyer_id, book_id, quantity, total_price) VALUES (?, ?, ?, ?)',
-                    (buyer_id, book['id'], jumlah, total_price)
+                    'INSERT INTO offline_sales (buyer_id, book_id, quantity, total_price, payment_status) VALUES (?, ?, ?, ?, ?)',
+                    (buyer_id, book['id'], jumlah, total_price, payment_status)
                 )
                 imported += 1
                 
@@ -869,6 +996,11 @@ def import_offline_sales():
         message = f'Import selesai! Berhasil: {imported} transaksi'
         if skipped > 0:
             message += f', Dilewati: {skipped} baris'
+        
+        # Add info about optional columns
+        message += '\n\nKolom opsional yang bisa ditambahkan:'
+        message += '\n• Alamat (untuk pembeli baru)'
+        message += '\n• Status Pembayaran (Lunas/Belum Lunas)'
         
         return jsonify({
             'message': message,
@@ -996,6 +1128,8 @@ def import_online_sales():
 @login_required
 def export_online():
     conn = get_db_connection()
+    
+    # Base query dengan filter by transfer_date
     query = """
     SELECT 
         strftime('%d-%m-%Y %H:%M', os.sale_date) as 'Tanggal Transaksi', 
@@ -1006,19 +1140,63 @@ def export_online():
         os.total_price as 'Total Harga'
     FROM online_sales os
     JOIN books b ON os.book_id = b.id
-    ORDER BY os.id DESC
+    WHERE 1=1
     """
-    df = pd.read_sql_query(query, conn)
+    
+    # Apply filters
+    params = []
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    
+    if start_date:
+        query += " AND date(os.transfer_date) >= date(?)"
+        params.append(start_date)
+    
+    if end_date:
+        query += " AND date(os.transfer_date) <= date(?)"
+        params.append(end_date)
+    
+    query += " ORDER BY os.id DESC"
+    
+    df = pd.read_sql_query(query, conn, params=params)
     conn.close()
     
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Rekap Online')
+        
+        # Format the Excel file
+        worksheet = writer.sheets['Rekap Online']
+        
+        # Set column widths
+        worksheet.column_dimensions['A'].width = 18  # Tanggal Transaksi
+        worksheet.column_dimensions['B'].width = 18  # Tanggal Transfer
+        worksheet.column_dimensions['C'].width = 25  # Nama Pembeli
+        worksheet.column_dimensions['D'].width = 35  # Alamat
+        worksheet.column_dimensions['E'].width = 25  # Nama Kitab
+        worksheet.column_dimensions['F'].width = 10  # Jumlah
+        worksheet.column_dimensions['G'].width = 15  # Harga Kitab
+        worksheet.column_dimensions['H'].width = 15  # Ongkir
+        worksheet.column_dimensions['I'].width = 15  # Total Harga
+        
     output.seek(0)
     
-    return send_file(output, download_name='semua_rekap_online.xlsx', as_attachment=True)
-
-# TAMBAHKAN ENDPOINT INI DI app.py setelah endpoint yang sudah ada
+    # Generate filename with filter info
+    filename_parts = ['rekap_online']
+    if start_date or end_date:
+        filename_parts.append('filtered')
+        if start_date and end_date:
+            filename_parts.append(f'{start_date}_to_{end_date}'.replace('-', ''))
+        elif start_date:
+            filename_parts.append(f'from_{start_date}'.replace('-', ''))
+        elif end_date:
+            filename_parts.append(f'to_{end_date}'.replace('-', ''))
+    else:
+        filename_parts.append(datetime.now().strftime('%Y%m%d'))
+    
+    filename = '_'.join(filename_parts) + '.xlsx'
+    
+    return send_file(output, download_name=filename, as_attachment=True)
 
 # --- API UNTUK CASH RECORDS (Dilindungi) ---
 @app.route('/api/cash-records', methods=['GET'])

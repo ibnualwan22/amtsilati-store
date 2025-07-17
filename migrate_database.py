@@ -204,7 +204,22 @@ class DatabaseMigration:
             self.connection.commit()
         else:
             print("  ⚠️  Tabel 'cash_records' sudah ada")
-    
+
+    def migration_007_add_payment_status_to_offline_sales(self):
+        """Menambahkan kolom payment_status ke tabel offline_sales"""
+        if not self.check_column_exists('offline_sales', 'payment_status'):
+            self.cursor.execute('''
+                ALTER TABLE offline_sales 
+                ADD COLUMN payment_status TEXT NOT NULL DEFAULT 'Belum Lunas' 
+                CHECK(payment_status IN ('Lunas', 'Belum Lunas'))
+            ''')
+            print("  ✓ Kolom 'payment_status' ditambahkan ke offline_sales")
+        else:
+            print("  ⚠️  Kolom 'payment_status' sudah ada di offline_sales")
+        
+        self.connection.commit()
+        
+
     def run_all_migrations(self):
         """Jalankan semua migrasi yang belum dijalankan"""
         print("\n=== RUNNING DATABASE MIGRATIONS ===")
@@ -229,6 +244,7 @@ class DatabaseMigration:
                 ('004_add_quantity_online_sales', self.migration_004_add_quantity_online_sales),
                 ('005_remove_dormitory_column', self.migration_005_remove_dormitory_column),
                 ('006_create_cash_records_table', self.migration_006_create_cash_records_table),
+                ('007_add_payment_status_to_offline_sales', self.migration_007_add_payment_status_to_offline_sales),
             ]
             
             # Jalankan migrasi

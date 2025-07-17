@@ -1321,6 +1321,227 @@ button[disabled] {
         box-shadow: -2px 0 4px rgba(0,0,0,0.05);
     }
 }
+/* Info Stat Card untuk Total Ongkir */
+.stat-card.info {
+    position: relative;
+}
+
+.stat-card.info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--info) 0%, #2563eb 100%);
+}
+
+.stat-card.info .stat-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+}
+
+/* Filter Container Styles */
+.filter-container {
+    background: var(--gray-50);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--gray-200);
+}
+
+.filter-section {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 10px;
+    border: 1px solid var(--gray-100);
+}
+
+/* Payment Status Badge in Table */
+.availability-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.availability-badge.available {
+    background: rgba(16, 185, 129, 0.1);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.availability-badge.unavailable {
+    background: rgba(245, 158, 11, 0.1);
+    color: #92400e;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Filter Status Bar */
+.filter-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(37, 99, 235, 0.9) 100%);
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.filter-status button {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--info);
+    border: none;
+    padding: 0.375rem 0.875rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.filter-status button:hover {
+    background: white;
+    transform: translateY(-1px);
+}
+
+/* Button Group for Export */
+.btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Responsive untuk Filter */
+@media (max-width: 768px) {
+    .filter-container {
+        padding: 1rem;
+    }
+    
+    .filter-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-section h4 {
+        font-size: 0.875rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+    }
+}
+
+/* Mobile optimization untuk stats grid */
+@media (max-width: 968px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Stack ongkir stat di bawah */
+    #shippingStatCard {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #shippingStatCard {
+        grid-column: span 1;
+    }
+}
+/* Tambahkan CSS ini di bagian <style> dalam admin.html */
+
+/* Filter Section Styling */
+
+.filter-container .form-row {
+    gap: 1rem;
+    margin-bottom: 0;
+    align-items: flex-end;
+}
+
+.filter-container .form-group {
+    margin-bottom: 0;
+}
+
+.filter-container .btn {
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+/* Filter Status */
+#offline-filter-status,
+#online-filter-status {
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+    color: var(--info);
+    border-radius: 8px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+}
+
+/* Card Header with Button Group */
+.card-header .btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Responsive untuk Mobile */
+@media (max-width: 768px) {
+    .filter-container .form-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .filter-container .form-group:last-child {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .filter-container .btn {
+        flex: 1;
+    }
+    
+    #offline-filter-status,
+    #online-filter-status {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    #offline-filter-status button,
+    #online-filter-status button {
+        width: 100%;
+    }
+}
+
+/* Export Button Styling */
+.btn-group .btn-secondary {
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
+}
     </style>
 </head>
 <body>
@@ -1550,20 +1771,20 @@ button[disabled] {
                         </div>
                     </div>
                     
-                    <div class="stat-card danger">
-                        <div class="stat-header">
-                            <div>
-                                <h3>Total Santri</h3>
-                                <div class="stat-value" id="totalBuyers">0</div>
-                                <div class="stat-change">
-                                    <i class="fas fa-arrow-up"></i> 25 santri baru
-                                </div>
-                            </div>
-                            <div class="stat-icon">
-                                <i class="fas fa-users"></i>
-                            </div>
-                        </div>
-                    </div>
+                    <div class="stat-card info">
+    <div class="stat-header">
+        <div>
+            <h3 id="shippingStatTitle">Total Ongkir</h3>
+            <div class="stat-value" id="totalShippingCost">Rp 0</div>
+            <div class="stat-change">
+                <i class="fas fa-truck"></i> Biaya pengiriman bulan ini
+            </div>
+        </div>
+        <div class="stat-icon">
+            <i class="fas fa-shipping-fast"></i>
+        </div>
+    </div>
+</div>
                 </div>
 
                 <!-- Sales Chart -->
@@ -1803,30 +2024,41 @@ button[disabled] {
                     </div>
                     <div class="card-body">
                         <form id="offline-sale-form">
-                            <div class="form-group" style="margin-bottom: 1.5rem;">
-                                <label>
-                                    <i class="fas fa-user"></i> Nama Pembeli
-                                </label>
-                                <select id="offline-buyer" name="buyer_id" required></select>
-                            </div>
+    <div class="form-row">
+        <div class="form-group" style="flex: 2;">
+            <label>
+                <i class="fas fa-user"></i> Nama Pembeli
+            </label>
+            <select id="offline-buyer" name="buyer_id" required></select>
+        </div>
+        <div class="form-group" style="flex: 1;">
+            <label>
+                <i class="fas fa-check-circle"></i> Status Pembayaran
+            </label>
+            <select id="offline-payment-status" name="payment_status" required>
+                <option value="Lunas">Lunas</option>
+                <option value="Belum Lunas">Belum Lunas</option>
+            </select>
+        </div>
+    </div>
 
-                            <button type="button" class="btn-add-item" onclick="addOfflineBookItem()">
-                                <i class="fas fa-plus"></i> Tambah Kitab
-                            </button>
+    <button type="button" class="btn-add-item" onclick="addOfflineBookItem()">
+        <i class="fas fa-plus"></i> Tambah Kitab
+    </button>
 
-                            <div class="book-items-container" id="offline-book-items">
-                                <!-- Book items will be added here -->
-                            </div>
+    <div class="book-items-container" id="offline-book-items">
+        <!-- Book items will be added here -->
+    </div>
 
-                            <div class="total-summary">
-                                <div class="total-summary-title">Total Harga</div>
-                                <div class="total-summary-value" id="offline-total-price">Rp 0</div>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
-                                <i class="fas fa-save"></i> Simpan Transaksi
-                            </button>
-                        </form>
+    <div class="total-summary">
+        <div class="total-summary-title">Total Harga</div>
+        <div class="total-summary-value" id="offline-total-price">Rp 0</div>
+    </div>
+    
+    <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+        <i class="fas fa-save"></i> Simpan Transaksi
+    </button>
+</form>
                     </div>
                 </div>
             </section>
@@ -1851,6 +2083,13 @@ button[disabled] {
                 <div class="form-group">
                     <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
                     <input type="number" id="edit-offline-quantity" name="quantity" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-check-circle"></i> Status Pembayaran</label>
+                    <select id="edit-offline-payment-status" name="payment_status" required>
+                        <option value="Lunas">Lunas</option>
+                        <option value="Belum Lunas">Belum Lunas</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label><i class="fas fa-tag"></i> Total Harga</label>
@@ -1982,146 +2221,197 @@ button[disabled] {
                     </div>
                 </div>
             </section>
-
-            <!-- Transactions Section -->
-            <section id="transactions-section" class="content-section">
-                <div class="page-header">
-                    <h1 class="page-title">Riwayat Transaksi</h1>
-                    <p class="page-subtitle">Lihat semua transaksi penjualan</p>
-                </div>
-
-                <!-- Import Transactions -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-file-import"></i>
-                            Import Transaksi Offline
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="import-transactions-form">
-                            <div class="form-group">
-                                <label>
-                                    <i class="fas fa-file-excel"></i> File Excel (.xlsx)
-                                </label>
-                                <input type="file" id="transactions-excel-file" name="file" accept=".xlsx" required>
-                                <small style="color: var(--gray-500); margin-top: 0.25rem;">
-                                    1 Format kolom: Nama Pembeli, Nama Kitab, Jumlah (Nama Kitab Harus Sesuai Dengan Yang Ada Di Data Kitab)
-                                    <br>
-                                    2 Jika Anda Memasukkan Nama Baru Maka Jangan Lupa Tambahkan Kolom Alamat Dan Akan Otomatis Terinput Di Data Pembeli Offline
-                                    <br>
-                                </small>
-                            </div>
-                            <button type="submit" class="btn btn-success" style="margin-top: 1rem;">
-                                <i class="fas fa-upload"></i> Import Transaksi
-                            </button>
-                        </form>
-                    </div>
-                </div>
-
-                <div class="card">
-    <div class="card-header">
-        <h2 class="card-title">
-            <i class="fas fa-file-import"></i>
-            Import Transaksi Online
-        </h2>
+                    <!-- Transactions Section -->
+<section id="transactions-section" class="content-section">
+    <div class="page-header">
+        <h1 class="page-title">Riwayat Transaksi</h1>
+        <p class="page-subtitle">Lihat semua transaksi penjualan</p>
     </div>
-    <div class="card-body">
-        <form id="import-transactions-form-online">
-            <div class="form-group">
-                <label>
-                    <i class="fas fa-file-excel"></i> File Excel (.xlsx)
-                </label>
-                <input type="file" id="transactions-excel-file-online" name="file" accept=".xlsx,.xls" required>
-                <small style="color: var(--gray-500); margin-top: 0.25rem;">
-                    1 Format kolom wajib: Nama Pembeli, Nama Kitab, Jumlah (Nama Kitab Harus Sesuai Dengan Yang Ada Di Data Kitab)
-                    <br>
-                    2 Format kolom opsional: Alamat Kirim, Ongkir, Tanggal Transfer
-                    <br>
-                </small>
-            </div>
-            <button type="submit" class="btn btn-success" style="margin-top: 1rem;">
-                <i class="fas fa-upload"></i> Import Transaksi Online
+
+    <!-- Import Transactions -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-file-import"></i>
+                Import Transaksi Offline
+            </h2>
+        </div>
+        <div class="card-body">
+            <form id="import-transactions-form">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-file-excel"></i> File Excel (.xlsx)
+                    </label>
+                    <input type="file" id="transactions-excel-file" name="file" accept=".xlsx" required>
+                    <small style="color: var(--gray-500); margin-top: 0.25rem;">
+                        Format kolom wajib: Nama Pembeli, Nama Kitab, Jumlah
+                        <br>
+                        Format kolom opsional: Alamat (untuk pembeli baru), Status Pembayaran (Lunas/Belum Lunas)
+                        <br>
+                        Catatan: Nama Kitab harus sesuai dengan yang ada di data kitab
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-success" style="margin-top: 1rem;">
+                    <i class="fas fa-upload"></i> Import Transaksi
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-file-import"></i>
+                Import Transaksi Online
+            </h2>
+        </div>
+        <div class="card-body">
+            <form id="import-transactions-form-online">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-file-excel"></i> File Excel (.xlsx)
+                    </label>
+                    <input type="file" id="transactions-excel-file-online" name="file" accept=".xlsx,.xls" required>
+                    <small style="color: var(--gray-500); margin-top: 0.25rem;">
+                        Format kolom wajib: Nama Pembeli, Nama Kitab, Jumlah (Nama Kitab Harus Sesuai Dengan Yang Ada Di Data Kitab)
+                        <br>
+                        Format kolom opsional: Alamat Kirim, Ongkir, Tanggal Transfer
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-success" style="margin-top: 1rem;">
+                    <i class="fas fa-upload"></i> Import Transaksi Online
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transaksi Offline -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-store"></i>
+                Transaksi Offline
+            </h2>
+            <button class="btn btn-secondary" onclick="exportOfflineWithFilter()">
+                <i class="fas fa-download"></i> Export
             </button>
-        </form>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="card-body" style="background: var(--gray-50); padding: 1rem; border-bottom: 1px solid var(--gray-200);">
+            <div class="filter-container">
+                <div class="form-row" style="align-items: flex-end;">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Dari Tanggal</label>
+                        <input type="date" id="filter-offline-start-date">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Sampai Tanggal</label>
+                        <input type="date" id="filter-offline-end-date">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-check-circle"></i> Status Pembayaran</label>
+                        <select id="filter-payment-status">
+                            <option value="all">Semua Status</option>
+                            <option value="Lunas">Lunas</option>
+                            <option value="Belum Lunas">Belum Lunas</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" onclick="applyOfflineFilter()">
+                            <i class="fas fa-filter"></i> Terapkan Filter
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetOfflineFilter()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Table Section -->
+        <div class="card-body">
+            <div id="offline-filter-status" style="display: none; margin-bottom: 1rem;"></div>
+            <div class="table-container">
+                <table id="all-offline-sales">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Nama Pembeli</th>
+                            <th>Alamat</th>
+                            <th>Kitab</th>
+                            <th>Jumlah</th>
+                            <th>Total Harga</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
 
-                
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-history"></i>
-                            Riwayat Transaksi
-                        </h2>
-                        <div class="btn-group">
-                            <a href="/api/export-offline-sales" class="btn btn-secondary">
-                                <i class="fas fa-download"></i> Export Offline
-                            </a>
-                            <a href="/api/export-online-sales" class="btn btn-secondary">
-                                <i class="fas fa-download"></i> Export Online
-                            </a>
-                        </div>
+    <!-- Transaksi Online -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-globe"></i>
+                Transaksi Online
+            </h2>
+            <button class="btn btn-secondary" onclick="exportOnlineWithFilter()">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </div>
+        
+        <!-- Filter Section -->
+        <div class="card-body" style="background: var(--gray-50); padding: 1rem; border-bottom: 1px solid var(--gray-200);">
+            <div class="filter-container">
+                <div class="form-row" style="align-items: flex-end;">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Dari Tanggal Transfer</label>
+                        <input type="date" id="filter-online-start-date">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Sampai Tanggal Transfer</label>
+                        <input type="date" id="filter-online-end-date">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" onclick="applyOnlineFilter()">
+                            <i class="fas fa-filter"></i> Terapkan Filter
+                        </button>
+                        <button class="btn btn-secondary" onclick="resetOnlineFilter()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
                     </div>
                 </div>
-                
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-store"></i>
-                            Transaksi Offline
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-container">
-                            <table id="all-offline-sales">
-                                <thead>
-                                    <tr>
-                                        <th>Tanggal</th>
-                                        <th>Nama Pembeli</th>
-                                        <th>Alamat</th>
-                                        <th>Kitab</th>
-                                        <th>Jumlah</th>
-                                        <th>Total Harga</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">
-                            <i class="fas fa-globe"></i>
-                            Transaksi Online
-                        </h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-container">
-                            <table id="all-online-sales">
-                                <thead>
-                                    <tr>
-                                        <th>Tanggal</th>
-                                        <th>Tgl. Transfer</th>
-                                        <th>Nama Pembeli</th>
-                                        <th>Alamat Kirim</th>
-                                        <th>Kitab</th>
-                                        <th>Jml</th>
-                                        <th>Ongkir</th>
-                                        <th>Total Harga</th>
-                                        <th>Aksi</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            </div>
+        </div>
+        
+        <!-- Table Section -->
+        <div class="card-body">
+            <div id="online-filter-status" style="display: none; margin-bottom: 1rem;"></div>
+            <div class="table-container">
+                <table id="all-online-sales">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Tgl. Transfer</th>
+                            <th>Nama Pembeli</th>
+                            <th>Alamat Kirim</th>
+                            <th>Kitab</th>
+                            <th>Jml</th>
+                            <th>Ongkir</th>
+                            <th>Total Harga</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
 
             <!-- Cash Records Section -->
             <section id="cash-records-section" class="content-section">
@@ -2357,6 +2647,516 @@ button[disabled] {
         let salesChart = null;
         let offlineItemCount = 0;
         let onlineItemCount = 0;
+        let currentFilters = {
+            offline: {
+                payment_status: 'all',
+                start_date: '',
+                end_date: ''
+            },
+            online: {
+              start_date: '',
+              end_date: ''
+             }
+           };
+
+        // Apply Offline Filter
+async function applyOfflineFilter() {
+    currentFilters.offline.payment_status = $('#filter-payment-status').val();
+    currentFilters.offline.start_date = $('#filter-offline-start-date').val();
+    currentFilters.offline.end_date = $('#filter-offline-end-date').val();
+    
+    await loadOfflineTransactions();
+    showOfflineFilterStatus();
+}
+
+// Reset Offline Filter
+function resetOfflineFilter() {
+    $('#filter-payment-status').val('all');
+    $('#filter-offline-start-date').val('');
+    $('#filter-offline-end-date').val('');
+    
+    currentFilters.offline = {
+        payment_status: 'all',
+        start_date: '',
+        end_date: ''
+    };
+    
+    $('#offline-filter-status').hide();
+    loadOfflineTransactions();
+}
+
+// Apply Online Filter
+async function applyOnlineFilter() {
+    currentFilters.online.start_date = $('#filter-online-start-date').val();
+    currentFilters.online.end_date = $('#filter-online-end-date').val();
+    
+    await loadOnlineTransactions();
+    showOnlineFilterStatus();
+}
+
+// Reset Online Filter
+function resetOnlineFilter() {
+    $('#filter-online-start-date').val('');
+    $('#filter-online-end-date').val('');
+    
+    currentFilters.online = {
+        start_date: '',
+        end_date: ''
+    };
+    
+    $('#online-filter-status').hide();
+    loadOnlineTransactions();
+}
+
+// Load Offline Transactions with filters
+async function loadOfflineTransactions() {
+    const params = new URLSearchParams();
+    
+    if (currentFilters.offline.payment_status && currentFilters.offline.payment_status !== 'all') {
+        params.append('payment_status', currentFilters.offline.payment_status);
+    }
+    if (currentFilters.offline.start_date) {
+        params.append('start_date', currentFilters.offline.start_date);
+    }
+    if (currentFilters.offline.end_date) {
+        params.append('end_date', currentFilters.offline.end_date);
+    }
+    
+    const response = await fetch('/api/recent-offline-sales?' + params.toString());
+    const sales = await response.json();
+    
+    const tbody = $('#all-offline-sales tbody');
+    tbody.empty();
+    
+    sales.forEach(s => {
+        const paymentBadge = s.payment_status === 'Lunas' 
+            ? '<span class="availability-badge available"><i class="fas fa-check-circle"></i> Lunas</span>'
+            : '<span class="availability-badge unavailable"><i class="fas fa-clock"></i> Belum Lunas</span>';
+            
+        tbody.append(`<tr>
+            <td>${s.sale_date_formatted}</td>
+            <td style="font-weight: 600;">${s.buyer_name}</td>
+            <td>${s.address || '-'}</td>
+            <td>${s.book_name}</td>
+            <td style="text-align: center;">${s.quantity}</td>
+            <td style="color: var(--primary); font-weight: 700;">Rp ${s.total_price.toLocaleString('id-ID')}</td>
+            <td>${paymentBadge}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn action-btn-edit" onclick="editOfflineSale(${s.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn action-btn-delete" onclick="deleteOfflineSale(${s.id}, '${s.buyer_name.replace(/'/g, "\\'")}', '${s.book_name.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </td>
+        </tr>`);
+    });
+    
+    if (sales.length === 0) {
+        tbody.append('<tr><td colspan="8" style="text-align: center; color: var(--gray-500);">Tidak ada transaksi yang sesuai filter</td></tr>');
+    }
+}
+
+// Load Online Transactions with filters
+async function loadOnlineTransactions() {
+    const params = new URLSearchParams();
+    
+    if (currentFilters.online.start_date) {
+        params.append('start_date', currentFilters.online.start_date);
+    }
+    if (currentFilters.online.end_date) {
+        params.append('end_date', currentFilters.online.end_date);
+    }
+    
+    const response = await fetch('/api/recent-online-sales?' + params.toString());
+    const sales = await response.json();
+    
+    const tbody = $('#all-online-sales tbody');
+    tbody.empty();
+    
+    sales.forEach(s => {
+        tbody.append(`<tr>
+            <td>${s.sale_date_formatted}</td>
+            <td>${s.transfer_date_formatted || '-'}</td>
+            <td style="font-weight: 600;">${s.buyer_name}</td>
+            <td>${s.buyer_address}</td>
+            <td>${s.book_name}</td>
+            <td style="text-align: center;">${s.quantity || 1}</td>
+            <td>Rp ${s.shipping_cost.toLocaleString('id-ID')}</td>
+            <td style="color: var(--primary); font-weight: 700;">Rp ${s.total_price.toLocaleString('id-ID')}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn action-btn-edit" onclick="editOnlineSale(${s.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn action-btn-delete" onclick="deleteOnlineSale(${s.id}, '${s.buyer_name.replace(/'/g, "\\'")}', '${s.book_name.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </td>
+        </tr>`);
+    });
+    
+    if (sales.length === 0) {
+        tbody.append('<tr><td colspan="9" style="text-align: center; color: var(--gray-500);">Tidak ada transaksi yang sesuai filter</td></tr>');
+    }
+}
+
+// Show filter status
+function showOfflineFilterStatus() {
+    const hasFilter = currentFilters.offline.payment_status !== 'all' || 
+                     currentFilters.offline.start_date || 
+                     currentFilters.offline.end_date;
+    
+    if (hasFilter) {
+        let statusText = 'Filter aktif: ';
+        const filters = [];
+        
+        if (currentFilters.offline.payment_status !== 'all') {
+            filters.push(`Status: ${currentFilters.offline.payment_status}`);
+        }
+        if (currentFilters.offline.start_date || currentFilters.offline.end_date) {
+            const dateFilter = [];
+            if (currentFilters.offline.start_date) dateFilter.push(`dari ${formatDateDisplay(currentFilters.offline.start_date)}`);
+            if (currentFilters.offline.end_date) dateFilter.push(`sampai ${formatDateDisplay(currentFilters.offline.end_date)}`);
+            filters.push(`Tanggal ${dateFilter.join(' ')}`);
+        }
+        
+        statusText += filters.join(', ');
+        
+        $('#offline-filter-status').html(`
+            <div>
+                <i class="fas fa-info-circle"></i> ${statusText}
+            </div>
+            <button class="btn btn-sm" onclick="resetOfflineFilter()" style="padding: 0.25rem 0.75rem; background: white; color: var(--info); border: 1px solid var(--info);">
+                Clear Filter
+            </button>
+        `).show();
+    } else {
+        $('#offline-filter-status').hide();
+    }
+}
+
+function showOnlineFilterStatus() {
+    const hasFilter = currentFilters.online.start_date || currentFilters.online.end_date;
+    
+    if (hasFilter) {
+        let statusText = 'Filter aktif: ';
+        const dateFilter = [];
+        if (currentFilters.online.start_date) dateFilter.push(`dari ${formatDateDisplay(currentFilters.online.start_date)}`);
+        if (currentFilters.online.end_date) dateFilter.push(`sampai ${formatDateDisplay(currentFilters.online.end_date)}`);
+        statusText += `Tanggal Transfer ${dateFilter.join(' ')}`;
+        
+        $('#online-filter-status').html(`
+            <div>
+                <i class="fas fa-info-circle"></i> ${statusText}
+            </div>
+            <button class="btn btn-sm" onclick="resetOnlineFilter()" style="padding: 0.25rem 0.75rem; background: white; color: var(--info); border: 1px solid var(--info);">
+                Clear Filter
+            </button>
+        `).show();
+    } else {
+        $('#online-filter-status').hide();
+    }
+}
+
+// Helper function
+function formatDateDisplay(dateStr) {
+    const date = new Date(dateStr);
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    return date.toLocaleDateString('id-ID', options);
+}
+
+// Export functions with filter
+function exportOfflineWithFilter() {
+    const params = new URLSearchParams();
+    
+    if (currentFilters.offline.payment_status && currentFilters.offline.payment_status !== 'all') {
+        params.append('payment_status', currentFilters.offline.payment_status);
+    }
+    if (currentFilters.offline.start_date) {
+        params.append('start_date', currentFilters.offline.start_date);
+    }
+    if (currentFilters.offline.end_date) {
+        params.append('end_date', currentFilters.offline.end_date);
+    }
+    
+    window.location.href = '/api/export-offline-sales?' + params.toString();
+}
+
+function exportOnlineWithFilter() {
+    const params = new URLSearchParams();
+    
+    if (currentFilters.online.start_date) {
+        params.append('start_date', currentFilters.online.start_date);
+    }
+    if (currentFilters.online.end_date) {
+        params.append('end_date', currentFilters.online.end_date);
+    }
+    
+    window.location.href = '/api/export-online-sales?' + params.toString();
+}
+
+// Update loadRecentSales
+async function loadRecentSales() {
+    await loadOfflineTransactions();
+    await loadOnlineTransactions();
+}   
+
+           function applyTransactionFilters() {
+    // Get filter values
+    currentFilters.offline.payment_status = $('#filter-payment-status').val();
+    currentFilters.offline.start_date = $('#filter-offline-start-date').val();
+    currentFilters.offline.end_date = $('#filter-offline-end-date').val();
+    currentFilters.online.start_date = $('#filter-online-start-date').val();
+    currentFilters.online.end_date = $('#filter-online-end-date').val();
+    
+    // Reload transactions dengan filters
+    loadFilteredTransactions();
+}
+
+// Function untuk reset filters
+function resetTransactionFilters() {
+    // Reset form values
+    $('#filter-payment-status').val('all');
+    $('#filter-offline-start-date').val('');
+    $('#filter-offline-end-date').val('');
+    $('#filter-online-start-date').val('');
+    $('#filter-online-end-date').val('');
+    
+    // Reset filter state
+    currentFilters = {
+        offline: { payment_status: 'all', start_date: '', end_date: '' },
+        online: { start_date: '', end_date: '' }
+    };
+    
+    // Reload transactions
+    loadRecentSales();
+}
+
+// Function untuk load transactions dengan filters
+async function loadFilteredTransactions() {
+    // Load Offline Sales dengan filters
+    const offlineParams = new URLSearchParams();
+    if (currentFilters.offline.payment_status && currentFilters.offline.payment_status !== 'all') {
+        offlineParams.append('payment_status', currentFilters.offline.payment_status);
+    }
+    if (currentFilters.offline.start_date) {
+        offlineParams.append('start_date', currentFilters.offline.start_date);
+    }
+    if (currentFilters.offline.end_date) {
+        offlineParams.append('end_date', currentFilters.offline.end_date);
+    }
+    
+    const offResponse = await fetch('/api/recent-offline-sales?' + offlineParams.toString());
+    const offSales = await offResponse.json();
+    
+    // Update offline table
+    updateOfflineTable(offSales);
+    
+    // Load Online Sales dengan filters
+    const onlineParams = new URLSearchParams();
+    if (currentFilters.online.start_date) {
+        onlineParams.append('start_date', currentFilters.online.start_date);
+    }
+    if (currentFilters.online.end_date) {
+        onlineParams.append('end_date', currentFilters.online.end_date);
+    }
+    
+    const onResponse = await fetch('/api/recent-online-sales?' + onlineParams.toString());
+    const onSales = await onResponse.json();
+    
+    // Update online table
+    updateOnlineTable(onSales);
+    
+    // Show filter status
+    showFilterStatus();
+}
+
+// Function untuk update offline table
+function updateOfflineTable(sales) {
+    const tbody = $('#all-offline-sales tbody');
+    tbody.empty();
+    
+    sales.forEach(s => {
+        const paymentBadge = s.payment_status === 'Lunas' 
+            ? '<span class="availability-badge available"><i class="fas fa-check-circle"></i> Lunas</span>'
+            : '<span class="availability-badge unavailable"><i class="fas fa-clock"></i> Belum Lunas</span>';
+            
+        tbody.append(`<tr>
+            <td>${s.sale_date_formatted}</td>
+            <td style="font-weight: 600;">${s.buyer_name}</td>
+            <td>${s.address || '-'}</td>
+            <td>${s.book_name}</td>
+            <td style="text-align: center;">${s.quantity}</td>
+            <td style="color: var(--primary); font-weight: 700;">Rp ${s.total_price.toLocaleString('id-ID')}</td>
+            <td>${paymentBadge}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn action-btn-edit" onclick="editOfflineSale(${s.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn action-btn-delete" onclick="deleteOfflineSale(${s.id}, '${s.buyer_name.replace(/'/g, "\\'")}', '${s.book_name.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </td>
+        </tr>`);
+    });
+    
+    if (sales.length === 0) {
+        tbody.append('<tr><td colspan="8" style="text-align: center; color: var(--gray-500);">Tidak ada transaksi yang sesuai filter</td></tr>');
+    }
+}
+
+// Function untuk update online table
+function updateOnlineTable(sales) {
+    const tbody = $('#all-online-sales tbody');
+    tbody.empty();
+    
+    sales.forEach(s => {
+        tbody.append(`<tr>
+            <td>${s.sale_date_formatted}</td>
+            <td>${s.transfer_date_formatted || '-'}</td>
+            <td style="font-weight: 600;">${s.buyer_name}</td>
+            <td>${s.buyer_address}</td>
+            <td>${s.book_name}</td>
+            <td style="text-align: center;">${s.quantity || 1}</td>
+            <td>Rp ${s.shipping_cost.toLocaleString('id-ID')}</td>
+            <td style="color: var(--primary); font-weight: 700;">Rp ${s.total_price.toLocaleString('id-ID')}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="action-btn action-btn-edit" onclick="editOnlineSale(${s.id})">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="action-btn action-btn-delete" onclick="deleteOnlineSale(${s.id}, '${s.buyer_name.replace(/'/g, "\\'")}', '${s.book_name.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </td>
+        </tr>`);
+    });
+    
+    if (sales.length === 0) {
+        tbody.append('<tr><td colspan="9" style="text-align: center; color: var(--gray-500);">Tidak ada transaksi yang sesuai filter</td></tr>');
+    }
+}
+
+// Function untuk show filter status
+function showFilterStatus() {
+    const hasFilter = 
+        currentFilters.offline.payment_status !== 'all' ||
+        currentFilters.offline.start_date ||
+        currentFilters.offline.end_date ||
+        currentFilters.online.start_date ||
+        currentFilters.online.end_date;
+    
+    if (hasFilter) {
+        if ($('#filter-status').length === 0) {
+            const statusHtml = `
+                <div id="filter-status" class="filter-status" style="
+                    background: var(--info);
+                    color: white;
+                    padding: 0.75rem 1rem;
+                    border-radius: 8px;
+                    margin-bottom: 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                ">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Filter sedang aktif. Menampilkan hasil yang difilter.</span>
+                    <button onclick="resetTransactionFilters()" style="
+                        margin-left: auto;
+                        background: white;
+                        color: var(--info);
+                        border: none;
+                        padding: 0.25rem 0.75rem;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 0.875rem;
+                        font-weight: 600;
+                    ">
+                        Clear Filter
+                    </button>
+                </div>`;
+            $('#transactions-section .card:first').before(statusHtml);
+        }
+    } else {
+        $('#filter-status').remove();
+    }
+}
+
+// UPDATE handleOfflineRekapSubmit untuk include payment status
+async function handleOfflineRekapSubmit() {
+    const buyerId = $('#offline-buyer').val();
+    const paymentStatus = $('#offline-payment-status').val();
+    
+    if (!buyerId) {
+        showMessage('Pilih pembeli terlebih dahulu', 'error');
+        return;
+    }
+    
+    const items = [];
+    let hasValidItem = false;
+
+    $('#offline-book-items .book-item').each(function() {
+        const bookId = $(this).find('.offline-book-select').val();
+        const quantity = $(this).find('.offline-quantity').val();
+        
+        if (bookId && quantity) {
+            items.push({
+                book_id: bookId,
+                quantity: parseInt(quantity)
+            });
+            hasValidItem = true;
+        }
+    });
+
+    if (!hasValidItem) {
+        showMessage('Tambahkan minimal satu kitab', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/add-offline-sale', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                buyer_id: buyerId,
+                items: items,
+                payment_status: paymentStatus
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Gagal menyimpan transaksi');
+        }
+
+        showMessage('Transaksi offline berhasil disimpan!', 'success');
+        
+        // Reset form
+        $('#offline-sale-form')[0].reset();
+        $('#offline-buyer').val(null).trigger('change');
+        $('#offline-payment-status').val('Lunas');
+        $('#offline-book-items').empty();
+        offlineItemCount = 0;
+        addOfflineBookItem();
+        updateOfflineTotalPrice();
+        
+        // Reload data
+        loadRecentSales();
+        loadDashboardStats();
+        updateChart();
+        
+    } catch (error) {
+        showMessage(error.message, 'error');
+    }
+}
 
         // Fungsi untuk edit
         function editBuyer(id, name, address) {
@@ -3066,68 +3866,72 @@ button[disabled] {
         }
 
         async function handleOfflineRekapSubmit() {
-            const buyerId = $('#offline-buyer').val();
-            if (!buyerId) {
-                showMessage('Pilih pembeli terlebih dahulu', 'error');
-                return;
-            }
-            
-            const items = [];
-            let hasValidItem = false;
+    const buyerId = $('#offline-buyer').val();
+    const paymentStatus = $('#offline-payment-status').val(); // Get payment status
+    
+    if (!buyerId) {
+        showMessage('Pilih pembeli terlebih dahulu', 'error');
+        return;
+    }
+    
+    const items = [];
+    let hasValidItem = false;
 
-            $('#offline-book-items .book-item').each(function() {
-                const bookId = $(this).find('.offline-book-select').val();
-                const quantity = $(this).find('.offline-quantity').val();
-                
-                if (bookId && quantity) {
-                    items.push({
-                        book_id: bookId,
-                        quantity: parseInt(quantity)
-                    });
-                    hasValidItem = true;
-                }
+    $('#offline-book-items .book-item').each(function() {
+        const bookId = $(this).find('.offline-book-select').val();
+        const quantity = $(this).find('.offline-quantity').val();
+        
+        if (bookId && quantity) {
+            items.push({
+                book_id: bookId,
+                quantity: parseInt(quantity)
             });
-
-            if (!hasValidItem) {
-                showMessage('Tambahkan minimal satu kitab', 'error');
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/add-offline-sale', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        buyer_id: buyerId,
-                        items: items  // Kirim sebagai array items
-                    })
-                });
-                
-                const result = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(result.error || 'Gagal menyimpan transaksi');
-                }
-
-                showMessage('Transaksi offline berhasil disimpan!', 'success');
-                
-                // Reset form
-                $('#offline-sale-form')[0].reset();
-                $('#offline-buyer').val(null).trigger('change');
-                $('#offline-book-items').empty();
-                offlineItemCount = 0;
-                addOfflineBookItem();
-                updateOfflineTotalPrice();
-                
-                // Reload data
-                loadRecentSales();
-                loadDashboardStats();
-                updateChart();
-                
-            } catch (error) {
-                showMessage(error.message, 'error');
-            }
+            hasValidItem = true;
         }
+    });
+
+    if (!hasValidItem) {
+        showMessage('Tambahkan minimal satu kitab', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/add-offline-sale', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                buyer_id: buyerId,
+                items: items,
+                payment_status: paymentStatus // Include payment status
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(result.error || 'Gagal menyimpan transaksi');
+        }
+
+        showMessage('Transaksi offline berhasil disimpan!', 'success');
+        
+        // Reset form
+        $('#offline-sale-form')[0].reset();
+        $('#offline-buyer').val(null).trigger('change');
+        $('#offline-payment-status').val('Lunas'); // Reset to default
+        $('#offline-book-items').empty();
+        offlineItemCount = 0;
+        addOfflineBookItem();
+        updateOfflineTotalPrice();
+        
+        // Reload data
+        loadRecentSales();
+        loadDashboardStats();
+        updateChart();
+        
+    } catch (error) {
+        showMessage(error.message, 'error');
+    }
+}
 
         async function handleOnlineRekapSubmit() {
             const buyerName = $('#online-buyer-name').val();
@@ -3201,62 +4005,58 @@ button[disabled] {
 
         // Dashboard functions
         async function loadDashboardStats() {
-            try {
-                // Get current month name
-                const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                    "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-                ];
-                const currentMonth = monthNames[new Date().getMonth()];
-                const currentYear = new Date().getFullYear();
-                
-                // Load books count
-                const booksResponse = await fetch('/api/books/all');
-                const allBooks = await booksResponse.json();
-                $('#totalBooks').text(allBooks.length);
-
-                // Load buyers count
-                const buyersResponse = await fetch('/api/offline-buyers');
-                const buyers = await buyersResponse.json();
-                $('#totalBuyers').text(buyers.length);
-
-                // Load sales totals for current month
-                const offlineResponse = await fetch('/api/recent-offline-sales');
-                const offlineSales = await offlineResponse.json();
-                
-                // Filter sales for current month
-                const currentMonthStart = new Date(currentYear, new Date().getMonth(), 1);
-                const currentMonthEnd = new Date(currentYear, new Date().getMonth() + 1, 0);
-                
-                const monthlyOfflineSales = offlineSales.filter(sale => {
-                    const saleDate = parseDateString(sale.sale_date_formatted);
-                    return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
-                });
-                
-                const totalOffline = monthlyOfflineSales.reduce((sum, sale) => sum + sale.total_price, 0);
-                $('#totalOfflineSales').text(`Rp ${totalOffline.toLocaleString('id-ID')}`);
-                
-                // Update stat card title for offline
-                $('#offlineStatTitle').text(`Penjualan Offline ${currentMonth}`);
-
-                const onlineResponse = await fetch('/api/recent-online-sales');
-                const onlineSales = await onlineResponse.json();
-                
-                const monthlyOnlineSales = onlineSales.filter(sale => {
-                    const saleDate = parseDateString(sale.sale_date_formatted);
-                    return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
-                });
-                
-                const totalOnline = monthlyOnlineSales.reduce((sum, sale) => sum + sale.total_price, 0);
-                $('#totalOnlineSales').text(`Rp ${totalOnline.toLocaleString('id-ID')}`);
-                
-                // Update stat card title for online
-                $('#onlineStatTitle').text(`Penjualan Online ${currentMonth}`);
-                
-            } catch (error) {
-                console.error('Error loading dashboard stats:', error);
-            }
-        }
+    try {
+        // Get current month name
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
+        const currentMonth = monthNames[new Date().getMonth()];
+        const currentYear = new Date().getFullYear();
         
+        // Load books count
+        const booksResponse = await fetch('/api/books/all');
+        const allBooks = await booksResponse.json();
+        $('#totalBooks').text(allBooks.length);
+
+        // Load sales totals for current month
+        const offlineResponse = await fetch('/api/recent-offline-sales');
+        const offlineSales = await offlineResponse.json();
+        
+        // Filter sales for current month
+        const currentMonthStart = new Date(currentYear, new Date().getMonth(), 1);
+        const currentMonthEnd = new Date(currentYear, new Date().getMonth() + 1, 0);
+        
+        const monthlyOfflineSales = offlineSales.filter(sale => {
+            const saleDate = parseDateString(sale.sale_date_formatted);
+            return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
+        });
+        
+        const totalOffline = monthlyOfflineSales.reduce((sum, sale) => sum + sale.total_price, 0);
+        $('#totalOfflineSales').text(`Rp ${totalOffline.toLocaleString('id-ID')}`);
+        $('#offlineStatTitle').text(`Penjualan Offline ${currentMonth}`);
+
+        // Load online sales
+        const onlineResponse = await fetch('/api/recent-online-sales');
+        const onlineSales = await onlineResponse.json();
+        
+        const monthlyOnlineSales = onlineSales.filter(sale => {
+            const saleDate = parseDateString(sale.sale_date_formatted);
+            return saleDate >= currentMonthStart && saleDate <= currentMonthEnd;
+        });
+        
+        const totalOnline = monthlyOnlineSales.reduce((sum, sale) => sum + sale.total_price, 0);
+        $('#totalOnlineSales').text(`Rp ${totalOnline.toLocaleString('id-ID')}`);
+        $('#onlineStatTitle').text(`Penjualan Online ${currentMonth}`);
+        
+        // Calculate total shipping costs for current month (GANTI TOTAL SANTRI)
+        const monthlyShippingCost = monthlyOnlineSales.reduce((sum, sale) => sum + sale.shipping_cost, 0);
+        $('#totalShippingCost').text(`Rp ${monthlyShippingCost.toLocaleString('id-ID')}`);
+        $('#shippingStatTitle').text(`Total Ongkir ${currentMonth}`);
+        
+    } catch (error) {
+        console.error('Error loading dashboard stats:', error);
+    }
+}
         // Helper function to parse date string
         function parseDateString(dateStr) {
             // Parse format: "DD-MM-YYYY HH:MM"
@@ -3535,6 +4335,11 @@ button[disabled] {
     offTbody.empty();
     
     offSales.forEach(s => {
+        // Tambahkan payment status badge
+        const paymentBadge = s.payment_status === 'Lunas' 
+            ? '<span class="availability-badge available"><i class="fas fa-check-circle"></i> Lunas</span>'
+            : '<span class="availability-badge unavailable"><i class="fas fa-clock"></i> Belum Lunas</span>';
+            
         offTbody.append(`<tr>
             <td>${s.sale_date_formatted}</td>
             <td style="font-weight: 600;">${s.buyer_name}</td>
@@ -3542,6 +4347,7 @@ button[disabled] {
             <td>${s.book_name}</td>
             <td style="text-align: center;">${s.quantity}</td>
             <td style="color: var(--primary); font-weight: 700;">Rp ${s.total_price.toLocaleString('id-ID')}</td>
+            <td>${paymentBadge}</td>
             <td>
                 <div class="action-buttons">
                     <button class="action-btn action-btn-edit" onclick="editOfflineSale(${s.id})">
@@ -3556,10 +4362,10 @@ button[disabled] {
     });
     
     if (offSales.length === 0) {
-        offTbody.append('<tr><td colspan="7" style="text-align: center; color: var(--gray-500);">Belum ada transaksi offline</td></tr>');
+        offTbody.append('<tr><td colspan="8" style="text-align: center; color: var(--gray-500);">Belum ada transaksi offline</td></tr>');
     }
 
-    // Load Online Sales
+    // Load Online Sales - TETAP SAMA, tidak perlu diubah
     const onResponse = await fetch('/api/recent-online-sales');
     const onSales = await onResponse.json();
     const onTbody = $('#all-online-sales tbody');
@@ -3592,7 +4398,6 @@ button[disabled] {
         onTbody.append('<tr><td colspan="9" style="text-align: center; color: var(--gray-500);">Belum ada transaksi online</td></tr>');
     }
 }
-
         async function editBook(id) {
             const response = await fetch(`/api/book/${id}`);
             if (!response.ok) { 
@@ -3741,6 +4546,7 @@ button[disabled] {
         $('#edit-offline-buyer').val(sale.buyer_id).trigger('change');
         $('#edit-offline-book').val(sale.book_id).trigger('change');
         $('#edit-offline-quantity').val(sale.quantity);
+        $('#edit-offline-payment-status').val(sale.payment_status || 'Lunas'); // Set payment status
         $('#edit-offline-total').val(`Rp ${sale.total_price.toLocaleString('id-ID')}`);
         
         // Show modal
@@ -3910,37 +4716,38 @@ function closeEditOnlineModal() {
 $(document).ready(function() {
     // Form submissions
     $('#edit-offline-sale-form').on('submit', async function(e) {
-        e.preventDefault();
+    e.preventDefault();
+    
+    const data = {
+        id: $('#edit-offline-sale-id').val(),
+        buyer_id: $('#edit-offline-buyer').val(),
+        book_id: $('#edit-offline-book').val(),
+        quantity: $('#edit-offline-quantity').val(),
+        payment_status: $('#edit-offline-payment-status').val() // Include payment status
+    };
+    
+    try {
+        const response = await fetch('/api/update-offline-sale', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
         
-        const data = {
-            id: $('#edit-offline-sale-id').val(),
-            buyer_id: $('#edit-offline-buyer').val(),
-            book_id: $('#edit-offline-book').val(),
-            quantity: $('#edit-offline-quantity').val()
-        };
+        const result = await response.json();
         
-        try {
-            const response = await fetch('/api/update-offline-sale', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            
-            const result = await response.json();
-            
-            if (response.ok) {
-                showMessage(result.message, 'success');
-                closeEditOfflineModal();
-                loadRecentSales();
-                loadDashboardStats();
-                updateChart();
-            } else {
-                showMessage(result.error || 'Gagal update transaksi', 'error');
-            }
-        } catch (error) {
-            showMessage('Error: ' + error.message, 'error');
+        if (response.ok) {
+            showMessage(result.message, 'success');
+            closeEditOfflineModal();
+            loadRecentSales();
+            loadDashboardStats();
+            updateChart();
+        } else {
+            showMessage(result.error || 'Gagal update transaksi', 'error');
         }
-    });
+    } catch (error) {
+        showMessage('Error: ' + error.message, 'error');
+    }
+});
     
     $('#edit-online-sale-form').on('submit', async function(e) {
         e.preventDefault();
