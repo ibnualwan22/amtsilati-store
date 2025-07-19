@@ -1,0 +1,309 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<section id="cash-records-section" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Rekap Kas</h1>
+        <p class="page-subtitle">Kelola catatan kas masuk dan keluar</p>
+    </div>
+
+    <div class="stats-grid" style="margin-bottom: 2rem;">
+        <div class="stat-card success">
+            <div class="stat-header">
+                <div>
+                    <h3>Total Debit</h3>
+                    <div class="stat-value" id="totalDebit">Rp 0</div>
+                    <div class="stat-change"><i class="fas fa-arrow-down"></i> Kas Masuk</div>
+                </div>
+                <div class="stat-icon"><i class="fas fa-arrow-circle-down"></i></div>
+            </div>
+        </div>
+        <div class="stat-card danger">
+            <div class="stat-header">
+                <div>
+                    <h3>Total Kredit</h3>
+                    <div class="stat-value" id="totalKredit">Rp 0</div>
+                    <div class="stat-change"><i class="fas fa-arrow-up"></i> Kas Keluar</div>
+                </div>
+                <div class="stat-icon"><i class="fas fa-arrow-circle-up"></i></div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-header">
+                <div>
+                    <h3>Saldo Kas</h3>
+                    <div class="stat-value" id="saldoKas">Rp 0</div>
+                    <div class="stat-change" id="saldoStatus"><i class="fas fa-wallet"></i> Saldo Akhir</div>
+                </div>
+                <div class="stat-icon"><i class="fas fa-wallet"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-plus-circle"></i> Tambah Catatan Kas</h2>
+        </div>
+        <div class="card-body">
+            <form id="add-cash-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-exchange-alt"></i> Jenis Transaksi</label>
+                        <select id="cash-type" name="type" required>
+                            <option value="debit">Debit (Kas Masuk)</option>
+                            <option value="kredit">Kredit (Kas Keluar)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Tanggal</label>
+                        <input type="date" id="cash-date" name="record_date" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-money-bill"></i> Jumlah</label>
+                        <input type="number" id="cash-amount" name="amount" min="0" required placeholder="Contoh: 100000">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tags"></i> Kategori</label>
+                        <select id="cash-category" name="category">
+                            <option value="">-- Pilih Kategori --</option>
+                            <option value="Penjualan">Penjualan</option>
+                            <option value="Operasional">Operasional</option>
+                            <option value="Gaji">Gaji</option>
+                            <option value="Listrik">Listrik</option>
+                            <option value="Internet">Internet</option>
+                            <option value="Transportasi">Transportasi</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-sticky-note"></i> Keterangan</label>
+                    <textarea id="cash-description" name="description" rows="3" required placeholder="Masukkan keterangan transaksi"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Catatan</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-list"></i> Daftar Catatan Kas</h2>
+            <button class="btn btn-secondary" onclick="exportCashRecords()">
+                <i class="fas fa-download"></i> Export Excel
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="date-filter" style="margin-bottom: 1.5rem;">
+                <label>Dari:</label>
+                <input type="date" id="cashStartDate">
+                <label>Sampai:</label>
+                <input type="date" id="cashEndDate">
+                <select id="cashTypeFilter" style="margin-left: 1rem;">
+                    <option value="">Semua Jenis</option>
+                    <option value="debit">Debit Saja</option>
+                    <option value="kredit">Kredit Saja</option>
+                </select>
+                <button class="btn btn-primary" onclick="loadCashRecords()"><i class="fas fa-filter"></i> Filter</button>
+            </div>
+            <div class="table-container">
+                <table id="cash-table">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Jenis</th>
+                            <th>Keterangan</th>
+                            <th>Kategori</th>
+                            <th>Jumlah</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cash-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    /**
+     * Mengambil data kas dari API dan menampilkannya di tabel serta ringkasan.
+     */
+    async function loadCashRecords() {
+        try {
+            const params = new URLSearchParams();
+            const startDate = $('#cashStartDate').val();
+            const endDate = $('#cashEndDate').val();
+            const type = $('#cashTypeFilter').val();
+            
+            if (startDate) params.append('start_date', startDate);
+            if (endDate) params.append('end_date', endDate);
+            if (type) params.append('type', type);
+            
+            const response = await fetch(`/api/cash-records?${params}`);
+            const data = await response.json();
+            
+            $('#totalDebit').text(`Rp ${data.summary.total_debit.toLocaleString('id-ID')}`);
+            $('#totalKredit').text(`Rp ${data.summary.total_kredit.toLocaleString('id-ID')}`);
+            $('#saldoKas').text(`Rp ${data.summary.total_kas.toLocaleString('id-ID')}`);
+            
+            const saldoStatus = $('#saldoStatus');
+            if (data.summary.total_kas >= 0) {
+                saldoStatus.html('<i class="fas fa-check-circle"></i> Saldo Positif').css('color', 'var(--success)');
+            } else {
+                saldoStatus.html('<i class="fas fa-exclamation-circle"></i> Saldo Negatif').css('color', 'var(--danger)');
+            }
+            
+            const tbody = $('#cash-table-body');
+            tbody.empty();
+            if (data.records.length > 0) {
+                data.records.forEach(record => {
+                    const typeClass = record.type === 'debit' ? 'success' : 'danger';
+                    const typeText = record.type === 'debit' ? 'Debit' : 'Kredit';
+                    const row = `
+                        <tr>
+                            <td>${record.record_date_formatted}</td>
+                            <td><span class="availability-badge ${record.type === 'debit' ? 'available' : 'unavailable'}">${typeText}</span></td>
+                            <td>${record.description}</td>
+                            <td>${record.category || '-'}</td>
+                            <td style="color: var(--${typeClass}); font-weight: 700;">Rp ${record.amount.toLocaleString('id-ID')}</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn action-btn-edit" onclick="editCashRecord(${record.id})"><i class="fas fa-edit"></i> Edit</button>
+                                    <button class="action-btn action-btn-delete" onclick="deleteCashRecord(${record.id})"><i class="fas fa-trash"></i> Hapus</button>
+                                </div>
+                            </td>
+                        </tr>`;
+                    tbody.append(row);
+                });
+            } else {
+                tbody.append('<tr><td colspan="6" style="text-align: center; color: var(--gray-500);">Tidak ada data kas</td></tr>');
+            }
+        } catch (error) {
+            console.error('Error loading cash records:', error);
+            showMessage('Gagal memuat data kas', 'error');
+        }
+    }
+
+    /**
+     * Menangani pengiriman form tambah/update catatan kas.
+     */
+    async function handleAddCashRecord() {
+        const formData = {
+            type: $('#cash-type').val(),
+            description: $('#cash-description').val(),
+            amount: parseFloat($('#cash-amount').val()),
+            category: $('#cash-category').val(),
+            record_date: $('#cash-date').val()
+        };
+
+        try {
+            const response = await fetch('/api/add-cash-record', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(formData)
+            });
+            const result = await response.json();
+            
+            if (response.ok) {
+                showMessage(result.message, 'success');
+                $('#add-cash-form')[0].reset();
+                $('#cash-date').val(new Date().toISOString().split('T')[0]);
+                loadCashRecords();
+            } else {
+                showMessage(result.error || 'Gagal menambah catatan kas', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Mengisi form dengan data yang ada untuk diedit.
+     */
+    async function editCashRecord(id) {
+        const response = await fetch('/api/cash-records');
+        const data = await response.json();
+        const record = data.records.find(r => r.id === id);
+        
+        if (!record) return;
+        
+        // Konversi format tanggal DD-MM-YYYY ke YYYY-MM-DD untuk input
+        const dateParts = record.record_date_formatted.split('-');
+        const isoDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+
+        $('#cash-type').val(record.type);
+        $('#cash-description').val(record.description);
+        $('#cash-amount').val(record.amount);
+        $('#cash-category').val(record.category || '');
+        $('#cash-date').val(isoDate);
+        
+        // Ganti behavior form untuk update
+        const form = $('#add-cash-form');
+        form.off('submit').on('submit', async function(e) {
+            e.preventDefault();
+            const formData = {
+                id: id, type: $('#cash-type').val(), description: $('#cash-description').val(),
+                amount: parseFloat($('#cash-amount').val()), category: $('#cash-category').val(), record_date: $('#cash-date').val()
+            };
+            try {
+                const updateResponse = await fetch('/api/update-cash-record', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(formData)
+                });
+                const result = await updateResponse.json();
+                if (updateResponse.ok) {
+                    showMessage(result.message, 'success');
+                    form[0].reset();
+                    $('#cash-date').val(new Date().toISOString().split('T')[0]);
+                    form.off('submit').on('submit', e => { e.preventDefault(); handleAddCashRecord(); });
+                    loadCashRecords();
+                } else {
+                    showMessage(result.error || 'Gagal update catatan kas', 'error');
+                }
+            } catch (error) { showMessage('Error: ' + error.message, 'error'); }
+        });
+        
+        $('html, body').animate({ scrollTop: form.offset().top - 100 }, 500);
+    }
+
+    /**
+     * Menghapus catatan kas setelah konfirmasi.
+     */
+    async function deleteCashRecord(id) {
+        if (!confirm('Yakin ingin menghapus catatan kas ini?')) return;
+        try {
+            const response = await fetch(`/api/delete-cash-record/${id}`, { method: 'POST' });
+            const result = await response.json();
+            if (response.ok) {
+                showMessage(result.message, 'success');
+                loadCashRecords();
+            } else {
+                showMessage(result.error || 'Gagal menghapus', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * Mengekspor data kas ke Excel.
+     */
+    function exportCashRecords() {
+        window.location.href = '/api/export-cash-records';
+    }
+
+    // Kode yang berjalan setelah halaman HTML selesai dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCashRecords();
+        $('#cash-date').val(new Date().toISOString().split('T')[0]);
+        $('#add-cash-form').on('submit', function(e) {
+            e.preventDefault();
+            handleAddCashRecord();
+        });
+    });
+</script>
+{% endblock %}

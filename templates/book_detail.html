@@ -725,10 +725,209 @@
                 transform: translateX(0);
             }
         }
+        .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.6); /* --dark dengan opacity */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: var(--white);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: var(--shadow-xl);
+    width: 90%;
+    max-width: 650px;
+    position: relative;
+    animation: fadeInUp 0.4s ease;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--gray-200);
+    padding-bottom: 1.5rem;
+}
+
+.modal-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.close-button {
+    background: transparent;
+    border: none;
+    font-size: 2.5rem;
+    color: var(--gray-400);
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.close-button:hover {
+    color: var(--danger);
+    transform: rotate(90deg);
+}
+
+#whatsapp-form .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+#whatsapp-form .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#whatsapp-form label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#whatsapp-form input,
+#whatsapp-form textarea {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#whatsapp-form input:focus,
+#whatsapp-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+#whatsapp-form textarea {
+    resize: vertical;
+}
+
+/* --- CSS Responsif untuk Modal --- */
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 1.5rem;
+    }
+    #whatsapp-form .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    .modal-title {
+        font-size: 1.25rem;
+    }
+}
+@media (max-width: 968px) {
+    .product-container {
+        /* Ubah layout dari 2 kolom menjadi 1 kolom (menumpuk) */
+        grid-template-columns: 1fr;
+    }
+
+    .product-image-section {
+        padding: 2rem;
+        min-height: 500px;
+    }
+
+    .product-image-wrapper {
+        height: auto;
+        max-height: 500px;
+    }
+
+    .product-title {
+        font-size: 2rem;
+    }
+
+    .price-value {
+        font-size: 2.5rem;
+    }
+}
+
+/* --- Untuk Layar HP Sedang (di bawah 768px) --- */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 1rem;
+    }
+
+    .main-content {
+        padding: 1.5rem 1rem;
+    }
+
+    .product-info-section {
+        padding: 2rem 1.5rem;
+    }
+
+    /* Ubah fitur "100% Original", dll menjadi 1 kolom */
+    .features-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    /* Buat "Kitab Lainnya" menjadi 2 kolom, mirip seperti di shop.html */
+    .related-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+/* --- Untuk Layar HP Kecil (di bawah 480px) --- */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 1rem 0.75rem;
+    }
+
+    .product-info-section {
+        padding: 1.5rem;
+    }
+
+    .product-title {
+        font-size: 1.75rem;
+    }
+
+    .price-value {
+        font-size: 2.25rem;
+    }
+
+    /* Perkecil ukuran kartu di "Kitab Lainnya" */
+    .related-grid {
+        gap: 0.75rem;
+    }
+    
+    .related-content h4 {
+        font-size: 0.875rem;
+    }
+    
+    .related-price {
+        font-size: 1rem;
+    }
+    
+    .btn-small {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.75rem;
+    }
+}
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header class="header">
         <div class="header-content">
             <a href="/toko" class="back-link">
@@ -737,125 +936,92 @@
             </a>
             <a href="/" class="logo">
                 <div class="logo-icon" style="background: transparent; box-shadow: none;">
-    <img src="/static/images/amtsilati-logo.png" alt="Amtsilati Store" style="width: 180%; height: 200%; object-fit: contain;">
-</div>
+                    <img src="/static/images/amtsilati-logo.png" alt="Amtsilati Store" style="width: 180%; height: 200%; object-fit: contain;">
+                </div>
                 <span class="logo-text">Amtsilati Store</span>
             </a>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="product-container">
-            <!-- Product Image -->
             <div class="product-image-section slide-in-left">
                 <div class="product-image-wrapper">
                     {% if book.image_filename %}
-                        <img src="{{ url_for('uploaded_file', filename=book.image_filename) }}" 
-                             alt="{{ book.name }}" 
-                             onerror="this.onerror=null; this.src='https://placehold.co/450x600/e2e8f0/4a5568?text=Tidak+Ada+Gambar';">
-                        <div class="image-badge">
-                            {% if book.availability != 'Tersedia' %}
-                                <span class="availability-badge unavailable" style="backdrop-filter: blur(10px);">
-                                    <i class="fas fa-times-circle"></i> Stok Habis
-                                </span>
-                            {% endif %}
-                        </div>
+                        <img src="{{ url_for('uploaded_file', filename=book.image_filename) }}" alt="{{ book.name }}" onerror="this.onerror=null; this.src='https://placehold.co/450x600/e2e8f0/4a5568?text=Tidak+Ada+Gambar';">
                     {% else %}
-                        <div class="no-image">
-                            <i class="fas fa-book"></i>
-                            <p>Gambar tidak tersedia</p>
-                        </div>
+                        <div class="no-image"><i class="fas fa-book"></i><p>Gambar tidak tersedia</p></div>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Product Info -->
             <div class="product-info-section slide-in-right">
                 <div class="product-category">Kitab Pembelajaran</div>
-                
                 <h1 class="product-title">{{ book.name }}</h1>
-                
                 <div class="availability-info">
                     {% if book.availability == 'Tersedia' %}
-                        <span class="availability-badge available">
-                            <i class="fas fa-check-circle"></i> Stok Tersedia
-                        </span>
-                        <span style="color: var(--gray-500); font-size: 0.875rem;">
-                            <i class="fas fa-truck"></i> Siap dikirim
-                        </span>
+                        <span class="availability-badge available"><i class="fas fa-check-circle"></i> Stok Tersedia</span>
+                        <span style="color: var(--gray-500); font-size: 0.875rem;"><i class="fas fa-truck"></i> Siap dikirim</span>
                     {% else %}
-                        <span class="availability-badge unavailable">
-                            <i class="fas fa-times-circle"></i> Stok Habis
-                        </span>
+                        <span class="availability-badge unavailable"><i class="fas fa-times-circle"></i> Stok Habis</span>
                     {% endif %}
                 </div>
-
                 <div class="product-price">
                     <div class="price-label">Harga</div>
                     <div class="price-value">Rp {{ book.price | rupiah }}</div>
                 </div>
 
-                <!-- Purchase Links -->
                 <div class="purchase-section">
-                    <h3 class="section-title">
-                        <i class="fas fa-shopping-bag"></i>
-                        Pilih Metode Pembelian
-                    </h3>
-                    
+                    <h3 class="section-title"><i class="fas fa-shopping-bag"></i> Pilih Metode Pembelian</h3>
                     {% if book.availability == 'Tersedia' %}
+                        
+                        <div class="form-group" style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem;">
+                            <label for="quantity" style="font-weight: 600; font-size: 1rem;">Jumlah:</label>
+                            <input type="number" id="quantity" value="1" min="1" style="padding: 0.5rem; width: 80px; border-radius: 8px; border: 2px solid var(--gray-200); font-size: 1rem; text-align: center;">
+                        </div>
+
                         <div class="purchase-links">
-                            {% if book.link_shopee %}
+                            <button id="open-order-modal-button" class="purchase-link btn-whatsapp">
+                                 <i class="fab fa-whatsapp"></i> 
+                                <span>Pesan via WhatsApp</span>
+                              <i class="fas fa-external-link-alt" style="margin-left: auto; font-size: 0.75rem;"></i>
+                            </button>
+
+                        {% if book.link_shopee %}
                                 <a href="{{ book.link_shopee }}" target="_blank" class="purchase-link btn-shopee">
-                                    <i class="fas fa-shopping-bag"></i> 
-                                    <span>Beli di Shopee</span>
+                                    <i class="fas fa-shopping-bag"></i> <span>Beli di Shopee</span>
                                     <i class="fas fa-external-link-alt" style="margin-left: auto; font-size: 0.75rem;"></i>
                                 </a>
                             {% endif %}
-
-                            {% if book.link_wa %}
-                                <a href="{{ book.link_wa }}" target="_blank" class="purchase-link btn-whatsapp">
-                                    <i class="fab fa-whatsapp"></i> 
-                                    <span>Pesan via WhatsApp</span>
-                                    <i class="fas fa-external-link-alt" style="margin-left: auto; font-size: 0.75rem;"></i>
-                                </a>
-                            {% endif %}
-
                             {% if book.link_ig %}
                                 <a href="{{ book.link_ig }}" target="_blank" class="purchase-link btn-instagram">
-                                    <i class="fab fa-instagram"></i> 
-                                    <span>Lihat di Instagram</span>
+                                    <i class="fab fa-instagram"></i> <span>Lihat di Instagram</span>
                                     <i class="fas fa-external-link-alt" style="margin-left: auto; font-size: 0.75rem;"></i>
                                 </a>
                             {% endif %}
-
                             {% if book.link_tiktok %}
                                 <a href="{{ book.link_tiktok }}" target="_blank" class="purchase-link btn-tiktok">
-                                    <i class="fab fa-tiktok"></i> 
-                                    <span>Lihat di TikTok</span>
+                                    <i class="fab fa-tiktok"></i> <span>Lihat di TikTok</span>
                                     <i class="fas fa-external-link-alt" style="margin-left: auto; font-size: 0.75rem;"></i>
                                 </a>
                             {% endif %}
-
                             <a href="/cek-ongkir" class="purchase-link btn-ongkir">
-                                <i class="fas fa-truck"></i> 
-                                <span>Cek Estimasi Ongkos Kirim</span>
+                                <i class="fas fa-truck"></i> <span>Cek Estimasi Ongkos Kirim</span>
                                 <i class="fas fa-calculator" style="margin-left: auto;"></i>
                             </a>
                         </div>
                     {% else %}
                         <div style="text-align: center; padding: 3rem 1rem; background: var(--gray-50); border-radius: 16px;">
                             <i class="fas fa-info-circle" style="font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem; display: block;"></i>
-                            <p style="color: var(--gray-600); font-weight: 500;">
-                                Maaf, kitab ini sedang tidak tersedia. 
-                                <br>Silakan cek kembali nanti atau hubungi kami untuk informasi lebih lanjut.
-                            </p>
+                            <p style="color: var(--gray-600); font-weight: 500;">Maaf, kitab ini sedang tidak tersedia.</p>
                         </div>
                     {% endif %}
                 </div>
-
-                <!-- Features -->
-                <div class="features-grid">
+            </div>
+        </div>
+    </main>
+    
+     <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-icon">
                             <i class="fas fa-shield-alt"></i>
@@ -925,7 +1091,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-logo">
@@ -952,36 +1117,121 @@
             </div>
         </div>
     </footer>
-
+<div id="orderModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Lengkapi Data Pemesanan</h2>
+            <button id="closeModal" class="close-button">&times;</button>
+        </div>
+        
+        <form id="whatsapp-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="customer-name"><i class="fas fa-user"></i> Nama Lengkap</label>
+                    <input type="text" id="customer-name" placeholder="Masukkan nama Anda" required>
+                </div>
+                <div class="form-group">
+                    <label for="customer-phone"><i class="fas fa-phone"></i> No. Handphone (WhatsApp)</label>
+                    <input type="tel" id="customer-phone" placeholder="Contoh: 08123456789" required>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="customer-address"><i class="fas fa-map-marker-alt"></i> Alamat Lengkap</label>
+                    <textarea id="customer-address" rows="3" placeholder="Jalan, No. Rumah, RT/RW, Kelurahan, Kecamatan, Kota/Kabupaten" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="customer-zipcode"><i class="fas fa-envelope"></i> Kode Pos</label>
+                    <input type="text" id="customer-zipcode" placeholder="Masukkan kode pos" required>
+                </div>
+            </div>
+            <button type="submit" class="purchase-link btn-whatsapp" style="width: 100%; margin-top: 1.5rem;">
+                <i class="fab fa-whatsapp"></i> Lanjutkan ke WhatsApp
+            </button>
+        </form>
+    </div>
+</div>
     <script>
-        // Add animation classes on load
-        document.addEventListener('DOMContentLoaded', function() {
-            const fadeElements = document.querySelectorAll('.fade-in');
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.animationDelay = '0.3s';
-                    }
-                });
-            });
-            
-            fadeElements.forEach(el => observer.observe(el));
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Konfigurasi ---
+    const phoneNumber = '6282332176464';
+    const bookTitle = {{ book.name|tojson }};
 
-        // Smooth scroll for internal links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
+    // --- Ambil Elemen dari Halaman ---
+    const quantityInput = document.getElementById('quantity');
+    const openModalButton = document.getElementById('open-order-modal-button');
+    
+    // Elemen Modal
+    const orderModal = document.getElementById('orderModal');
+    const closeModalButton = document.getElementById('closeModal');
+    const whatsappForm = document.getElementById('whatsapp-form');
+
+    // --- Fungsi untuk menampilkan & menyembunyikan Modal ---
+    function showModal() {
+        if (orderModal) orderModal.style.display = 'flex';
+    }
+    function hideModal() {
+        if (orderModal) orderModal.style.display = 'none';
+    }
+
+    // --- Event Listener untuk membuka & menutup Modal ---
+    if (openModalButton) {
+        openModalButton.addEventListener('click', showModal);
+    }
+    if (closeModalButton) {
+        closeModalButton.addEventListener('click', hideModal);
+    }
+    // Tutup modal jika klik di luar area kontennya
+    window.addEventListener('click', function(event) {
+        if (event.target == orderModal) {
+            hideModal();
+        }
+    });
+
+
+    // --- Event Listener untuk Form di dalam Modal ---
+    if (whatsappForm) {
+        whatsappForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Mencegah form reload halaman
+
+            // 1. Ambil semua data dari form modal
+            const customerName = document.getElementById('customer-name').value;
+            const customerPhone = document.getElementById('customer-phone').value;
+            const customerAddress = document.getElementById('customer-address').value;
+            const customerZipcode = document.getElementById('customer-zipcode').value;
+            
+            // 2. Ambil data jumlah dari halaman produk
+            const quantity = quantityInput.value;
+
+            // 3. Buat template pesan lengkap
+            const messageTemplate = `
+Terima kasih telah menghubungi Amtsilati Store. Silakan beri tahu apa yang dapat kami bantu.
+
+Amtsilati store melayani pembelian semua kitab karya K.H. Taufiqul Hakim
+
+Untuk order silahkan mengisi format di bawah ini 
+
+
+Nama : ${customerName}
+No Hp : ${customerPhone}
+Alamat Lengkap : ${customerAddress}
+Kode pos : ${customerZipcode}
+Judul kitab : ${bookTitle}
+Banyaknya : ${quantity}
+
+Mohon di-follow up untuk total dan info pembayarannya. Terima kasih.
+            `.trim();
+
+            // 4. Encode pesan dan buat URL WhatsApp
+            const encodedMessage = encodeURIComponent(messageTemplate);
+            const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+            // 5. Buka WhatsApp di tab baru dan sembunyikan modal
+            window.open(whatsappUrl, '_blank');
+            hideModal();
+            whatsappForm.reset(); // Kosongkan form setelah dikirim
         });
-    </script>
+    }
+});
+</script>
+
 </body>
 </html>

@@ -1,0 +1,165 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<section id="online-sales-section" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Penjualan Online</h1>
+        <p class="page-subtitle">Catat penjualan melalui platform online</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-globe"></i>
+                Rekap Penjualan Online
+            </h2>
+        </div>
+        <div class="card-body">
+            <form id="online-sale-form">
+                <div class="form-grid">
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-user"></i> Nama Pembeli</label><input type="text" id="online-buyer-name" name="buyer_name" required placeholder="Masukkan nama pembeli"></div>
+                        <div class="form-group"><label><i class="fas fa-map-marker-alt"></i> Alamat Kirim</label><input type="text" id="online-buyer-address" name="buyer_address" required placeholder="Alamat lengkap"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-calendar"></i> Tanggal Transfer</label><input type="date" id="online-transfer-date" name="transfer_date" required></div>
+                        <div class="form-group"><label><i class="fas fa-truck"></i> Ongkos Kirim</label><input type="number" id="online-shipping" name="shipping_cost" min="0" placeholder="Masukkan ongkir" required></div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-add-item" onclick="addOnlineBookItem()" style="margin-top: 1.5rem;">
+                    <i class="fas fa-plus"></i> Tambah Kitab
+                </button>
+
+                <div class="book-items-container" id="online-book-items">
+                    </div>
+
+                <div class="total-summary">
+                    <div class="total-summary-title">Total Harga (termasuk ongkir)</div>
+                    <div class="total-summary-value" id="online-total-price">Rp 0</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                    <i class="fas fa-save"></i> Simpan Transaksi
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // --- Fungsi spesifik untuk halaman Penjualan Online ---
+
+    function addOnlineBookItem() {
+        onlineItemCount++;
+        const itemHtml = `
+            <div class="book-item" data-item-id="${onlineItemCount}">
+                <div class="book-item-header">
+                    <span class="book-item-number">Kitab #${onlineItemCount}</span>
+                    ${onlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOnlineItem(${onlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-book"></i> Pilih Kitab</label><select class="online-book-select" data-item="${onlineItemCount}" required></select></div>
+                    <div class="form-group"><label><i class="fas fa-sort-numeric-up"></i> Jumlah</label><input type="number" class="online-quantity" data-item="${onlineItemCount}" min="1" value="1" required></div>
+                    <div class="form-group"><label><i class="fas fa-tag"></i> Harga</label><input type="text" class="online-price" data-item="${onlineItemCount}" disabled></div>
+                </div>
+            </div>`;
+        $('#online-book-items').append(itemHtml);
+        const newSelect = $(`.online-book-select[data-item="${onlineItemCount}"]`);
+        newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
+        if (books && books.length > 0) {
+            books.forEach(book => {
+                if (book.availability === 'Tersedia') newSelect.append(new Option(book.name, book.id));
+            });
+        }
+        newSelect.select2({ placeholder: '-- Pilih Kitab --', width: '100%' });
+        newSelect.on('change', function() { updateOnlineItemPrice($(this).data('item')); updateOnlineTotalPrice(); });
+        $(`.online-quantity[data-item="${onlineItemCount}"]`).on('input', updateOnlineTotalPrice);
+    }
+
+    function removeOnlineItem(itemId) {
+        $(`.book-item[data-item-id="${itemId}"]`).remove();
+        updateOnlineTotalPrice();
+    }
+
+    function updateOnlineItemPrice(itemId) {
+        const bookId = $(`.online-book-select[data-item="${itemId}"]`).val();
+        const book = books.find(b => b.id == bookId);
+        $(`.online-price[data-item="${itemId}"]`).val(book ? `Rp ${book.price.toLocaleString('id-ID')}` : '');
+    }
+
+    function updateOnlineTotalPrice() {
+        let total = 0;
+        $('#online-book-items .book-item').each(function() {
+            const bookId = $(this).find('.online-book-select').val();
+            const quantity = parseInt($(this).find('.online-quantity').val()) || 0;
+            if (bookId) {
+                const book = books.find(b => b.id == bookId);
+                if (book) total += book.price * quantity;
+            }
+        });
+        const shipping = parseInt($('#online-shipping').val()) || 0;
+        total += shipping;
+        $('#online-total-price').text(`Rp ${total.toLocaleString('id-ID')}`);
+    }
+
+    async function handleOnlineRekapSubmit() {
+        const buyerName = $('#online-buyer-name').val();
+        const buyerAddress = $('#online-buyer-address').val();
+        const transferDate = $('#online-transfer-date').val();
+        const shippingCost = parseInt($('#online-shipping').val()) || 0;
+        if (!buyerName || !buyerAddress || !transferDate) {
+            showMessage('Lengkapi data pembeli terlebih dahulu', 'error');
+            return;
+        }
+        const items = [];
+        let hasValidItem = false;
+        $('#online-book-items .book-item').each(function() {
+            const bookId = $(this).find('.online-book-select').val();
+            const quantity = $(this).find('.online-quantity').val();
+            if (bookId && quantity) {
+                items.push({ book_id: bookId, quantity: parseInt(quantity) });
+                hasValidItem = true;
+            }
+        });
+        if (!hasValidItem) {
+            showMessage('Tambahkan minimal satu kitab', 'error');
+            return;
+        }
+        try {
+            const response = await fetch('/api/add-online-sale', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ buyer_name: buyerName, buyer_address: buyerAddress, transfer_date: transferDate, shipping_cost: shippingCost, items: items })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Gagal menyimpan transaksi');
+            showMessage('Transaksi online berhasil disimpan!', 'success');
+            $('#online-sale-form')[0].reset();
+            $('#online-book-items').empty();
+            onlineItemCount = 0;
+            addOnlineBookItem();
+            updateOnlineTotalPrice();
+        } catch (error) {
+            showMessage(error.message, 'error');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Isi variabel global 'books' dengan data dari API
+        const bookResponse = await fetch('/api/books');
+        const bookData = await bookResponse.json();
+        books.push(...bookData);
+
+        addOnlineBookItem();
+
+        $('#online-shipping').on('input', updateOnlineTotalPrice);
+        $('#online-sale-form').on('submit', function(e) {
+            e.preventDefault();
+            handleOnlineRekapSubmit();
+        });
+    });
+</script>
+{% endblock %}

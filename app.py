@@ -66,7 +66,6 @@ def uploaded_file(filename):
     try:
         return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
     except FileNotFoundError:
-        # Jika file tidak ditemukan, kembalikan placeholder
         return redirect('https://placehold.co/400x600/e2e8f0/4a5568?text=Gambar+Tidak+Ditemukan'), 404
 
 # --- Rute Halaman Publik ---
@@ -95,7 +94,7 @@ def book_detail(book_id):
 def cek_ongkir_page():
     return render_template('cek_ongkir.html')
 
-# --- Rute Halaman Admin ---
+# --- Rute Halaman Login & Logout Admin ---
 @app.route('/admin/login', methods=('GET', 'POST'))
 def login():
     if request.method == 'POST':
@@ -120,10 +119,49 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# --- Rute Halaman Admin (Struktur Modular Baru) ---
 @app.route('/admin')
+@app.route('/admin/dashboard')
 @login_required
 def admin_dashboard():
-    return render_template('admin.html')
+    """Menampilkan halaman dashboard utama."""
+    return render_template('admin/dashboard.html')
+
+@app.route('/admin/kitab')
+@login_required
+def admin_kitab():
+    """Menampilkan halaman manajemen kitab."""
+    return render_template('admin/kitab.html')
+
+@app.route('/admin/kas')
+@login_required
+def admin_kas():
+    """Menampilkan halaman rekap kas."""
+    return render_template('admin/kas.html')
+
+@app.route('/admin/pembeli')
+@login_required
+def admin_pembeli():
+    """Menampilkan halaman data pembeli offline."""
+    return render_template('admin/pembeli.html')
+
+@app.route('/admin/penjualan/offline')
+@login_required
+def admin_penjualan_offline():
+    """Menampilkan halaman input penjualan offline."""
+    return render_template('admin/penjualan_offline.html')
+
+@app.route('/admin/penjualan/online')
+@login_required
+def admin_penjualan_online():
+    """Menampilkan halaman input penjualan online."""
+    return render_template('admin/penjualan_online.html')
+
+@app.route('/admin/transaksi')
+@login_required
+def admin_transaksi():
+    """Menampilkan halaman riwayat semua transaksi."""
+    return render_template('admin/riwayat_transaksi.html')
 
 # ================== SEMUA API (ENDPOINT DATA) ==================
 

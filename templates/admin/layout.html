@@ -1,0 +1,2132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Amtsilati Store</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #a5b4fc;
+            --secondary: #0ea5e9;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --dark: #0f172a;
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --navbar-height: 70px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.6;
+            padding-top: var(--navbar-height);
+        }
+
+        /* Modern Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--navbar-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(229, 231, 235, 0.5);
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar-container {
+            max-width: 100%;
+            height: 100%;
+            padding: 0 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar-logo {
+            width: 45px;
+            height: 45px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navbar-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .navbar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Desktop Navigation */
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            color: var(--gray-600);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .nav-link:hover {
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 0.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow-xl);
+            min-width: 200px;
+            padding: 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--gray-700);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--gray-200);
+            margin: 0.5rem 0;
+        }
+
+        /* User Menu */
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 12px;
+            background: var(--gray-100);
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+            padding: 0.625rem 1.25rem;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-700);
+            padding: 0.5rem;
+        }
+
+        /* Mobile Navigation */
+        
+        /* Mobile Bottom Navigation */
+@media (max-width: 968px) {
+    /* Hide desktop nav di mobile */
+    .navbar-nav {
+        display: none !important;
+    }
+    
+    /* Simplify navbar untuk mobile */
+    .navbar {
+        height: 60px;
+        padding: 0;
+    }
+    
+    .navbar-container {
+        padding: 0 1rem;
+        height: 60px;
+    }
+    
+    .navbar-title {
+        font-size: 1rem;
+    }
+    
+    .navbar-logo {
+        width: 35px;
+        height: 35px;
+    }
+    
+    /* Hide user info text, show avatar only */
+    .user-info span {
+        display: none;
+    }
+    
+    .user-info {
+        padding: 0.5rem;
+        background: transparent;
+    }
+    
+    /* Bottom Navigation Bar */
+    .bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid var(--gray-200);
+        box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1);
+        z-index: 1000;
+        padding: 0.5rem 0;
+    }
+    
+    .bottom-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem;
+        color: var(--gray-500);
+        text-decoration: none;
+        font-size: 0.75rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: none;
+        border: none;
+    }
+    
+    .bottom-nav-item i {
+        font-size: 1.25rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .bottom-nav-item.active {
+        color: var(--primary);
+    }
+    
+    .bottom-nav-item:active {
+        transform: scale(0.95);
+    }
+    
+    /* Adjust main content for bottom nav */
+    .main-content {
+        padding-bottom: 80px;
+    }
+    
+    /* Mobile Slide Menu */
+    .mobile-slide-menu {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 300px;
+        height: 100vh;
+        background: white;
+        box-shadow: -4px 0 10px rgba(0, 0, 0, 0.1);
+        transition: right 0.3s ease;
+        z-index: 2000;
+        overflow-y: auto;
+    }
+    
+    .mobile-slide-menu.active {
+        right: 0;
+    }
+    
+    .mobile-menu-header {
+        padding: 1.5rem;
+        background: var(--gray-50);
+        border-bottom: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .mobile-menu-close {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--gray-100);
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-menu-close:hover {
+        background: var(--gray-200);
+    }
+    
+    .mobile-menu-content {
+        padding: 1rem;
+    }
+    
+    .mobile-menu-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .mobile-menu-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.75rem;
+    }
+    
+    .mobile-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1rem;
+        border-radius: 10px;
+        color: var(--gray-700);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+    
+    .mobile-menu-item:hover {
+        background: var(--gray-100);
+        color: var(--primary);
+    }
+    
+    .mobile-menu-item.active {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--primary);
+    }
+    
+    .mobile-menu-item.logout {
+        background: var(--danger);
+        color: white;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    
+    /* Overlay */
+    .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1999;
+    }
+    
+    .mobile-menu-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    /* Responsive adjustments */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1.25rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-header {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    /* Hide desktop-only elements */
+    .btn-logout {
+        display: none;
+    }
+}
+
+/* Desktop - keep original */
+@media (min-width: 969px) {
+    .bottom-nav,
+    .mobile-slide-menu,
+    .mobile-menu-overlay {
+        display: none !important;
+    }
+}
+@media (max-width: 768px) {
+    /* Simplify forms on mobile */
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Larger touch targets */
+    input, select, textarea, .btn {
+        min-height: 44px;
+    }
+    
+    /* Stack buttons vertically on mobile */
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+        /* Main Content */
+        .main-content {
+            min-height: calc(100vh - var(--navbar-height));
+            background: var(--gray-50);
+        }
+
+        /* Content Area */
+        .content {
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--gray-600);
+            font-size: 1rem;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.75rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray-100);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .stat-card.success::before { background: linear-gradient(180deg, var(--success) 0%, #059669 100%); }
+        .stat-card.warning::before { background: linear-gradient(180deg, var(--warning) 0%, #d97706 100%); }
+        .stat-card.danger::before { background: linear-gradient(180deg, var(--danger) 0%, #dc2626 100%); }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: var(--gray-100);
+            color: var(--primary);
+        }
+
+        .stat-card.success .stat-icon { background: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .stat-card.warning .stat-icon { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+        .stat-card.danger .stat-icon { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--gray-900);
+            line-height: 1;
+        }
+
+        .stat-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 1px solid var(--gray-100);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        input, select, textarea {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background: var(--gray-50);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Multi-item form */
+        .book-items-container {
+            margin-bottom: 1rem;
+        }
+
+        .book-item {
+            background: var(--gray-50);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 2px solid var(--gray-200);
+            position: relative;
+        }
+
+        .book-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .book-item-number {
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .btn-remove-item {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-remove-item:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .btn-add-item {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-add-item:hover {
+            background: #059669;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+
+        .total-summary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+
+        .total-summary-title {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-summary-value {
+            font-size: 1.75rem;
+            font-weight: 800;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-200);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+            transform: translateY(-1px);
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+            background: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: var(--gray-50);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-700);
+            border-bottom: 2px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        tr:hover {
+            background: var(--gray-50);
+        }
+
+        .table-image {
+            width: 50px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            padding: 1rem;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-xl);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .close-button {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: var(--gray-100);
+            border: none;
+            color: var(--gray-600);
+            transition: all 0.3s ease;
+        }
+
+        .close-button:hover {
+            background: var(--gray-200);
+            color: var(--gray-900);
+        }
+
+        /* Messages */
+        #message {
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #message.success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        #message.error {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+            color: #991b1b;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Loading */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Custom Select2 Styling */
+        .select2-container .select2-selection--single {
+            height: auto !important;
+            padding: 0.65rem 1rem !important;
+            border: 2px solid var(--gray-200) !important;
+            border-radius: 10px !important;
+            background: var(--gray-50) !important;
+            font-weight: 500 !important;
+        }
+
+        .select2-container--default.select2-container--focus .select2-selection--single,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: var(--primary) !important;
+            background: white !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+        }
+
+        .select2-dropdown {
+            border-radius: 10px !important;
+            border: 2px solid var(--gray-200) !important;
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        .select2-results__option--highlighted {
+            background: var(--primary) !important;
+        }
+
+        /* Date Filter */
+        .date-filter {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .date-filter label {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .action-btn-edit {
+            background: var(--success);
+            color: white;
+        }
+
+        .action-btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .availability-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .availability-badge.available {
+            background: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .availability-badge.unavailable {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+        #message {
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    display: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    animation: slideIn 0.3s ease;
+    max-height: 400px;
+    overflow-y: auto;
+    white-space: pre-line; /* Untuk menampilkan line breaks */
+    line-height: 1.6;
+}
+
+#message.success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+#message.error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+    color: #991b1b;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Style untuk warnings dalam pesan */
+#message.success:has-text("⚠") {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+    color: #92400e;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+/* Scrollbar styling untuk pesan */
+#message::-webkit-scrollbar {
+    width: 6px;
+}
+
+#message::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+}
+
+#message::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+#message::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+/* Loading state untuk buttons */
+button[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Spinner animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.fa-spinner.fa-spin {
+    animation: spin 1s linear infinite;
+/* Action Buttons untuk Transaksi */
+.action-buttons {
+    display: flex;
+    gap: 0.375rem;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 0.375rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.action-btn-edit {
+    background: var(--info);
+    color: white;
+}
+
+.action-btn-edit:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.action-btn-delete {
+    background: var(--danger);
+    color: white;
+}
+
+.action-btn-delete:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Table responsive untuk transaksi */
+@media (max-width: 1200px) {
+    #all-offline-sales th:nth-child(3),
+    #all-offline-sales td:nth-child(3),
+    #all-online-sales th:nth-child(4),
+    #all-online-sales td:nth-child(4) {
+        display: none; /* Hide alamat di layar medium */
+    }
+}
+
+@media (max-width: 968px) {
+    /* Responsive table */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        min-width: 700px;
+    }
+    
+    /* Smaller action buttons on mobile */
+    .action-btn {
+        padding: 0.25rem 0.375rem;
+        font-size: 0.625rem;
+        gap: 0.125rem;
+    }
+    
+    .action-btn i {
+        font-size: 0.75rem;
+    }
+    
+    /* Hide button text on very small screens */
+    @media (max-width: 480px) {
+        .action-btn span {
+            display: none;
+        }
+        
+        .action-btn {
+            padding: 0.375rem;
+        }
+    }
+}
+
+/* Modal responsive */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        max-width: none;
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .modal-header {
+        margin-bottom: 1rem;
+    }
+    
+    .modal-title {
+        font-size: 1.125rem;
+    }
+}
+
+/* Sticky column untuk action buttons */
+@media (min-width: 768px) {
+    #all-offline-sales th:last-child,
+    #all-offline-sales td:last-child,
+    #all-online-sales th:last-child,
+    #all-online-sales td:last-child {
+        position: sticky;
+        right: 0;
+        background: white;
+        box-shadow: -2px 0 4px rgba(0,0,0,0.05);
+    }
+}
+/* Info Stat Card untuk Total Ongkir */
+.stat-card.info {
+    position: relative;
+}
+
+.stat-card.info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--info) 0%, #2563eb 100%);
+}
+
+.stat-card.info .stat-icon {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--info);
+}
+
+/* Filter Container Styles */
+.filter-container {
+    background: var(--gray-50);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--gray-200);
+}
+
+.filter-section {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 10px;
+    border: 1px solid var(--gray-100);
+}
+
+/* Payment Status Badge in Table */
+.availability-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.availability-badge.available {
+    background: rgba(16, 185, 129, 0.1);
+    color: #065f46;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.availability-badge.unavailable {
+    background: rgba(245, 158, 11, 0.1);
+    color: #92400e;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+/* Filter Status Bar */
+.filter-status {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(37, 99, 235, 0.9) 100%);
+    color: white;
+    border-radius: 10px;
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.filter-status button {
+    margin-left: auto;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--info);
+    border: none;
+    padding: 0.375rem 0.875rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.filter-status button:hover {
+    background: white;
+    transform: translateY(-1px);
+}
+
+/* Button Group for Export */
+.btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Responsive untuk Filter */
+@media (max-width: 768px) {
+    .filter-container {
+        padding: 1rem;
+    }
+    
+    .filter-section {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .filter-section h4 {
+        font-size: 0.875rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        width: 100%;
+    }
+}
+
+/* Mobile optimization untuk stats grid */
+@media (max-width: 968px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Stack ongkir stat di bawah */
+    #shippingStatCard {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    #shippingStatCard {
+        grid-column: span 1;
+    }
+}
+/* Tambahkan CSS ini di bagian <style> dalam admin.html */
+
+/* Filter Section Styling */
+
+.filter-container .form-row {
+    gap: 1rem;
+    margin-bottom: 0;
+    align-items: flex-end;
+}
+
+.filter-container .form-group {
+    margin-bottom: 0;
+}
+
+.filter-container .btn {
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+/* Filter Status */
+#offline-filter-status,
+#online-filter-status {
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+    color: var(--info);
+    border-radius: 8px;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.875rem;
+}
+
+/* Card Header with Button Group */
+.card-header .btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Responsive untuk Mobile */
+@media (max-width: 768px) {
+    .filter-container .form-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .filter-container .form-group:last-child {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .filter-container .btn {
+        flex: 1;
+    }
+    
+    #offline-filter-status,
+    #online-filter-status {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    #offline-filter-status button,
+    #online-filter-status button {
+        width: 100%;
+    }
+}
+
+/* Export Button Styling */
+.btn-group .btn-secondary {
+    font-size: 0.875rem;
+    padding: 0.625rem 1.25rem;
+}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <div class="navbar-logo">
+                    <img src="{{ url_for('static', filename='images/amtsilati-logo.png') }}" alt="Amtsilati Store">
+                </div>
+                <h1 class="navbar-title">Amtsilati Store</h1>
+            </div>
+
+            <div class="navbar-nav">
+                <a href="{{ url_for('admin_dashboard') }}" class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('admin_kitab') }}" class="nav-link {% if request.endpoint == 'admin_kitab' %}active{% endif %}">
+                    <i class="fas fa-book"></i>
+                    <span>Kitab</span>
+                </a>
+                <a href="{{ url_for('admin_kas') }}" class="nav-link {% if request.endpoint == 'admin_kas' %}active{% endif %}">
+                    <i class="fas fa-wallet"></i>
+                    <span>Rekap Kas</span>
+                </a>
+                <div class="nav-item dropdown">
+                    <button class="nav-link {% if request.endpoint in ['admin_pembeli', 'admin_penjualan_offline', 'admin_penjualan_online', 'admin_transaksi'] %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Penjualan</span>
+                        <i class="fas fa-chevron-down" style="font-size: 0.75rem; margin-left: 0.25rem;"></i>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="{{ url_for('admin_pembeli') }}" class="dropdown-item">
+                            <i class="fas fa-users"></i>
+                            <span>Data Pembeli</span>
+                        </a>
+                        <a href="{{ url_for('admin_penjualan_offline') }}" class="dropdown-item">
+                            <i class="fas fa-store"></i>
+                            <span>Penjualan Offline</span>
+                        </a>
+                        <a href="{{ url_for('admin_penjualan_online') }}" class="dropdown-item">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Penjualan Online</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ url_for('admin_transaksi') }}" class="dropdown-item">
+                            <i class="fas fa-receipt"></i>
+                            <span>Riwayat Transaksi</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navbar-user">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>Admin</span>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+             </div>
+    </nav>
+    
+    <div class="bottom-nav">
+        <a href="{{ url_for('admin_dashboard') }}" class="bottom-nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}"><i class="fas fa-home"></i><span>Dashboard</span></a>
+        <a href="{{ url_for('admin_kitab') }}" class="bottom-nav-item {% if request.endpoint == 'admin_kitab' %}active{% endif %}"><i class="fas fa-book"></i><span>Kitab</span></a>
+        <a href="{{ url_for('admin_kas') }}" class="bottom-nav-item {% if request.endpoint == 'admin_kas' %}active{% endif %}"><i class="fas fa-wallet"></i><span>Kas</span></a>
+        <a href="{{ url_for('admin_penjualan_offline') }}" class="bottom-nav-item {% if request.endpoint == 'admin_penjualan_offline' %}active{% endif %}"><i class="fas fa-store"></i><span>Offline</span></a>
+        <a href="{{ url_for('admin_penjualan_online') }}" class="bottom-nav-item {% if request.endpoint == 'admin_penjualan_online' %}active{% endif %}"><i class="fas fa-globe"></i><span>Online</span></a>
+        <button class="bottom-nav-item" id="mobileMenuBtn"><i class="fas fa-bars"></i><span>Menu</span></button>
+    </div>
+    
+    <div class="mobile-slide-menu" id="mobileSlideMenu">
+        <div class="mobile-menu-content">
+            <a href="{{ url_for('admin_dashboard') }}" class="mobile-menu-item">...</a>
+            <a href="{{ url_for('admin_kitab') }}" class="mobile-menu-item">...</a>
+            </div>
+    </div>
+
+
+    <main class="main-content">
+        <div class="content">
+            <div id="message"></div>
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <div id="edit-book-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Edit Detail Kitab</h2>
+            <button class="close-button">&times;</button>
+        </div>
+        <form id="edit-book-form" enctype="multipart/form-data">
+            <input type="hidden" id="edit-book-id" name="id">
+            <input type="hidden" id="existing-image-filename" name="existing_image_filename">
+            <div class="form-grid">
+                <div class="form-group"><label><i class="fas fa-book"></i> Nama Kitab</label><input type="text" id="edit-book-name" name="name" required></div>
+                <div class="form-group"><label><i class="fas fa-tag"></i> Harga</label><input type="number" id="edit-book-price" name="price" required></div>
+                <div class="form-group"><label><i class="fas fa-check-circle"></i> Ketersediaan</label><select id="edit-book-availability" name="availability" required><option value="Tersedia">Tersedia</option><option value="Tidak Tersedia">Tidak Tersedia</option></select></div>
+                <div class="form-group"><label><i class="fab fa-instagram"></i> Link Instagram</label><input type="url" id="edit-book-link-ig" name="link_ig"></div>
+                <div class="form-group"><label><i class="fab fa-whatsapp"></i> Link WhatsApp</label><input type="url" id="edit-book-link-wa" name="link_wa"></div>
+                <div class="form-group"><label><i class="fas fa-shopping-bag"></i> Link Shopee</label><input type="url" id="edit-book-link-shopee" name="link_shopee"></div>
+                <div class="form-group"><label><i class="fab fa-tiktok"></i> Link TikTok</label><input type="url" id="edit-book-link-tiktok" name="link_tiktok"></div>
+                <div class="form-group" style="grid-column: 1 / -1;"><label><i class="fas fa-image"></i> Ganti Foto</label><input type="file" id="edit-book-image" name="image" accept="image/png, image/jpeg, image/webp"><small style="color: var(--gray-500);">Biarkan kosong jika tidak ingin mengubah foto</small></div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;"><i class="fas fa-save"></i> Simpan Perubahan</button>
+        </form>
+    </div>
+</div>
+    <div id="edit-offline-sale-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Edit Transaksi Offline</h2>
+            <button class="close-button">&times;</button>
+        </div>
+        <form id="edit-offline-sale-form">
+            <input type="hidden" id="edit-offline-sale-id">
+            <div class="form-grid">
+                <div class="form-group"><label><i class="fas fa-user"></i> Nama Pembeli</label><select id="edit-offline-buyer" name="buyer_id" required></select></div>
+                <div class="form-group"><label><i class="fas fa-book"></i> Nama Kitab</label><select id="edit-offline-book" name="book_id" required></select></div>
+                <div class="form-group"><label><i class="fas fa-sort-numeric-up"></i> Jumlah</label><input type="number" id="edit-offline-quantity" name="quantity" min="1" required></div>
+                <div class="form-group"><label><i class="fas fa-check-circle"></i> Status Pembayaran</label><select id="edit-offline-payment-status" name="payment_status" required><option value="Lunas">Lunas</option><option value="Belum Lunas">Belum Lunas</option></select></div>
+                <div class="form-group"><label><i class="fas fa-tag"></i> Total Harga</label><input type="text" id="edit-offline-total" disabled></div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;"><i class="fas fa-save"></i> Simpan Perubahan</button>
+        </form>
+    </div>
+</div>
+    <div id="edit-online-sale-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Edit Transaksi Online</h2>
+            <button class="close-button">&times;</button>
+        </div>
+        <form id="edit-online-sale-form">
+            <input type="hidden" id="edit-online-sale-id">
+            <div class="form-grid">
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-user"></i> Nama Pembeli</label><input type="text" id="edit-online-buyer-name" name="buyer_name" required></div>
+                    <div class="form-group"><label><i class="fas fa-calendar"></i> Tanggal Transfer</label><input type="date" id="edit-online-transfer-date" name="transfer_date"></div>
+                </div>
+                <div class="form-group"><label><i class="fas fa-map-marker-alt"></i> Alamat Kirim</label><input type="text" id="edit-online-buyer-address" name="buyer_address" required></div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-book"></i> Nama Kitab</label><select id="edit-online-book" name="book_id" required></select></div>
+                    <div class="form-group"><label><i class="fas fa-sort-numeric-up"></i> Jumlah</label><input type="number" id="edit-online-quantity" name="quantity" min="1" required></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label><i class="fas fa-truck"></i> Ongkos Kirim</label><input type="number" id="edit-online-shipping" name="shipping_cost" min="0" required></div>
+                    <div class="form-group"><label><i class="fas fa-tag"></i> Total Harga</label><input type="text" id="edit-online-total" disabled></div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;"><i class="fas fa-save"></i> Simpan Perubahan</button>
+        </form>
+    </div>
+</div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+    //================================================================
+    // JAVASCRIPT GLOBAL - Toolbox untuk semua halaman admin
+    //================================================================
+
+    // --- 1. Variabel Global ---
+    const messageDiv = document.getElementById('message');
+    const books = []; // Akan diisi oleh halaman yang membutuhkan data kitab
+    let salesChart = null; // Untuk diisi oleh halaman dashboard
+    let offlineItemCount = 0; // Counter untuk form penjualan
+    let onlineItemCount = 0;  // Counter untuk form penjualan
+    let currentFilters = {
+        offline: { payment_status: 'all', start_date: '', end_date: '' },
+        online: { start_date: '', end_date: '' }
+    };
+
+    // --- 2. Fungsi Helper Utama (Utilitas) ---
+
+    /**
+     * Menampilkan pesan notifikasi (sukses atau error) di bagian atas halaman.
+     */
+    function showMessage(text, type) {
+        if (messageDiv) {
+            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
+            messageDiv.className = type;
+            messageDiv.style.display = 'block';
+            // Scroll ke atas agar user melihat pesan
+            $('html, body').animate({ scrollTop: 0 }, 'slow');
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 10000); // Pesan akan hilang setelah 10 detik
+        } else {
+            // Fallback jika div #message tidak ditemukan
+            alert(text);
+        }
+    }
+
+    /**
+     * Fungsi generik untuk menangani pengiriman semua jenis form (tambah, edit, import) via API.
+     * Menampilkan status loading pada tombol submit.
+     */
+    async function handleFormSubmit(form, url) {
+        const submitButton = $(form).find('button[type="submit"]');
+        const originalText = submitButton.html();
+        submitButton.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Memproses...');
+
+        try {
+            const formData = new FormData(form);
+            const response = await fetch(url, { method: 'POST', body: formData });
+            const result = await response.json();
+
+            if (response.ok) {
+                let message = result.message || 'Operasi berhasil!';
+                if (result.imported !== undefined) message += `\n✓ Berhasil: ${result.imported}`;
+                if (result.updated !== undefined && result.updated > 0) message += `\n↻ Diupdate: ${result.updated}`;
+                if (result.skipped !== undefined && result.skipped > 0) message += `\n⚠ Dilewati: ${result.skipped}`;
+                if (result.warnings && result.warnings.length > 0) {
+                    message += '\n\n⚠️ Peringatan:\n• ' + result.warnings.join('\n• ');
+                }
+                
+                showMessage(message, 'success');
+                form.reset();
+                
+                // Tutup modal jika form ada di dalam modal
+                if ($(form).closest('.modal-overlay').length) {
+                    $(form).closest('.modal-overlay').hide();
+                }
+
+                // Cara paling sederhana untuk memastikan semua data di halaman terupdate
+                location.reload();
+
+            } else {
+                showMessage(result.error || 'Terjadi kesalahan', 'error');
+            }
+        } catch (error) {
+            showMessage('Error: ' + error.message, 'error');
+        } finally {
+            // Kembalikan tombol ke keadaan semula
+            submitButton.prop('disabled', false).html(originalText);
+        }
+    }
+
+    /**
+     * Validasi file yang di-upload harus berformat Excel.
+     */
+    function validateExcelFile(fileInput) {
+        const file = fileInput.files[0];
+        if (!file) {
+            showMessage('Pilih file terlebih dahulu', 'error');
+            return false;
+        }
+        const validExtensions = ['xlsx', 'xls'];
+        const fileExtension = file.name.split('.').pop().toLowerCase();
+        if (!validExtensions.includes(fileExtension)) {
+            showMessage('File harus berformat Excel (.xlsx atau .xls)', 'error');
+            fileInput.value = '';
+            return false;
+        }
+        return true;
+    }
+
+
+    // --- 3. Fungsi CRUD untuk Modal (Kitab & Pembeli) ---
+    
+    /**
+     * Mengambil data kitab dan mengisi form modal edit kitab.
+     */
+    async function editBook(id) {
+        const response = await fetch(`/api/book/${id}`);
+        if (!response.ok) { 
+            showMessage('Gagal memuat data kitab.', 'error'); 
+            return; 
+        }
+        const book = await response.json();
+
+        $('#edit-book-id').val(book.id);
+        $('#existing-image-filename').val(book.image_filename || '');
+        $('#edit-book-name').val(book.name);
+        $('#edit-book-price').val(book.price);
+        $('#edit-book-availability').val(book.availability);
+        $('#edit-book-link-ig').val(book.link_ig || '');
+        $('#edit-book-link-wa').val(book.link_wa || '');
+        $('#edit-book-link-shopee').val(book.link_shopee || '');
+        $('#edit-book-link-tiktok').val(book.link_tiktok || '');
+        $('#edit-book-modal').show();
+    }
+
+    /**
+     * Menghapus kitab setelah konfirmasi.
+     */
+    async function deleteBook(id, name) {
+        const confirmation = prompt(`Untuk konfirmasi, ketik nama kitab yang akan dihapus: "${name}"`);
+        if (confirmation === name) {
+            const response = await fetch(`/api/delete-book/${id}`, { method: 'POST' });
+            const result = await response.json();
+            showMessage(result.message || `Error: ${result.error}`, response.ok ? 'success' : 'error');
+            if (response.ok) {
+                location.reload();
+            }
+        } else if (confirmation !== null) {
+            showMessage("Nama tidak sesuai. Penghapusan dibatalkan.", "error");
+        }
+    }
+
+    /**
+     * Mengedit pembeli dengan prompt.
+     */
+    function editBuyer(id, name, address) {
+        const newName = prompt('Nama:', name);
+        if (newName === null) return;
+        const newAddress = prompt('Alamat:', address || '');
+        if (newAddress === null) return;
+
+        if (newName !== name || newAddress !== address) {
+            fetch('/api/update-buyer', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id: id, name: newName, address: newAddress || '' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    showMessage(data.message, 'success');
+                    location.reload();
+                } else {
+                    showMessage(data.error || 'Gagal update data', 'error');
+                }
+            })
+            .catch(error => showMessage('Error: ' + error.message, 'error'));
+        }
+    }
+
+    /**
+     * Menghapus pembeli setelah konfirmasi.
+     */
+    function deleteBuyer(id, name) {
+        if (!confirm(`Yakin ingin menghapus ${name}? Operasi ini tidak bisa dibatalkan.`)) {
+            return;
+        }
+        fetch(`/api/delete-buyer/${id}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                showMessage(data.message, 'success');
+                location.reload();
+            } else {
+                showMessage(data.error || 'Gagal hapus data', 'error');
+            }
+        })
+        .catch(error => showMessage('Error: ' + error.message, 'error'));
+    }
+
+
+    // --- 4. Fungsi CRUD untuk Modal (Transaksi) ---
+
+    async function editOfflineSale(saleId) {
+        try {
+            const response = await fetch(`/api/get-offline-sale/${saleId}`);
+            const sale = await response.json();
+            if (!response.ok) throw new Error(sale.error || 'Gagal memuat data transaksi');
+            
+            await loadBuyersForEdit();
+            await loadBooksForEdit('offline');
+            
+            $('#edit-offline-sale-id').val(sale.id);
+            $('#edit-offline-buyer').val(sale.buyer_id).trigger('change');
+            $('#edit-offline-book').val(sale.book_id).trigger('change');
+            $('#edit-offline-quantity').val(sale.quantity);
+            $('#edit-offline-payment-status').val(sale.payment_status || 'Lunas');
+            updateEditOfflineTotal();
+            $('#edit-offline-sale-modal').show();
+        } catch (error) { showMessage(error.message, 'error'); }
+    }
+
+    async function deleteOfflineSale(saleId, buyerName, bookName) {
+        if (!confirm(`Yakin ingin menghapus transaksi:\n${buyerName} - ${bookName}?`)) return;
+        try {
+            const response = await fetch(`/api/delete-offline-sale/${saleId}`, { method: 'POST' });
+            const result = await response.json();
+            if (response.ok) {
+                showMessage(result.message, 'success');
+                location.reload();
+            } else {
+                showMessage(result.error || 'Gagal menghapus transaksi', 'error');
+            }
+        } catch (error) { showMessage('Error: ' + error.message, 'error'); }
+    }
+    
+    async function editOnlineSale(saleId) {
+        try {
+            const response = await fetch(`/api/get-online-sale/${saleId}`);
+            const sale = await response.json();
+            if (!response.ok) throw new Error(sale.error || 'Gagal memuat data transaksi');
+            
+            await loadBooksForEdit('online');
+            
+            $('#edit-online-sale-id').val(sale.id);
+            $('#edit-online-buyer-name').val(sale.buyer_name);
+            $('#edit-online-buyer-address').val(sale.buyer_address);
+            $('#edit-online-transfer-date').val(sale.transfer_date_formatted || '');
+            $('#edit-online-shipping').val(sale.shipping_cost);
+            $('#edit-online-quantity').val(sale.quantity || 1);
+            $('#edit-online-book').val(sale.book_id).trigger('change');
+            updateEditOnlineTotal();
+            $('#edit-online-sale-modal').show();
+        } catch (error) { showMessage(error.message, 'error'); }
+    }
+
+    async function deleteOnlineSale(saleId, buyerName, bookName) {
+        if (!confirm(`Yakin ingin menghapus transaksi:\n${buyerName} - ${bookName}?`)) return;
+        try {
+            const response = await fetch(`/api/delete-online-sale/${saleId}`, { method: 'POST' });
+            const result = await response.json();
+            if (response.ok) {
+                showMessage(result.message, 'success');
+                location.reload();
+            } else {
+                showMessage(result.error || 'Gagal menghapus transaksi', 'error');
+            }
+        } catch (error) { showMessage('Error: ' + error.message, 'error'); }
+    }
+    
+    function closeEditOfflineModal() { $('#edit-offline-sale-modal').hide(); }
+    function closeEditOnlineModal() { $('#edit-online-sale-modal').hide(); }
+
+    async function loadBuyersForEdit() {
+    const response = await fetch('/api/offline-buyers');
+    const buyers = await response.json();
+    const select = $('#edit-offline-buyer');
+    select.empty();
+    buyers.forEach(b => select.append(new Option(b.address ? `${b.name} - ${b.address}` : b.name, b.id)));
+    // Targetkan dropdownParent ke modal yang relevan agar dropdown muncul di atas modal
+    select.select2({ 
+        placeholder: 'Pilih Pembeli', 
+        width: '100%', 
+        dropdownParent: $('#edit-offline-sale-modal') 
+    });
+}
+
+    async function loadBooksForEdit(type = 'offline') {
+    // Ambil data buku dari variabel global 'books' jika sudah ada
+    if (!books || books.length === 0) {
+        const bookResponse = await fetch('/api/books/all');
+        const booksData = await bookResponse.json();
+        books.push(...booksData);
+    }
+    
+    const select = type === 'offline' ? $('#edit-offline-book') : $('#edit-online-book');
+    const parentModal = type === 'offline' ? $('#edit-offline-sale-modal') : $('#edit-online-sale-modal');
+    select.empty();
+    books.forEach(book => {
+        select.append(new Option(book.name, book.id));
+    });
+    select.select2({ 
+        placeholder: 'Pilih Kitab', 
+        width: '100%', 
+        dropdownParent: parentModal 
+    });
+}
+
+/**
+ * Mengupdate total harga di modal edit transaksi offline.
+ */
+function updateEditOfflineTotal() {
+    const bookId = $('#edit-offline-book').val();
+    const quantity = parseInt($('#edit-offline-quantity').val()) || 0;
+    
+    if (bookId && books.length > 0) {
+        const book = books.find(b => b.id == bookId);
+        if (book) {
+            const total = book.price * quantity;
+            $('#edit-offline-total').val(`Rp ${total.toLocaleString('id-ID')}`);
+        }
+    }
+}
+
+function updateEditOnlineTotal() {
+    const bookId = $('#edit-online-book').val();
+    const quantity = parseInt($('#edit-online-quantity').val()) || 1;
+    const shipping = parseFloat($('#edit-online-shipping').val()) || 0;
+    
+    if (bookId && books.length > 0) {
+        const book = books.find(b => b.id == bookId);
+        if (book) {
+            const total = (book.price * quantity) + shipping;
+            $('#edit-online-total').val(`Rp ${total.toLocaleString('id-ID')}`);
+        }
+    }
+}
+
+    // --- 5. Inisialisasi Global (Event Listeners) ---
+    $(document).ready(function() {
+        // Fungsi untuk membuka dan menutup menu mobile
+        function openMobileMenu() {
+            $('#mobileSlideMenu').addClass('active');
+            $('#mobileMenuOverlay').addClass('active');
+            $('body').css('overflow', 'hidden');
+        }
+
+        function closeMobileMenu() {
+            $('#mobileSlideMenu').removeClass('active');
+            $('#mobileMenuOverlay').removeClass('active');
+            $('body').css('overflow', '');
+        }
+
+        $('#mobileMenuBtn, #mobileMenuToggle').on('click', openMobileMenu);
+        $('#closeMobileMenu, #mobileMenuOverlay').on('click', closeMobileMenu);
+        $('.mobile-menu-item').on('click', closeMobileMenu);
+
+        // Fungsi untuk menutup semua modal
+        $('.close-button').on('click', function() {
+            $(this).closest('.modal-overlay').hide();
+        });
+        $(window).on('click', function(e) {
+            if ($(e.target).is('.modal-overlay')) {
+                $(e.target).hide();
+            }
+        });
+
+        // Event listener untuk form edit transaksi (yang ada di dalam modal)
+       $('#edit-offline-sale-form').on('submit', async function(e) {
+    e.preventDefault();
+    const data = {
+        id: $('#edit-offline-sale-id').val(),
+        buyer_id: $('#edit-offline-buyer').val(),
+        book_id: $('#edit-offline-book').val(),
+        quantity: $('#edit-offline-quantity').val(),
+        payment_status: $('#edit-offline-payment-status').val()
+    };
+    try {
+        const response = await fetch('/api/update-offline-sale', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (response.ok) {
+            showMessage(result.message, 'success');
+            closeEditOfflineModal();
+            location.reload(); // GANTI DENGAN INI
+        } else {
+            showMessage(result.error || 'Gagal update transaksi', 'error');
+        }
+    } catch (error) {
+        showMessage('Error: ' + error.message, 'error');
+    }
+});
+    
+    $('#edit-online-sale-form').on('submit', async function(e) {
+    e.preventDefault();
+    const data = {
+        id: $('#edit-online-sale-id').val(),
+        buyer_name: $('#edit-online-buyer-name').val(),
+        buyer_address: $('#edit-online-buyer-address').val(),
+        book_id: $('#edit-online-book').val(),
+        quantity: $('#edit-online-quantity').val(),
+        shipping_cost: $('#edit-online-shipping').val(),
+        transfer_date: $('#edit-online-transfer-date').val()
+    };
+    try {
+        const response = await fetch('/api/update-online-sale', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (response.ok) {
+            showMessage(result.message, 'success');
+            closeEditOnlineModal();
+            location.reload(); // GANTI DENGAN INI
+        } else {
+            showMessage(result.error || 'Gagal update transaksi', 'error');
+        }
+    } catch (error) {
+        showMessage('Error: ' + error.message, 'error');
+    }
+});
+        $('#edit-offline-book, #edit-offline-quantity').on('change input', updateEditOfflineTotal);
+        $('#edit-online-book, #edit-online-quantity, #edit-online-shipping').on('change input', updateEditOnlineTotal);
+    });
+</script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

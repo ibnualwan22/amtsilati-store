@@ -1,0 +1,173 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<section id="books-section" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Manajemen Kitab</h1>
+        <p class="page-subtitle">Kelola daftar kitab yang tersedia</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-file-excel"></i>
+                Import Kitab dari Excel
+            </h2>
+        </div>
+        <div class="card-body">
+            <form id="import-books-form">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-file-upload"></i> File Excel (.xlsx)
+                    </label>
+                    <input type="file" id="books-excel-file" name="file" accept=".xlsx" required>
+                    <small style="color: var(--gray-500); margin-top: 0.25rem;">
+                        Format kolom: Nama, Harga, Ketersediaan, Link Instagram, Link WhatsApp, Link Shopee, Link TikTok
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-success" style="margin-top: 1rem;">
+                    <i class="fas fa-upload"></i> Import Kitab
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-plus-circle"></i>
+                Tambah Kitab Baru
+            </h2>
+        </div>
+        <div class="card-body">
+            <form id="add-book-form" enctype="multipart/form-data">
+                <div class="form-grid">
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-book"></i> Nama Kitab</label><input type="text" id="book-name" name="name" required placeholder="Masukkan nama kitab"></div>
+                        <div class="form-group"><label><i class="fas fa-tag"></i> Harga</label><input type="number" id="book-price" name="price" required placeholder="Contoh: 25000"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-check-circle"></i> Ketersediaan</label><select id="book-availability" name="availability" required><option value="Tersedia">Tersedia</option><option value="Tidak Tersedia">Tidak Tersedia</option></select></div>
+                        <div class="form-group"><label><i class="fas fa-image"></i> Foto Kitab</label><input type="file" id="book-image" name="image" accept="image/png, image/jpeg, image/webp"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fab fa-instagram"></i> Link Instagram</label><input type="url" id="book-link-ig" name="link_ig" placeholder="https://instagram.com/..."></div>
+                        <div class="form-group"><label><i class="fab fa-whatsapp"></i> Link WhatsApp</label><input type="url" id="book-link-wa" name="link_wa" placeholder="https://wa.me/..."></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label><i class="fas fa-shopping-bag"></i> Link Shopee</label><input type="url" id="book-link-shopee" name="link_shopee" placeholder="https://shopee.co.id/..."></div>
+                        <div class="form-group"><label><i class="fab fa-tiktok"></i> Link TikTok</label><input type="url" id="book-link-tiktok" name="link_tiktok" placeholder="https://tiktok.com/..."></div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;"><i class="fas fa-save"></i> Tambah Kitab</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-list"></i>
+                Daftar Kitab
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table id="books-table">
+                    <thead>
+                        <tr>
+                            <th>Gambar</th>
+                            <th>Nama Kitab</th>
+                            <th>Harga</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="books-table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+    /**
+     * Mengambil data kitab dari API dan menampilkannya di tabel.
+     */
+    async function loadBooksTable() {
+        try {
+            const response = await fetch('/api/books/all');
+            const allBooks = await response.json();
+            const tableBody = $('#books-table-body');
+            tableBody.empty();
+            
+            if (allBooks.length === 0) {
+                tableBody.append('<tr><td colspan="5" style="text-align:center;">Belum ada data kitab.</td></tr>');
+                return;
+            }
+
+            allBooks.forEach(book => {
+                const formattedPrice = book.price.toLocaleString('id-ID');
+                const imageUrl = book.image_filename ? `/uploads/${book.image_filename}` : 'https://placehold.co/60x80/e2e8f0/4a5568?text=No+Img';
+                const statusBadge = book.availability === 'Tersedia' 
+                    ? `<span class="availability-badge available">Tersedia</span>`
+                    : `<span class="availability-badge unavailable">Habis</span>`;
+                
+                const row = `
+                    <tr>
+                        <td><img src="${imageUrl}" alt="${book.name}" class="table-image" loading="lazy"></td>
+                        <td style="font-weight: 600;">${book.name}</td>
+                        <td style="color: var(--primary); font-weight: 700;">Rp ${formattedPrice}</td>
+                        <td>${statusBadge}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn action-btn-edit" onclick="editBook(${book.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="action-btn action-btn-delete" onclick="deleteBook(${book.id}, '${book.name.replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
+                            </div>
+                        </td>
+                    </tr>`;
+                tableBody.append(row);
+            });
+        } catch (error) {
+            showMessage('Gagal memuat daftar kitab.', 'error');
+            console.error('Error loading books:', error);
+        }
+    }
+
+    // Kode yang berjalan setelah halaman HTML selesai dimuat
+    document.addEventListener('DOMContentLoaded', function() {
+        // Panggil fungsi untuk mengisi tabel kitab
+        loadBooksTable();
+
+        // Daftarkan event listener untuk form yang ada di halaman ini
+        $('#import-books-form').on('submit', function(e) {
+            e.preventDefault();
+            // Panggil fungsi global handleFormSubmit dari layout.html
+            handleFormSubmit(this, '/api/import-books');
+        });
+
+        $('#add-book-form').on('submit', function(e) {
+            e.preventDefault();
+            handleFormSubmit(this, '/api/add-book');
+        });
+
+        // Event listener untuk form edit ada di layout.html karena modalnya global
+        $('#edit-book-form').on('submit', function(e) {
+            e.preventDefault();
+            handleFormSubmit(this, '/api/update-book');
+        });
+
+        $('#books-excel-file').on('change', function() {
+            validateExcelFile(this);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<section id="offline-buyers-section" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Data Pembeli</h1>
+        <p class="page-subtitle">Kelola data pembeli offline</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-file-import"></i>
+                Import Data Pembeli
+            </h2>
+        </div>
+        <div class="card-body">
+            <form id="import-form">
+                <div class="form-group">
+                    <label>
+                        <i class="fas fa-file-excel"></i> Import dari Excel (.xlsx)
+                    </label>
+                    <input type="file" id="excel-file" name="file" accept=".xlsx" required>
+                    <small style="color: var(--gray-500); margin-top: 0.25rem;">
+                        Format: Kolom harus berisi Nama dan Alamat
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                    <i class="fas fa-upload"></i> Import Data
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-users"></i>
+                Daftar Pembeli
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Alamat</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="buyers-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Fungsi untuk memuat tabel pembeli
+    async function loadBuyersTable() {
+        const response = await fetch('/api/offline-buyers');
+        const buyers = await response.json();
+        const tableBody = $('#buyers-table-body');
+        tableBody.empty();
+        
+        buyers.forEach(buyer => {
+            const row = `
+                <tr>
+                    <td style="font-weight: 600;">${buyer.name}</td>
+                    <td>${buyer.address || '-'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-btn-edit" onclick="editBuyer(${buyer.id}, '${buyer.name.replace(/'/g, "\\'")}', '${(buyer.address || '').replace(/'/g, "\\'")}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn action-btn-delete" onclick="deleteBuyer(${buyer.id}, '${buyer.name.replace(/'/g, "\\'")}')">
+                            <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </div>
+            </td>
+        </tr>`;
+            tableBody.append(row);
+        });
+
+        if (buyers.length === 0) {
+            tableBody.append('<tr><td colspan="3" style="text-align:center;">Belum ada data pembeli.</td></tr>');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadBuyersTable();
+
+        // Event listener untuk form import pembeli
+        $('#import-form').on('submit', function(e) { 
+            e.preventDefault(); 
+            handleFormSubmit(this, '/api/import-buyers'); 
+        });
+        
+        $('#excel-file').on('change', function() {
+            validateExcelFile(this);
+        });
+    });
+</script>
+{% endblock %}

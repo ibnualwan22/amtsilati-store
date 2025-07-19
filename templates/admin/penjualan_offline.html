@@ -1,0 +1,190 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<section id="offline-sales-section" class="content-section active">
+    <div class="page-header">
+        <h1 class="page-title">Penjualan Offline</h1>
+        <p class="page-subtitle">Catat penjualan langsung di toko</p>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-cash-register"></i>
+                Rekap Penjualan Offline
+            </h2>
+        </div>
+        <div class="card-body">
+            <form id="offline-sale-form">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label>
+                            <i class="fas fa-user"></i> Nama Pembeli
+                        </label>
+                        <select id="offline-buyer" name="buyer_id" required></select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>
+                            <i class="fas fa-check-circle"></i> Status Pembayaran
+                        </label>
+                        <select id="offline-payment-status" name="payment_status" required>
+                            <option value="Lunas">Lunas</option>
+                            <option value="Belum Lunas">Belum Lunas</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-add-item" onclick="addOfflineBookItem()">
+                    <i class="fas fa-plus"></i> Tambah Kitab
+                </button>
+
+                <div class="book-items-container" id="offline-book-items">
+                    </div>
+
+                <div class="total-summary">
+                    <div class="total-summary-title">Total Harga</div>
+                    <div class="total-summary-value" id="offline-total-price">Rp 0</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                    <i class="fas fa-save"></i> Simpan Transaksi
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // --- Fungsi spesifik untuk halaman Penjualan Offline ---
+
+    function addOfflineBookItem() {
+        offlineItemCount++;
+        const itemHtml = `
+            <div class="book-item" data-item-id="${offlineItemCount}">
+                <div class="book-item-header">
+                    <span class="book-item-number">Kitab #${offlineItemCount}</span>
+                    ${offlineItemCount > 1 ? `<button type="button" class="btn-remove-item" onclick="removeOfflineItem(${offlineItemCount})"><i class="fas fa-trash"></i></button>` : ''}
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><i class="fas fa-book"></i> Pilih Kitab</label>
+                        <select class="offline-book-select" data-item="${offlineItemCount}" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-sort-numeric-up"></i> Jumlah</label>
+                        <input type="number" class="offline-quantity" data-item="${offlineItemCount}" min="1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> Harga</label>
+                        <input type="text" class="offline-price" data-item="${offlineItemCount}" disabled>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('#offline-book-items').append(itemHtml);
+        const newSelect = $(`.offline-book-select[data-item="${offlineItemCount}"]`);
+        newSelect.empty().append(new Option('-- Pilih Kitab --', ''));
+        if (books && books.length > 0) {
+            books.forEach(book => {
+                if (book.availability === 'Tersedia') newSelect.append(new Option(book.name, book.id));
+            });
+        }
+        newSelect.select2({ placeholder: '-- Pilih Kitab --', width: '100%' });
+        newSelect.on('change', function() { updateOfflineItemPrice($(this).data('item')); updateOfflineTotalPrice(); });
+        $(`.offline-quantity[data-item="${offlineItemCount}"]`).on('input', updateOfflineTotalPrice);
+    }
+
+    function removeOfflineItem(itemId) {
+        $(`.book-item[data-item-id="${itemId}"]`).remove();
+        updateOfflineTotalPrice();
+    }
+
+    function updateOfflineItemPrice(itemId) {
+        const bookId = $(`.offline-book-select[data-item="${itemId}"]`).val();
+        const book = books.find(b => b.id == bookId);
+        $(`.offline-price[data-item="${itemId}"]`).val(book ? `Rp ${book.price.toLocaleString('id-ID')}` : '');
+    }
+
+    function updateOfflineTotalPrice() {
+        let total = 0;
+        $('#offline-book-items .book-item').each(function() {
+            const bookId = $(this).find('.offline-book-select').val();
+            const quantity = parseInt($(this).find('.offline-quantity').val()) || 0;
+            if (bookId) {
+                const book = books.find(b => b.id == bookId);
+                if (book) total += book.price * quantity;
+            }
+        });
+        $('#offline-total-price').text(`Rp ${total.toLocaleString('id-ID')}`);
+    }
+
+    async function handleOfflineRekapSubmit() {
+        const buyerId = $('#offline-buyer').val();
+        const paymentStatus = $('#offline-payment-status').val();
+        if (!buyerId) {
+            showMessage('Pilih pembeli terlebih dahulu', 'error');
+            return;
+        }
+        const items = [];
+        let hasValidItem = false;
+        $('#offline-book-items .book-item').each(function() {
+            const bookId = $(this).find('.offline-book-select').val();
+            const quantity = $(this).find('.offline-quantity').val();
+            if (bookId && quantity) {
+                items.push({ book_id: bookId, quantity: parseInt(quantity) });
+                hasValidItem = true;
+            }
+        });
+        if (!hasValidItem) {
+            showMessage('Tambahkan minimal satu kitab', 'error');
+            return;
+        }
+        try {
+            const response = await fetch('/api/add-offline-sale', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ buyer_id: buyerId, items: items, payment_status: paymentStatus })
+            });
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'Gagal menyimpan transaksi');
+            showMessage('Transaksi offline berhasil disimpan!', 'success');
+            $('#offline-sale-form')[0].reset();
+            $('#offline-buyer').val(null).trigger('change');
+            $('#offline-payment-status').val('Lunas');
+            $('#offline-book-items').empty();
+            offlineItemCount = 0;
+            addOfflineBookItem();
+            updateOfflineTotalPrice();
+        } catch (error) {
+            showMessage(error.message, 'error');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Isi variabel global 'books' dengan data dari API
+        const bookResponse = await fetch('/api/books');
+        const bookData = await bookResponse.json();
+        books.push(...bookData);
+
+        // Isi dropdown pembeli
+        const buyerResponse = await fetch('/api/offline-buyers');
+        const buyerData = await buyerResponse.json();
+        const buyerSelect = $('#offline-buyer');
+        buyerSelect.empty().append(new Option('-- Pilih Pembeli --', ''));
+        buyerData.forEach(buyer => {
+            const displayText = buyer.address ? `${buyer.name} - ${buyer.address}` : buyer.name;
+            buyerSelect.append(new Option(displayText, buyer.id));
+        });
+        buyerSelect.select2({ placeholder: '-- Pilih Pembeli --', width: '100%' });
+        
+        addOfflineBookItem();
+
+        $('#offline-sale-form').on('submit', function(e){
+            e.preventDefault();
+            handleOfflineRekapSubmit();
+        });
+    });
+</script>
+{% endblock %}

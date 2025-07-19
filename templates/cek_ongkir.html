@@ -564,6 +564,74 @@
                 gap: 1rem;
             }
         }
+        @media (max-width: 768px) {
+    .header-content {
+        padding: 1rem;
+    }
+
+    .main-content {
+        /* Kurangi padding di sisi kiri dan kanan */
+        padding: 2rem 1rem;
+    }
+
+    .hero-section h1 {
+        font-size: 2rem; /* Perkecil judul utama */
+    }
+
+    .form-card {
+        padding: 1.5rem; /* Kurangi padding di dalam kartu form */
+    }
+
+    .origin-info {
+        padding: 1rem;
+        flex-direction: column; /* Tumpuk ikon dan teks secara vertikal */
+        text-align: center;
+    }
+
+    /* Perkecil ukuran font pada hasil pencarian ongkir */
+    .service-name {
+        font-size: 1rem;
+    }
+
+    .price {
+        font-size: 1.25rem;
+    }
+
+    .result-details {
+        flex-wrap: wrap; /* Izinkan detail (estimasi, kurir) untuk pindah baris */
+        gap: 1rem;
+    }
+}
+
+/* --- Untuk Layar HP Kecil (di bawah 480px) --- */
+@media (max-width: 480px) {
+    .main-content {
+        padding: 1.5rem 0.75rem;
+    }
+
+    .hero-section h1 {
+        font-size: 1.75rem;
+    }
+    
+    .hero-section p {
+        font-size: 1rem;
+    }
+
+    .form-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .result-card {
+        padding: 1rem;
+    }
+    
+    .result-card-header {
+        flex-direction: column; /* Tumpuk nama layanan dan harga */
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+}
     </style>
 </head>
 <body>
