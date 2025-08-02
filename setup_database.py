@@ -1,184 +1,148 @@
-import sqlite3
+# setup_database.py
+
+import pymysql.cursors
 import os
 import sys
 from werkzeug.security import generate_password_hash
 from config import get_config
 
-def create_database():
-    """Membuat database dan tabel-tabel yang diperlukan"""
-    # Dapatkan konfigurasi sesuai environment
+def get_connection():
+    """Membuat koneksi ke database MySQL"""
     config = get_config()
-    database_path = config.DATABASE_PATH
-    
-    # Buat direktori jika belum ada
-    database_dir = os.path.dirname(database_path)
-    if database_dir and not os.path.exists(database_dir):
-        os.makedirs(database_dir)
-        print(f"Created directory: {database_dir}")
-    
-    print(f"Creating database at: {database_path}")
-    print(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
-    
-    # Koneksi ke database
-    connection = sqlite3.connect(database_path)
-    cursor = connection.cursor()
-    
-    # Membuat tabel untuk data kitab dengan kolom lengkap
-    cursor.execute('''
+    try:
+        connection = pymysql.connect(
+            host=config.MYSQL_HOST,
+            user=config.MYSQL_USER,
+            password=config.MYSQL_PASSWORD,
+            port=config.MYSQL_PORT,
+            db=config.MYSQL_DB,
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        return connection
+    except pymysql.MySQLError as e:
+        print(f"Error connecting to MySQL: {e}")
+        sys.exit(1)
+
+def create_tables(cursor):
+    """Membuat tabel dengan sintaks MySQL"""
+    print("Executing CREATE TABLE statements for MySQL...")
+
+    # Sintaks diubah untuk MySQL (AUTO_INCREMENT, DECIMAL, ENUM, dll)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        username VARCHAR(80) NOT NULL UNIQUE,
+        password_hash VARCHAR(255) NOT NULL
+    )
+    """)
+    print("✓ Table 'users' checked/created.")
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS books (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE,
-        price REAL NOT NULL,
-        availability TEXT NOT NULL DEFAULT 'Tersedia',
-        link_ig TEXT,
-        link_wa TEXT,
-        link_shopee TEXT,
-        link_tiktok TEXT,
-        image_filename TEXT
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL UNIQUE,
+        price DECIMAL(10, 2) NOT NULL,
+        availability VARCHAR(50) DEFAULT 'Tersedia',
+        link_ig VARCHAR(255),
+        link_wa VARCHAR(255),
+        link_shopee VARCHAR(255),
+        link_tiktok VARCHAR(255),
+        image_filename VARCHAR(255)
     )
-    ''')
-    print("✓ Tabel 'books' berhasil dibuat/diperiksa")
-    
-    # Tabel untuk pembeli offline dengan kolom tambahan
-    cursor.execute('''
+    """)
+    print("✓ Table 'books' checked/created.")
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS offline_buyers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL UNIQUE,
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(255) NOT NULL UNIQUE,
         address TEXT,
-        dormitory TEXT
+        dormitory VARCHAR(100)
     )
-    ''')
-    print("✓ Tabel 'offline_buyers' berhasil dibuat/diperiksa")
-    
-    # Tabel untuk penjualan offline
-    cursor.execute('''
+    """)
+    print("✓ Table 'offline_buyers' checked/created.")
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS offline_sales (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        buyer_id INTEGER,
-        book_id INTEGER,
-        quantity INTEGER NOT NULL,
-        total_price REAL NOT NULL,
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        buyer_id INT NOT NULL,
+        book_id INT NOT NULL,
+        quantity INT NOT NULL,
+        total_price DECIMAL(10, 2) NOT NULL,
+        payment_status ENUM('Lunas', 'Belum Lunas') DEFAULT 'Lunas',
         sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (buyer_id) REFERENCES offline_buyers (id),
-        FOREIGN KEY (book_id) REFERENCES books (id)
+        FOREIGN KEY (buyer_id) REFERENCES offline_buyers(id),
+        FOREIGN KEY (book_id) REFERENCES books(id)
     )
-    ''')
-    print("✓ Tabel 'offline_sales' berhasil dibuat/diperiksa")
-    
-    # Tabel untuk penjualan online dengan kolom tambahan
-    cursor.execute('''
+    """)
+    print("✓ Table 'offline_sales' checked/created.")
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS online_sales (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        buyer_name TEXT NOT NULL,
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        buyer_name VARCHAR(255) NOT NULL,
         buyer_address TEXT NOT NULL,
-        book_id INTEGER,
-        quantity INTEGER NOT NULL DEFAULT 1,
-        shipping_cost REAL NOT NULL,
-        total_price REAL NOT NULL,
+        book_id INT NOT NULL,
+        quantity INT NOT NULL DEFAULT 1,
+        shipping_cost DECIMAL(10, 2),
+        total_price DECIMAL(10, 2) NOT NULL,
         transfer_date DATE,
         sale_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (book_id) REFERENCES books (id)
+        FOREIGN KEY (book_id) REFERENCES books(id)
     )
-    ''')
-    print("✓ Tabel 'online_sales' berhasil dibuat/diperiksa")
-    
-    # Tabel untuk admin users
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL
-    )
-    ''')
-    print("✓ Tabel 'users' berhasil dibuat/diperiksa")
-    
-    connection.commit()
-    connection.close()
-    print(f"\n✅ Database berhasil dibuat di: {database_path}")
+    """)
+    print("✓ Table 'online_sales' checked/created.")
 
-def create_admin_user(username='admin', password='password123'):
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS cash_records (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        type ENUM('debit', 'kredit') NOT NULL,
+        description TEXT NOT NULL,
+        amount DECIMAL(10, 2) NOT NULL,
+        category VARCHAR(100),
+        record_date DATE NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    print("✓ Table 'cash_records' checked/created.")
+
+def create_admin_user(cursor, username='admin', password='password123'):
     """Membuat user admin default"""
-    config = get_config()
-    database_path = config.DATABASE_PATH
-    
-    connection = sqlite3.connect(database_path)
-    cursor = connection.cursor()
-    
-    # Generate password hash
     password_hash = generate_password_hash(password)
-    
     try:
         cursor.execute(
-            "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+            "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
             (username, password_hash)
         )
-        print(f"\n✅ Admin user berhasil dibuat:")
-        print(f"   Username: {username}")
-        print(f"   Password: {password}")
-    except sqlite3.IntegrityError:
-        print(f"\n⚠️  Username '{username}' sudah ada di database.")
-    
-    connection.commit()
-    connection.close()
-
-def add_sample_data():
-    """Menambahkan data sample untuk development"""
-    config = get_config()
-    
-    # Hanya tambahkan sample data jika di development
-    if os.environ.get('FLASK_ENV') != 'development':
-        print("\n⚠️  Sample data hanya ditambahkan di environment development")
-        return
-    
-    database_path = config.DATABASE_PATH
-    connection = sqlite3.connect(database_path)
-    cursor = connection.cursor()
-    
-    # Sample data kitab
-    sample_books = [
-        ('Kitab Amtsilati 1', 25000, 'Tersedia', 'http://shopee.co.id/link1'),
-        ('Kitab Jurumiyyah', 30000, 'Tersedia', 'http://shopee.co.id/link2'),
-        ('Kitab Imrithi', 35000, 'Tidak Tersedia', 'http://shopee.co.id/link3'),
-        ('Kitab Alfiyah', 40000, 'Tersedia', 'http://shopee.co.id/link4'),
-        ('Kitab Nahwu Wadhih', 28000, 'Tersedia', 'http://shopee.co.id/link5')
-    ]
-    
-    for book in sample_books:
-        try:
-            cursor.execute(
-                "INSERT INTO books (name, price, availability, link_shopee) VALUES (?, ?, ?, ?)",
-                book
-            )
-            print(f"✓ Added: {book[0]}")
-        except sqlite3.IntegrityError:
-            print(f"⚠️  Skip: {book[0]} (sudah ada)")
-    
-    connection.commit()
-    connection.close()
-    print("\n✅ Sample data berhasil ditambahkan")
+        print(f"\\n✅ Admin user created: Username={username}, Password={password}")
+    except pymysql.IntegrityError:
+        print(f"\\n⚠️ Username '{username}' already exists.")
 
 def main():
-    """Main function untuk setup database"""
-    print("=== SETUP DATABASE ===")
-    
-    # Cek apakah ada argumen environment
+    """Fungsi utama untuk setup database MySQL"""
+    # Set environment jika ada argumen
     if len(sys.argv) > 1:
         os.environ['FLASK_ENV'] = sys.argv[1]
-        print(f"Setting FLASK_ENV to: {sys.argv[1]}")
-    
-    # Create database dan tabel
-    create_database()
-    
-    # Create admin user
-    create_admin_user()
-    
-    # Tanya apakah ingin menambahkan sample data
-    if os.environ.get('FLASK_ENV', 'development') == 'development':
-        response = input("\nApakah ingin menambahkan sample data? (y/n): ")
-        if response.lower() == 'y':
-            add_sample_data()
-    
-    print("\n✅ Setup database selesai!")
+
+    config = get_config()
+    print(f"=== DATABASE SETUP FOR: {os.environ.get('FLASK_ENV', 'development')} ===")
+    print(f"Target Database: {config.MYSQL_DB} on {config.MYSQL_HOST}")
+
+    # Konfirmasi sebelum menjalankan
+    response = input("This will create tables in the database. Continue? (y/n): ")
+    if response.lower() != 'y':
+        print("Setup cancelled.")
+        return
+
+    connection = get_connection()
+    try:
+        with connection.cursor() as cursor:
+            create_tables(cursor)
+            create_admin_user(cursor)
+        connection.commit()
+        print("\\n✅ Database setup completed successfully!")
+    finally:
+        connection.close()
 
 if __name__ == '__main__':
     main()

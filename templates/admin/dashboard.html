@@ -95,18 +95,17 @@
 
             const offlineResponse = await fetch('/api/recent-offline-sales?' + params.toString());
             const monthlyOfflineSales = await offlineResponse.json();
-            const totalOffline = monthlyOfflineSales.reduce((sum, sale) => sum + sale.total_price, 0);
+            const totalOffline = monthlyOfflineSales.reduce((sum, sale) => sum + parseFloat(sale.total_price), 0);
             $('#totalOfflineSales').text(`Rp ${totalOffline.toLocaleString('id-ID')}`);
-            $('#offlineStatTitle').text(`Penjualan Offline ${currentMonthName}`);
-
+            
             const onlineResponse = await fetch('/api/recent-online-sales?' + params.toString());
             const monthlyOnlineSales = await onlineResponse.json();
-            const totalOnline = monthlyOnlineSales.reduce((sum, sale) => sum + sale.total_price, 0);
-            const totalShipping = monthlyOnlineSales.reduce((sum, sale) => sum + sale.shipping_cost, 0);
+            
+            // PERBAIKAN DI SINI: Gunakan parseFloat() saat menjumlahkan
+            const totalOnline = monthlyOnlineSales.reduce((sum, sale) => sum + parseFloat(sale.total_price), 0);
+            const totalShipping = monthlyOnlineSales.reduce((sum, sale) => sum + parseFloat(sale.shipping_cost), 0);
             $('#totalOnlineSales').text(`Rp ${totalOnline.toLocaleString('id-ID')}`);
             $('#totalShippingCost').text(`Rp ${totalShipping.toLocaleString('id-ID')}`);
-            $('#onlineStatTitle').text(`Penjualan Online ${currentMonthName}`);
-            $('#shippingStatTitle').text(`Total Ongkir ${currentMonthName}`);
 
         } catch (error) {
             console.error('Error loading dashboard stats:', error);
@@ -219,87 +218,67 @@
         }
 
         async function updateChart() {
-            const startDate = $('#startDate').val();
-            const endDate = $('#endDate').val();
+        const startDate = $('#startDate').val();
+        const endDate = $('#endDate').val();
+        
+        if (!startDate || !endDate || !salesChart) return;
+
+        try {
+            // 1. Buat parameter filter tanggal
+            const params = new URLSearchParams({ start_date: startDate, end_date: endDate });
+
+            // 2. Ambil data offline & online DENGAN filter tanggal
+            const [offlineResponse, onlineResponse] = await Promise.all([
+                fetch('/api/recent-offline-sales?' + params.toString()),
+                fetch('/api/recent-online-sales?' + params.toString())
+            ]);
             
-            if (!startDate || !endDate) return;
+            const offlineSales = await offlineResponse.json();
+            const onlineSales = await onlineResponse.json();
+            
+            // 3. Proses data untuk ditampilkan di grafik
+            const salesByDate = {};
+            const allDates = [];
+            let currentDate = new Date(startDate);
+            const end = new Date(endDate);
 
-            try {
-                // Fetch sales data
-                const [offlineResponse, onlineResponse] = await Promise.all([
-                    fetch('/api/recent-offline-sales'),
-                    fetch('/api/recent-online-sales')
-                ]);
-                
-                const offlineSales = await offlineResponse.json();
-                const onlineSales = await onlineResponse.json();
-
-                // Process data by date
-                const salesByDate = {};
-                
-                // Convert start and end dates to Date objects for comparison
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-                
-                // Process offline sales
-                offlineSales.forEach(sale => {
-                    const dateStr = sale.sale_date_formatted.split(' ')[0]; // Get DD-MM-YYYY part
-                    const [day, month, year] = dateStr.split('-');
-                    const saleDate = new Date(year, month - 1, day);
-                    
-                    // Only include sales within the date range
-                    if (saleDate >= start && saleDate <= end) {
-                        if (!salesByDate[dateStr]) {
-                            salesByDate[dateStr] = { offline: 0, online: 0 };
-                        }
-                        salesByDate[dateStr].offline += sale.total_price;
-                    }
-                });
-
-                // Process online sales
-                onlineSales.forEach(sale => {
-                    const dateStr = sale.sale_date_formatted.split(' ')[0]; // Get DD-MM-YYYY part
-                    const [day, month, year] = dateStr.split('-');
-                    const saleDate = new Date(year, month - 1, day);
-                    
-                    // Only include sales within the date range
-                    if (saleDate >= start && saleDate <= end) {
-                        if (!salesByDate[dateStr]) {
-                            salesByDate[dateStr] = { offline: 0, online: 0 };
-                        }
-                        salesByDate[dateStr].online += sale.total_price;
-                    }
-                });
-
-                // Generate all dates in the range
-                const allDates = [];
-                const currentDate = new Date(start);
-                
-                while (currentDate <= end) {
-                    const day = String(currentDate.getDate()).padStart(2, '0');
-                    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-                    const year = currentDate.getFullYear();
-                    const dateStr = `${day}-${month}-${year}`;
-                    
-                    allDates.push(dateStr);
-                    
-                    // Ensure all dates have entries
-                    if (!salesByDate[dateStr]) {
-                        salesByDate[dateStr] = { offline: 0, online: 0 };
-                    }
-                    
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-
-                // Update chart
-                salesChart.data.labels = allDates;
-                salesChart.data.datasets[0].data = allDates.map(date => salesByDate[date]?.offline || 0);
-                salesChart.data.datasets[1].data = allDates.map(date => salesByDate[date]?.online || 0);
-                salesChart.update();
-            } catch (error) {
-                console.error('Error updating chart:', error);
+            // Buat daftar semua tanggal dalam rentang yang dipilih
+            while (currentDate <= end) {
+                const dateStr = currentDate.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+                allDates.push(dateStr);
+                salesByDate[dateStr] = { offline: 0, online: 0 };
+                currentDate.setDate(currentDate.getDate() + 1);
             }
+
+            // Jumlahkan total penjualan offline per tanggal
+            offlineSales.forEach(sale => {
+                // Ambil tanggal dari 'sale_date_formatted' dan ubah formatnya
+                const dateKey = sale.sale_date_formatted.split(' ')[0];
+                if (salesByDate[dateKey] !== undefined) {
+                    salesByDate[dateKey].offline += parseFloat(sale.total_price); // Gunakan parseFloat
+                }
+            });
+
+            // Jumlahkan total penjualan online per tanggal
+            onlineSales.forEach(sale => {
+                const dateKey = sale.sale_date_formatted.split(' ')[0];
+                if (salesByDate[dateKey] !== undefined) {
+                    salesByDate[dateKey].online += parseFloat(sale.total_price); // Gunakan parseFloat
+                }
+            });
+
+            // 4. Update data ke dalam Chart.js
+            salesChart.data.labels = allDates;
+            salesChart.data.datasets[0].data = allDates.map(date => salesByDate[date].offline);
+            salesChart.data.datasets[1].data = allDates.map(date => salesByDate[date].online);
+            salesChart.update();
+
+        } catch (error) {
+            console.error('Error updating chart:', error);
+            showMessage('Gagal memuat data grafik.', 'error');
         }
+    }
+
 
         // Utility functions
        
