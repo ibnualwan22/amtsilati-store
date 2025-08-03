@@ -9,44 +9,52 @@ BASE_DIR = Path(__file__).resolve().parent
 class Config:
     """Konfigurasi dasar aplikasi"""
     SECRET_KEY = os.environ.get('SECRET_KEY', 'kunci-rahasia-yang-sangat-sulit-ditebak')
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # Max 16MB
-
-    # Konfigurasi Upload Folder
-    # (Disesuaikan di kelas bawahnya)
-    UPLOAD_FOLDER = ''
-
-    # Konfigurasi Database MySQL
-    # (Disesuaikan di kelas bawahnya)
-    MYSQL_HOST = os.environ.get('DB_HOST', 'localhost')
-    MYSQL_USER = os.environ.get('DB_USER', 'root')
-    MYSQL_PASSWORD = os.environ.get('DB_PASS', '')
-    MYSQL_PORT = int(os.environ.get('DB_PORT', 3306))
-    MYSQL_DB = '' # Akan diisi di kelas development/production
-
-    # API Keys
-    BITESHIP_API_KEY = os.environ.get('BITESHIP_API_KEY',
-        "biteship_live.eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiYW10c2lsYXRpIHN0b3JlIiwidXNlcklkIjoiNjg2NWNhNGI4MzA3ZjgwMDEzNzY5NWQ5IiwiaWF0IjoxNzUxNjEwMzQ1fQ.hJAwHsYKTUWmhB6UvOeoLHGFIq0OA7y3yEAW4U5pwBA")
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # API Keys (tetap sama)
+    BITESHIP_API_KEY = os.environ.get('BITESHIP_API_KEY', "biteship_live...")
     BITESHIP_BASE_URL = "https://api.biteship.com"
 
 class DevelopmentConfig(Config):
     """Konfigurasi untuk development/lokal"""
     DEBUG = True
     TESTING = False
-    MYSQL_DB = 'as_store_dev' # Database untuk development
+    
+    # --- BAGIAN PERBAIKAN DIMULAI DI SINI ---
+    
+    # 1. Tetap sediakan variabel individual untuk dibaca oleh get_db_connection()
+    MYSQL_HOST = os.environ.get('DB_HOST')
+    MYSQL_USER = os.environ.get('DB_USER')
+    MYSQL_PASSWORD = os.environ.get('DB_PASS')
+    MYSQL_PORT = int(os.environ.get('DB_PORT', 3306))
+    MYSQL_DB = 'as_store_dev'
+
+    # 2. Tetap sediakan URI lengkap untuk dibaca oleh Flask-Migrate
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
+    
+    # --- SELESAI PERBAIKAN ---
+
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads_dev')
 
 class ProductionConfig(Config):
     """Konfigurasi untuk production"""
     DEBUG = False
     TESTING = False
-    MYSQL_DB = 'as_store_prod' # Database untuk production
+    
+    # --- TERAPKAN PERBAIKAN YANG SAMA DI SINI ---
+    
+    # 1. Variabel individual
+    MYSQL_HOST = os.environ.get('DB_HOST')
+    MYSQL_USER = os.environ.get('DB_USER')
+    MYSQL_PASSWORD = os.environ.get('DB_PASS')
+    MYSQL_PORT = int(os.environ.get('DB_PORT', 3306))
+    MYSQL_DB = 'as_store_prod'
 
-    # Jika di Fly.io, gunakan path persistent volume
-    if os.environ.get('FLY_APP_NAME'):
-        UPLOAD_FOLDER = '/data/uploads'
-    else:
-        # Fallback untuk production non-Fly.io
-        UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads_prod')
+    # 2. URI Lengkap
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
+
+    # --- SELESAI PERBAIKAN ---
 
 class TestingConfig(Config):
     """Konfigurasi untuk testing - menggunakan SQLite in-memory"""

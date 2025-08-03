@@ -10,13 +10,20 @@ from werkzeug.utils import secure_filename
 from config import get_config
 from datetime import datetime, date
 from sqlalchemy import create_engine, text
+from models import db  # <-- Impor db dari models.py
+from flask_migrate import Migrate # <-- Impor Migrate
 
 # --- Inisialisasi Aplikasi Flask ---
 app = Flask(__name__)
 
-# Load konfigurasi berdasarkan environment
+# --- Inisialisasi Aplikasi Flask ---
+app = Flask(__name__)
 config = get_config()
 app.config.from_object(config)
+
+# --- Inisialisasi Database & Migrasi ---
+db.init_app(app) # <-- Inisialisasi SQLAlchemy
+migrate = Migrate(app, db) # <-- Inisialisasi Migrate
 
 # Buat folder uploads jika belum ada
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
