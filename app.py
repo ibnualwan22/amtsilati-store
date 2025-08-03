@@ -9,6 +9,7 @@ from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from config import get_config
 from datetime import datetime, date
+from sqlalchemy import create_engine, text
 
 # --- Inisialisasi Aplikasi Flask ---
 app = Flask(__name__)
@@ -879,18 +880,21 @@ def get_online_sale(sale_id):
 @app.route('/api/export-offline-sales')
 @login_required
 def export_offline():
-    conn = get_db_connection()
     try:
+        # Membuat koneksi menggunakan SQLAlchemy
+        config = app.config
+        db_uri = f"mysql+pymysql://{config['MYSQL_USER']}:{config['MYSQL_PASSWORD']}@{config['MYSQL_HOST']}:{config['MYSQL_PORT']}/{config['MYSQL_DB']}"
+        engine = create_engine(db_uri)
+
         query = """
-        SELECT 
-            DATE_FORMAT(os.sale_date, '%%d-%%m-%%Y %%H:%%i') as 'Tanggal Transaksi', 
-            ob.name as 'Nama Pembeli', 
-            ob.address as 'Alamat', 
-            b.name as 'Nama Kitab', 
-            os.quantity as 'Jumlah', 
-            b.price as 'Harga Satuan', 
-            os.total_price as 'Total Harga',
-            IFNULL(os.payment_status, 'Lunas') as 'Status Pembayaran'
+        SELECT DATE_FORMAT(os.sale_date, '%%d-%%m-%%Y %%H:%%i') as 'Tanggal Transaksi', 
+               ob.name as 'Nama Pembeli', 
+               ob.address as 'Alamat', 
+               b.name as 'Nama Kitab', 
+               os.quantity as 'Jumlah', 
+               b.price as 'Harga Satuan', 
+               os.total_price as 'Total Harga',
+               IFNULL(os.payment_status, 'Lunas') as 'Status Pembayaran'
         FROM offline_sales os
         JOIN offline_buyers ob ON os.buyer_id = ob.id
         JOIN books b ON os.book_id = b.id
@@ -903,18 +907,21 @@ def export_offline():
         end_date = request.args.get('end_date')
         
         if payment_status and payment_status != 'all':
-            query += " AND os.payment_status = %s"
-            params.append(payment_status)
+            query += " AND os.payment_status = %(payment_status)s"
+            params.append({'payment_status': payment_status})
         if start_date:
-            query += " AND DATE(os.sale_date) >= %s"
-            params.append(start_date)
+            query += " AND DATE(os.sale_date) >= %(start_date)s"
+            params.append({'start_date': start_date})
         if end_date:
-            query += " AND DATE(os.sale_date) <= %s"
-            params.append(end_date)
+            query += " AND DATE(os.sale_date) <= %(end_date)s"
+            params.append({'end_date': end_date})
         
         query += " ORDER BY os.id DESC"
         
-        df = pd.read_sql_query(query, conn, params=params if params else None)
+        # Menggabungkan semua parameter menjadi satu dictionary
+        final_params = {k: v for d in params for k, v in d.items()}
+
+        df = pd.read_sql_query(query, engine, params=final_params if final_params else None)
         
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -931,13 +938,7 @@ def export_offline():
             
         output.seek(0)
         
-        filename_parts = ['rekap_offline']
-        if payment_status and payment_status != 'all':
-            filename_parts.append(payment_status.lower().replace(' ', '_'))
-        if start_date or end_date:
-            filename_parts.append('filtered')
-        filename_parts.append(datetime.now().strftime('%Y%m%d'))
-        
+        filename_parts = ['rekap_offline', datetime.now().strftime('%Y%m%d')]
         filename = '_'.join(filename_parts) + '.xlsx'
         
         return send_file(output, download_name=filename, as_attachment=True)
@@ -945,9 +946,6 @@ def export_offline():
     except Exception as e:
         print(f"Error exporting offline sales: {e}")
         return "Gagal mengekspor data", 500
-    finally:
-        if conn and conn.open:
-            conn.close()
 # 1. PERBAIKAN DI app.py - Ganti fungsi import_offline() yang ada dengan ini:
 
 # UPDATE endpoint /api/import-offline-sales di app.py
@@ -1079,8 +1077,12 @@ def import_online_sales():
 @app.route('/api/export-online-sales')
 @login_required
 def export_online():
-    conn = get_db_connection()
     try:
+        # Membuat koneksi menggunakan SQLAlchemy
+        config = app.config
+        db_uri = f"mysql+pymysql://{config['MYSQL_USER']}:{config['MYSQL_PASSWORD']}@{config['MYSQL_HOST']}:{config['MYSQL_PORT']}/{config['MYSQL_DB']}"
+        engine = create_engine(db_uri)
+
         query = """
         SELECT 
             DATE_FORMAT(os.sale_date, '%%d-%%m-%%Y %%H:%%i') as 'Tanggal Transaksi', 
@@ -1096,21 +1098,22 @@ def export_online():
         JOIN books b ON os.book_id = b.id
         WHERE 1=1
         """
-        
         params = []
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
         
         if start_date:
-            query += " AND DATE(os.transfer_date) >= %s"
-            params.append(start_date)
+            query += " AND DATE(os.transfer_date) >= %(start_date)s"
+            params.append({'start_date': start_date})
         if end_date:
-            query += " AND DATE(os.transfer_date) <= %s"
-            params.append(end_date)
+            query += " AND DATE(os.transfer_date) <= %(end_date)s"
+            params.append({'end_date': end_date})
         
         query += " ORDER BY os.id DESC"
         
-        df = pd.read_sql_query(query, conn, params=params if params else None)
+        final_params = {k: v for d in params for k, v in d.items()}
+
+        df = pd.read_sql_query(query, engine, params=final_params if final_params else None)
         
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine='openpyxl') as writer:
@@ -1128,22 +1131,12 @@ def export_online():
             
         output.seek(0)
         
-        filename_parts = ['rekap_online', datetime.now().strftime('%Y%m%d')]
-        if start_date:
-            filename_parts.append(f"from_{start_date}")
-        if end_date:
-            filename_parts.append(f"to_{end_date}")
-        
-        filename = '_'.join(filename_parts) + '.xlsx'
-        
+        filename = f"rekap_online_{datetime.now().strftime('%Y%m%d')}.xlsx"
         return send_file(output, download_name=filename, as_attachment=True)
 
     except Exception as e:
         print(f"Error exporting online sales: {e}")
         return "Gagal mengekspor data", 500
-    finally:
-        if conn and conn.open:
-            conn.close()
 
 # --- API UNTUK CASH RECORDS (Dilindungi) ---
 @app.route('/api/cash-records', methods=['GET'])
@@ -1259,8 +1252,12 @@ def delete_cash_record(record_id):
 @app.route('/api/export-cash-records')
 @login_required
 def export_cash_records():
-    conn = get_db_connection()
     try:
+        # Membuat koneksi menggunakan SQLAlchemy
+        config = app.config
+        db_uri = f"mysql+pymysql://{config['MYSQL_USER']}:{config['MYSQL_PASSWORD']}@{config['MYSQL_HOST']}:{config['MYSQL_PORT']}/{config['MYSQL_DB']}"
+        engine = create_engine(db_uri)
+
         query = """
         SELECT 
             DATE_FORMAT(record_date, '%%d-%%m-%%Y') as 'Tanggal',
@@ -1274,15 +1271,15 @@ def export_cash_records():
         FROM cash_records
         ORDER BY record_date DESC, id DESC
         """
-        df = pd.read_sql_query(query, conn)
+        df = pd.read_sql_query(query, engine)
         
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT COALESCE(SUM(amount), 0) as total FROM cash_records WHERE type = 'debit'")
-            total_debit = float(cursor.fetchone()['total'])
+        # Gunakan koneksi dari engine untuk query summary
+        with engine.connect() as connection:
+            total_debit_result = connection.execute(text("SELECT COALESCE(SUM(amount), 0) FROM cash_records WHERE type = 'debit'")).scalar_one()
+            total_kredit_result = connection.execute(text("SELECT COALESCE(SUM(amount), 0) FROM cash_records WHERE type = 'kredit'")).scalar_one()
             
-            cursor.execute("SELECT COALESCE(SUM(amount), 0) as total FROM cash_records WHERE type = 'kredit'")
-            total_kredit = float(cursor.fetchone()['total'])
-        
+        total_debit = float(total_debit_result)
+        total_kredit = float(total_kredit_result)
         saldo_akhir = total_debit - total_kredit
         
         summary_df = pd.DataFrame([
@@ -1314,9 +1311,6 @@ def export_cash_records():
     except Exception as e:
         print(f"Error exporting cash records: {str(e)}")
         return "Terjadi kesalahan saat membuat file export.", 500
-    finally:
-        if conn and conn.open:
-            conn.close()
 
 # --- API Publik untuk Ongkir ---
 @app.route('/api/cari-area', methods=['GET'])

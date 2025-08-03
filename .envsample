@@ -1,0 +1,14 @@
+# Flask Environment (development, production, testing)
+FLASK_ENV=development
+
+# Secret key untuk session
+SECRET_KEY=0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e
+
+# API Keys
+BITESHIP_API_KEY=kunci_api_biteship_pribadi_anda
+ 
+# Database Credentials
+DB_HOST=
+DB_USER=
+DB_PASS=
+DB_PORT=

@@ -17,10 +17,10 @@ class Config:
 
     # Konfigurasi Database MySQL
     # (Disesuaikan di kelas bawahnya)
-    MYSQL_HOST = '165.22.106.176'
-    MYSQL_USER = 'alan'
-    MYSQL_PASSWORD = 'alan'
-    MYSQL_PORT = 3306
+    MYSQL_HOST = os.environ.get('DB_HOST', 'localhost')
+    MYSQL_USER = os.environ.get('DB_USER', 'root')
+    MYSQL_PASSWORD = os.environ.get('DB_PASS', '')
+    MYSQL_PORT = int(os.environ.get('DB_PORT', 3306))
     MYSQL_DB = '' # Akan diisi di kelas development/production
 
     # API Keys
