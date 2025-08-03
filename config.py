@@ -57,6 +57,14 @@ class ProductionConfig(Config):
     # 2. URI Lengkap
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
 
+    # --- PERBAIKAN DI SINI ---
+    # Tentukan UPLOAD_FOLDER berdasarkan environment FLY_APP_NAME
+    if os.environ.get('FLY_APP_NAME'):
+        UPLOAD_FOLDER = '/data/uploads'
+    else:
+        # Fallback untuk production non-Fly.io
+        UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads_prod')
+
     # --- SELESAI PERBAIKAN ---
 
 class TestingConfig(Config):
