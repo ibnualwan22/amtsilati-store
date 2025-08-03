@@ -28,7 +28,9 @@ class DevelopmentConfig(Config):
     MYSQL_USER = os.environ.get('DB_USER')
     MYSQL_PASSWORD = os.environ.get('DB_PASS')
     MYSQL_PORT = int(os.environ.get('DB_PORT', 3306))
-    MYSQL_DB = 'as_store_dev'
+    #MYSQL_DB = 'as_store_dev'
+    MYSQL_DB = int(os.environ.get('DB_NAME', 'as_store_dev'))  # Pastikan ini adalah string
+
 
     # 2. Tetap sediakan URI lengkap untuk dibaca oleh Flask-Migrate
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
@@ -49,7 +51,8 @@ class ProductionConfig(Config):
     MYSQL_USER = os.environ.get('DB_USER')
     MYSQL_PASSWORD = os.environ.get('DB_PASS')
     MYSQL_PORT = int(os.environ.get('DB_PORT', 3306))
-    MYSQL_DB = 'as_store_prod'
+    #MYSQL_DB = 'as_store_prod'
+    MYSQL_DB = int(os.environ.get('DB_NAME', 'as_store_prod'))  # Pastikan ini adalah string
 
     # 2. URI Lengkap
     SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}"
